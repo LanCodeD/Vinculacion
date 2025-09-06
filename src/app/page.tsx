@@ -1,82 +1,146 @@
+"use client";
+import { motion } from "framer-motion";
 import Image from "next/image";
 import { FaFacebook, FaInstagram, FaTwitter, FaYoutube } from "react-icons/fa";
 
 export default function Home() {
   return (
     <>
+
+{/* ================= Header ================= */}
+<header className="w-full">
+  <nav className="border-gray-200 bg-blue-900 py-2.5">
+    <div className="mx-auto flex max-w-screen-xl flex-wrap items-center justify-between px-4">
+
+      {/* Logo e imagen */}
+      <a href="#" className="flex items-center space-x-3 relative">
+        <div className="w-10 h-10 sm:w-12 sm:h-12 relative">
+          <Image
+            src="/banner/tecnm.png" // Imagen en /public/banner/image.png
+            alt="Logo"
+            fill
+            className="object-contain scale-125"
+          />
+        </div>
+      </a>
+
+      <div className="flex items-center lg:order-2">
+        <a className="rounded-lg border-2 border-white px-4 py-2 text-sm font-medium text-white hover:bg-gray-50 sm:mr-2 lg:px-5 lg:py-2.5" href="/">
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+          </svg>
+        </a>
+        <a className="rounded-lg border-2 border-white px-4 py-2 text-sm font-medium text-white hover:bg-gray-50 sm:mr-2 lg:px-5 lg:py-2.5" href="/guest">
+          Log out
+        </a>
+      </div>
+
+      <div className="hidden w-full items-center justify-between lg:order-1 lg:flex lg:w-auto" id="mobile-menu-2">
+        <ul className="mt-4 flex flex-col font-medium lg:mt-0 lg:flex-row lg:space-x-8">
+          <li><a className="block border-b py-2 pr-4 pl-3 text-gray-200 hover:text-white lg:border-0 lg:p-0" href="/">ITSVA</a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+</header>
+
+
       {/* ================= Hero ================= */}
-      <section className="pt-8 lg:pt-32 pb-20 bg-[url('https://pagedone.io/asset/uploads/1691055810.png')] bg-center bg-cover">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 relative text-center">
-          {/* Banner superior */}
-          <div className="border border-indigo-600 p-1 w-60 mx-auto rounded-full flex items-center justify-between mb-4">
-            <span className="font-inter text-xs font-medium text-gray-900 ml-3">
-              Explore how to use for brands.
-            </span>
-            <a href="#" className="w-8 h-8 rounded-full flex justify-center items-center bg-indigo-600">
-              <svg width={17} height={16} viewBox="0 0 17 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <section className="min-h-screen bg-white flex items-center">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 flex flex-col-reverse lg:flex-row items-center lg:items-center gap-12 lg:gap-36">
+
+          {/* Texto*/}
+          <motion.div
+            className="flex-1 text-center lg:text-left"
+            initial={{ opacity: 0, x: -50 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 1, ease: "easeOut" }}
+          >
+            <h1 className="max-w-2xl font-manrope font-bold text-3xl sm:text-4xl md:text-5xl text-gray-900 mb-5 leading-snug">
+              Sistema de <span className="text-blue-700">convenios y bolsa de trabajo</span>
+            </h1>
+
+            <p className="max-w-md mx-auto lg:mx-0 text-base sm:text-lg text-gray-500 mb-8">
+              Conoce más sobre nuestros servicios y oportunidades.
+            </p>
+
+            <a
+              href="#"
+              className="inline-flex items-center justify-center py-3 px-7 text-base font-semibold text-white rounded-full bg-blue-700 shadow-lg
+        hover:bg-blue-700 hover:-translate-y-1 hover:scale-110
+        transition-transform duration-300 ease-in-out"
+            >
+              Ingresar
+              <svg
+                className="ml-2"
+                width={20}
+                height={20}
+                viewBox="0 0 20 20"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
                 <path
-                  d="M2.83398 8.00019L12.9081 8.00019M9.75991 11.778L13.0925 8.44541C13.3023 8.23553 13.4073 8.13059 13.4073 8.00019C13.4073 7.86979 13.3023 7.76485 13.0925 7.55497L9.75991 4.22241"
+                  d="M7.5 15L11.0858 11.4142C11.7525 10.7475 12.0858 10.4142 12.0858 10C12.0858 9.58579 11.7525 9.25245 11.0858 8.58579L7.5 5"
                   stroke="white"
-                  strokeWidth={1.6}
+                  strokeWidth={2}
                   strokeLinecap="round"
                   strokeLinejoin="round"
                 />
               </svg>
             </a>
-          </div>
+          </motion.div>
 
-          <h1 className="max-w-2xl mx-auto text-center font-manrope font-bold text-4xl text-gray-900 mb-5 md:text-5xl leading-[50px]">
-            Sistema de <span className="text-indigo-600">convenios y bolsa de trabajo</span>
-          </h1>
-
-          <p className="max-w-sm mx-auto text-center text-base font-normal leading-7 text-gray-500 mb-9">
-            Invierte inteligentemente y descubre una mejor manera de gestionar tu riqueza.
-          </p>
-
-          <a
-            href="#"
-            className="w-full md:w-auto mb-6 inline-flex items-center justify-center py-3 px-7 text-base font-semibold text-center text-white rounded-full bg-indigo-600 shadow-xs hover:bg-indigo-700 transition-all duration-500"
+          {/* Imagen a la derecha */}
+          <motion.div
+            className="flex-1 flex justify-center lg:justify-end mb-8 lg:mb-0"
+            initial={{ opacity: 0, x: 50 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 1, ease: "easeOut", delay: 0.3 }}
           >
-            Crear cuenta
-            <svg className="ml-2" width={20} height={20} viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path
-                d="M7.5 15L11.0858 11.4142C11.7525 10.7475 12.0858 10.4142 12.0858 10C12.0858 9.58579 11.7525 9.25245 11.0858 8.58579L7.5 5"
-                stroke="white"
-                strokeWidth={2}
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
-          </a>
-
-          {/* Imagen responsiva */}
-          <div className="flex justify-center mt-6">
             <Image
               src="/banner/estrecho.png"
               alt="Banner convenios y bolsa de trabajo"
-              width={600} 
-              height={400} 
+              width={600}
+              height={400}
               className="w-full max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg h-auto rounded-lg"
             />
-          </div>
+          </motion.div>
 
+        </div>
+
+        {/* Flecha para scroll */}
+        <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2">
+          <a href="#convenios">
+            <svg
+              className="w-8 h-8 text-indigo-600 animate-bounce"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+            </svg>
+          </a>
         </div>
       </section>
 
 
       {/* ================= Secciones adicionales ================= */}
-      <section className="bg-white py-20">
+      <section id="convenios" className="bg-blue-50 py-20">
         <div className="max-w-4xl mx-auto px-4 text-center">
-          <h2 className="text-3xl font-bold mb-4 text-indigo-600">Convenios</h2>
-          <p className="text-gray-700 mb-8">
-            Solicitudes.
-          </p>
+          <h2 className="text-3xl font-bold mb-4 text-blue-700">Convenios</h2>
+          <div className="flex justify-center mb-4">
+            <p className="text-gray-700 mb-8">
+              Solicitudes.
+            </p>
+          </div>
+
         </div>
       </section>
 
       <section className="bg-gray-50 py-20">
         <div className="max-w-4xl mx-auto px-4 text-center">
-          <h2 className="text-3xl font-bold mb-4 text-indigo-600">Bolsa de trabajo</h2>
+          <h2 className="text-3xl font-bold mb-4 text-blue-700">Bolsa de trabajo</h2>
           <p className="text-gray-700 mb-8">
             Postulaciones.
           </p>
@@ -85,7 +149,7 @@ export default function Home() {
 
       <section className="bg-white py-20">
         <div className="max-w-4xl mx-auto px-4 text-center">
-          <h2 className="text-3xl font-bold mb-4 text-indigo-600">Nosotros</h2>
+          <h2 className="text-3xl font-bold mb-4 text-blue-700">Nosotros</h2>
           <p className="text-gray-700 mb-8">
             Somos un área dedicada a la gestion de convenios y oportunidades laborales.
           </p>
@@ -101,63 +165,63 @@ export default function Home() {
           {/* Secciones del footer */}
           <div className="grid sm:grid-cols-2 md:grid-cols-4 gap-6 pb-10">
             <div>
-              <h3 className="text-indigo-600 font-bold text-xl mb-2">Área de vinculación y bolsa de trabajo</h3>
+              <h3 className="text-blue-700 font-bold text-xl mb-2">Área de vinculación y bolsa de trabajo</h3>
               <p className="text-gray-600 text-sm">Texto</p>
             </div>
 
             <div>
-              <h4 className="text-indigo-600 uppercase font-bold text-sm mb-2">Recursos</h4>
+              <h4 className="text-blue-700 uppercase font-bold text-sm mb-2">Recursos</h4>
               <ul className="text-gray-700 text-sm space-y-1">
-                <li><a href="/#" className="hover:text-indigo-600">Documentación</a></li>
-                <li><a href="/#" className="hover:text-indigo-600">Tutoriales</a></li>
+                <li><a href="/#" className="hover:text-blue-700">Documentación</a></li>
+                <li><a href="/#" className="hover:text-blue-700">Tutoriales</a></li>
               </ul>
             </div>
 
             <div>
-              <h4 className="text-indigo-600 uppercase font-bold text-sm mb-2">Soporte</h4>
+              <h4 className="text-blue-700 uppercase font-bold text-sm mb-2">Soporte</h4>
               <ul className="text-gray-700 text-sm space-y-1">
-                <li><a href="/#" className="hover:text-indigo-600">Centro de ayuda</a></li>
-                <li><a href="/#" className="hover:text-indigo-600">Política de privacidad</a></li>
-                <li><a href="/#" className="hover:text-indigo-600">Términos y condiciones</a></li>
+                <li><a href="/#" className="hover:text-blue-700">Centro de ayuda</a></li>
+                <li><a href="/#" className="hover:text-blue-700">Política de privacidad</a></li>
+                <li><a href="/#" className="hover:text-blue-700">Términos y condiciones</a></li>
               </ul>
             </div>
 
             <div>
-              <h4 className="text-indigo-600 uppercase font-bold text-sm mb-2">Contáctanos</h4>
+              <h4 className="text-blue-600 uppercase font-bold text-sm mb-2">Contáctanos</h4>
               <ul className="text-gray-700 text-sm space-y-1">
                 <li>Carretera Valladolid - Tizimin Km 3.5, Valladolid, Yucatán</li>
-                <li><a href="mailto:contact@company.com" className="hover:text-indigo-600">contact@company.com</a></li>
+                <li><a href="mailto:contact@company.com" className="hover:text-blue-600">contact@company.com</a></li>
               </ul>
             </div>
           </div>
           {/*Decoración */}
-          <div className="w-full h-1 bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400 rounded-full mb-6"></div>
+          <div className="w-full h-1 bg-gradient-to-r from-blue-400 via-purple-400 to-pink-300 rounded-full mb-6"></div>
 
           <div className="flex flex-row space-x-6 justify-center mb-6">
             <a
               href="https://x.com/TecnmValladolid"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-gray-500 hover:text-indigo-600"
+              className="text-gray-500 hover:text-blue-600"
             >
               <FaTwitter className="h-6 w-6" />
             </a>
             <a href="https://www.facebook.com/TecNMValladolid"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-gray-500 hover:text-indigo-600">
+              className="text-gray-500 hover:text-blue-600">
               <FaFacebook className="h-6 w-6" />
             </a>
             <a href="https://www.instagram.com/tecnmvalladolid/"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-gray-500 hover:text-indigo-600">
+              className="text-gray-500 hover:text-blue-600">
               <FaInstagram className="h-6 w-6" />
             </a>
             <a href="http://www.youtube.com/@tecnmcampusvalladolid4146"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-gray-500 hover:text-indigo-600">
+              className="text-gray-500 hover:text-blue-600">
               <FaYoutube className="h-6 w-6" />
             </a>
           </div>
