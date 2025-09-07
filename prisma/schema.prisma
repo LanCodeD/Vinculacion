@@ -1,0 +1,196 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model consents {
+  id_consentimiento    Int      @id @default(autoincrement())
+  usuarios_id          Int
+  aviso_version        String   @db.VarChar(100)
+  fecha_consentimiento DateTime @default(now()) @db.DateTime(0)
+  ip                   String?  @db.VarChar(50)
+  user_agent           String?  @db.VarChar(500)
+  consent_items        Json?
+  usuarios             usuarios @relation(fields: [usuarios_id], references: [id_usuarios], onDelete: Cascade, map: "fk_consents_usuario")
+
+  @@index([usuarios_id], map: "fk_consents_usuario")
+}
+
+model contacto_estados {
+  id_contacto_estados Int         @id @default(autoincrement())
+  nombre_estado       String      @unique(map: "nombre_estado") @db.VarChar(50)
+  descripcion         String?     @db.VarChar(100)
+  contactos           contactos[]
+}
+
+model contactos {
+  id_contactos        Int              @id @default(autoincrement())
+  usuarios_id         Int?
+  titulo              String?          @db.VarChar(50)
+  nombre              String?          @db.VarChar(100)
+  apellido            String?          @db.VarChar(100)
+  puesto              String?          @db.VarChar(100)
+  celular             String?          @db.VarChar(20)
+  correo              String?          @db.VarChar(150)
+  empresas_id         Int
+  grupos_id           Int?
+  es_representante    Int              @default(0) @db.TinyInt
+  contacto_estados_id Int              @default(1)
+  creado_en           DateTime         @default(now()) @db.DateTime(0)
+  actualizado_en      DateTime         @default(now()) @db.DateTime(0)
+  empresas            empresas         @relation(fields: [empresas_id], references: [id_empresas], map: "fk_contactos_empresa")
+  contacto_estados    contacto_estados @relation(fields: [contacto_estados_id], references: [id_contacto_estados], map: "fk_contactos_estado")
+  grupos              grupos?          @relation(fields: [grupos_id], references: [id_grupos], map: "fk_contactos_grupo")
+  usuarios            usuarios?        @relation(fields: [usuarios_id], references: [id_usuarios], map: "fk_contactos_usuario")
+  notificaciones      notificaciones[]
+
+  @@index([contacto_estados_id], map: "fk_contactos_estado")
+  @@index([usuarios_id], map: "fk_contactos_usuario")
+  @@index([correo], map: "idx_contactos_correo")
+  @@index([empresas_id], map: "idx_contactos_empresa")
+  @@index([empresas_id, es_representante], map: "idx_contactos_empresa_rep")
+  @@index([grupos_id], map: "idx_contactos_grupo")
+}
+
+model empresas {
+  id_empresas                Int         @id @default(autoincrement())
+  nombre_comercial           String      @db.VarChar(150)
+  razon_social               String?     @db.VarChar(150)
+  rfc                        String      @unique(map: "uq_empresas_rfc") @db.VarChar(12)
+  direccion                  String?     @db.VarChar(255)
+  correo                     String?     @db.VarChar(150)
+  telefono                   String?     @db.VarChar(25)
+  verificado                 Int         @default(0) @db.TinyInt
+  verificado_por_usuarios_id Int?
+  verificado_en              DateTime?   @db.DateTime(0)
+  creado_en                  DateTime    @default(now()) @db.DateTime(0)
+  actualizado_en             DateTime    @default(now()) @db.DateTime(0)
+  contactos                  contactos[]
+  usuarios                   usuarios?   @relation(fields: [verificado_por_usuarios_id], references: [id_usuarios], map: "fk_empresas_verificado_por")
+
+  @@index([verificado_por_usuarios_id], map: "fk_empresas_verificado_por")
+}
+
+model grupos {
+  id_grupos      Int         @id @default(autoincrement())
+  nombre_grupo   String      @unique(map: "uq_grupos_nombre") @db.VarChar(150)
+  creado_en      DateTime    @default(now()) @db.DateTime(0)
+  actualizado_en DateTime    @default(now()) @db.DateTime(0)
+  contactos      contactos[]
+}
+
+model notificaciones {
+  id_notificaciones Int        @id @default(autoincrement())
+  usuarios_id       Int?
+  contactos_id      Int?
+  tipo              String?    @db.VarChar(100)
+  titulo            String?    @db.VarChar(250)
+  mensaje           String?    @db.Text
+  metadata          Json?
+  leido             Int        @default(0) @db.TinyInt
+  creado_en         DateTime   @default(now()) @db.DateTime(0)
+  contactos         contactos? @relation(fields: [contactos_id], references: [id_contactos], map: "fk_notifications_contacto")
+  usuarios          usuarios?  @relation(fields: [usuarios_id], references: [id_usuarios], onDelete: Cascade, map: "fk_notifications_usuario")
+
+  @@index([contactos_id], map: "fk_notifications_contacto")
+  @@index([usuarios_id], map: "fk_notifications_usuario")
+}
+
+model permisos {
+  id_permisos    Int              @id @default(autoincrement())
+  nombre         String           @unique(map: "nombre") @db.VarChar(150)
+  descripcion    String?          @db.VarChar(150)
+  creado_en      DateTime         @default(now()) @db.DateTime(0)
+  roles_permisos roles_permisos[]
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model roles {
+  id_roles       Int              @id @default(autoincrement())
+  nombre         String           @unique(map: "nombre") @db.VarChar(100)
+  descripcion    String?          @db.VarChar(150)
+  creado_en      DateTime         @default(now()) @db.DateTime(0)
+  roles_permisos roles_permisos[]
+  usuarios       usuarios[]
+}
+
+model roles_permisos {
+  roles_id    Int
+  permisos_id Int
+  permisos    permisos @relation(fields: [permisos_id], references: [id_permisos], onDelete: Cascade, map: "fk_roles_perm_perm")
+  roles       roles    @relation(fields: [roles_id], references: [id_roles], onDelete: Cascade, map: "fk_roles_perm_role")
+
+  @@id([roles_id, permisos_id])
+  @@index([permisos_id], map: "fk_roles_perm_perm")
+}
+
+model tipos_cuenta {
+  id_tipos_cuenta Int        @id @default(autoincrement())
+  nombre          String     @unique(map: "nombre") @db.VarChar(100)
+  descripcion     String?    @db.VarChar(150)
+  creado_en       DateTime   @default(now()) @db.DateTime(0)
+  actualizado_en  DateTime   @default(now()) @db.DateTime(0)
+  usuarios        usuarios[]
+}
+
+model tokens_usuarios {
+  id_token      Int       @id @default(autoincrement())
+  usuarios_id   Int
+  token_hash    String    @db.Char(64)
+  tipo          String    @db.VarChar(30)
+  expiracion_en DateTime  @db.DateTime(0)
+  usado_en      DateTime? @db.DateTime(0)
+  intentos      Int       @default(0)
+  ip_origen     String?   @db.VarChar(45)
+  user_agent    String?   @db.VarChar(255) 
+  creado_en     DateTime  @default(now()) @db.DateTime(0)
+  usuarios      usuarios  @relation(fields: [usuarios_id], references: [id_usuarios], onDelete: Cascade, map: "fk_tokens_usuario")
+
+  @@index([token_hash], map: "idx_tokens_usuarios_hash")
+  @@index([tipo], map: "idx_tokens_usuarios_tipo")
+  @@index([usuarios_id], map: "idx_tokens_usuarios_usuario")
+}
+
+
+model usuarios {
+  id_usuarios          Int               @id @default(autoincrement())
+  nombre               String            @db.VarChar(120)
+  apellido             String            @db.VarChar(120)
+  correo               String            @unique(map: "uq_usuarios_correo") @db.VarChar(255)
+  password_hash        String?           @db.VarChar(255)
+  celular              String?           @db.VarChar(20)
+  tipos_cuenta_id      Int
+  roles_id             Int
+  correo_verificado    Int               @default(0) @db.TinyInt
+  correo_verificado_en DateTime?         @db.DateTime(0)
+  last_login           DateTime?         @db.DateTime(0)
+  intentos_fallidos    Int               @default(0)
+  bloqueado_hasta      DateTime?         @db.DateTime(0)
+  creado_en            DateTime          @default(now()) @db.DateTime(0)
+  actualizado_en       DateTime          @default(now()) @db.DateTime(0)
+  consents             consents[]
+  contactos            contactos[]
+  empresas             empresas[]
+  accounts             accounts[] 
+  notificaciones       notificaciones[]
+  tokens_usuarios      tokens_usuarios[]
+  roles                roles             @relation(fields: [roles_id], references: [id_roles], map: "fk_usuarios_role")
+  tipos_cuenta         tipos_cuenta      @relation(fields: [tipos_cuenta_id], references: [id_tipos_cuenta], map: "fk_usuarios_tipo")
+
+  @@index([roles_id], map: "fk_usuarios_role")
+  @@index([tipos_cuenta_id], map: "idx_usuarios_tipo")
+}
+
+model accounts {
+  id_accounts        String   @id @db.VarChar(191)
+  usuarios_id        Int
+  provider           String   @db.VarChar(50)
+  providerAccountId  String   @db.VarChar(191)
+
+  usuarios usuarios @relation(fields: [usuarios_id], references: [id_usuarios], onDelete: Cascade)
+}
+
