@@ -146,6 +146,8 @@ model tokens_usuarios {
   expiracion_en DateTime  @db.DateTime(0)
   usado_en      DateTime? @db.DateTime(0)
   intentos      Int       @default(0)
+  ip_origen     String?   @db.VarChar(45)
+  user_agent    String?   @db.VarChar(255) 
   creado_en     DateTime  @default(now()) @db.DateTime(0)
   usuarios      usuarios  @relation(fields: [usuarios_id], references: [id_usuarios], onDelete: Cascade, map: "fk_tokens_usuario")
 
@@ -153,6 +155,7 @@ model tokens_usuarios {
   @@index([tipo], map: "idx_tokens_usuarios_tipo")
   @@index([usuarios_id], map: "idx_tokens_usuarios_usuario")
 }
+
 
 model usuarios {
   id_usuarios          Int               @id @default(autoincrement())
@@ -173,6 +176,7 @@ model usuarios {
   consents             consents[]
   contactos            contactos[]
   empresas             empresas[]
+  accounts             accounts[] 
   notificaciones       notificaciones[]
   tokens_usuarios      tokens_usuarios[]
   roles                roles             @relation(fields: [roles_id], references: [id_roles], map: "fk_usuarios_role")
@@ -181,3 +185,13 @@ model usuarios {
   @@index([roles_id], map: "fk_usuarios_role")
   @@index([tipos_cuenta_id], map: "idx_usuarios_tipo")
 }
+
+model accounts {
+  id_accounts        String   @id @db.VarChar(191)
+  usuarios_id        Int
+  provider           String   @db.VarChar(50)
+  providerAccountId  String   @db.VarChar(191)
+
+  usuarios usuarios @relation(fields: [usuarios_id], references: [id_usuarios], onDelete: Cascade)
+}
+
