@@ -57,21 +57,31 @@ model contactos {
 }
 
 model empresas {
-  id_empresas                Int         @id @default(autoincrement())
-  nombre_comercial           String      @db.VarChar(150)
-  razon_social               String?     @db.VarChar(150)
-  rfc                        String      @unique(map: "uq_empresas_rfc") @db.VarChar(12)
-  direccion                  String?     @db.VarChar(255)
-  correo                     String?     @db.VarChar(150)
-  telefono                   String?     @db.VarChar(25)
-  verificado                 Int         @default(0) @db.TinyInt
+  id_empresas                Int       @id @default(autoincrement())
+  usuarios_id                Int
+  titulo                     String?   @db.VarChar(50)
+  puesto                     String?   @db.VarChar(100)
+  nombre_comercial           String    @db.VarChar(150)
+  razon_social               String?   @db.VarChar(150)
+  rfc                        String    @unique(map: "uq_empresas_rfc") @db.VarChar(12)
+  direccion                  String?   @db.VarChar(255)
+  correo                     String?   @db.VarChar(150)
+  telefono                   String?   @db.VarChar(25)
+  verificado                 Int       @default(0) @db.TinyInt
   verificado_por_usuarios_id Int?
-  verificado_en              DateTime?   @db.DateTime(0)
-  creado_en                  DateTime    @default(now()) @db.DateTime(0)
-  actualizado_en             DateTime    @default(now()) @db.DateTime(0)
-  contactos                  contactos[]
-  usuarios                   usuarios?   @relation(fields: [verificado_por_usuarios_id], references: [id_usuarios], map: "fk_empresas_verificado_por")
+  verificado_en              DateTime? @db.DateTime(0)
+  creado_en                  DateTime  @default(now()) @db.DateTime(0)
+  actualizado_en             DateTime  @default(now()) @db.DateTime(0)
 
+  // Relaciones
+  propietario    usuarios  @relation("EmpresaPerfil", fields: [usuarios_id], references: [id_usuarios], onDelete: Cascade, map: "fk_empresas_usuario")
+  verificado_por usuarios? @relation("EmpresaVerificador", fields: [verificado_por_usuarios_id], references: [id_usuarios], map: "fk_empresas_verificado_por")
+
+  contactos contactos[]
+  egresados egresados[]
+  docentes  docentes[]
+
+  @@index([usuarios_id], map: "idx_empresas_usuario")
   @@index([verificado_por_usuarios_id], map: "fk_empresas_verificado_por")
 }
 
@@ -146,7 +156,7 @@ model tokens_usuarios {
   usado_en      DateTime? @db.DateTime(0)
   intentos      Int       @default(0)
   ip_origen     String?   @db.VarChar(45)
-  user_agent    String?   @db.VarChar(255) 
+  user_agent    String?   @db.VarChar(255)
   creado_en     DateTime  @default(now()) @db.DateTime(0)
   usuarios      usuarios  @relation(fields: [usuarios_id], references: [id_usuarios], onDelete: Cascade, map: "fk_tokens_usuario")
 
@@ -155,42 +165,100 @@ model tokens_usuarios {
   @@index([usuarios_id], map: "idx_tokens_usuarios_usuario")
 }
 
-
 model usuarios {
-  id_usuarios          Int               @id @default(autoincrement())
-  nombre               String            @db.VarChar(120)
-  apellido             String            @db.VarChar(120)
-  correo               String            @unique(map: "uq_usuarios_correo") @db.VarChar(255)
-  password_hash        String?           @db.VarChar(255)
-  celular              String?           @db.VarChar(20)
-  tipos_cuenta_id      Int
-  roles_id             Int
-  correo_verificado    Int               @default(0) @db.TinyInt
-  correo_verificado_en DateTime?         @db.DateTime(0)
-  last_login           DateTime?         @db.DateTime(0)
-  intentos_fallidos    Int               @default(0)
-  bloqueado_hasta      DateTime?         @db.DateTime(0)
-  creado_en            DateTime          @default(now()) @db.DateTime(0)
-  actualizado_en       DateTime          @default(now()) @db.DateTime(0)
-  consents             consents[]
-  contactos            contactos[]
-  empresas             empresas[]
-  accounts             accounts[] 
-  notificaciones       notificaciones[]
-  tokens_usuarios      tokens_usuarios[]
-  roles                roles             @relation(fields: [roles_id], references: [id_roles], map: "fk_usuarios_role")
-  tipos_cuenta         tipos_cuenta      @relation(fields: [tipos_cuenta_id], references: [id_tipos_cuenta], map: "fk_usuarios_tipo")
+  id_usuarios           Int               @id @default(autoincrement())
+  nombre                String            @db.VarChar(120)
+  apellido              String            @db.VarChar(120)
+  correo                String            @unique(map: "uq_usuarios_correo") @db.VarChar(255)
+  password_hash         String?           @db.VarChar(255)
+  celular               String?           @db.VarChar(20)
+  tipos_cuenta_id       Int
+  roles_id              Int
+  correo_verificado     Int               @default(0) @db.TinyInt
+  correo_verificado_en  DateTime?         @db.DateTime(0)
+  last_login            DateTime?         @db.DateTime(0)
+  intentos_fallidos     Int               @default(0)
+  bloqueado_hasta       DateTime?         @db.DateTime(0)
+  creado_en             DateTime          @default(now()) @db.DateTime(0)
+  actualizado_en        DateTime          @default(now()) @db.DateTime(0)
+  consents              consents[]
+  contactos             contactos[]
+  empresas_perfil       empresas[]        @relation("EmpresaPerfil")
+  empresas_verificadas  empresas[]        @relation("EmpresaVerificador")
+  accounts              accounts[]
+  notificaciones        notificaciones[]
+  tokens_usuarios       tokens_usuarios[]
+  roles                 roles             @relation(fields: [roles_id], references: [id_roles], map: "fk_usuarios_role")
+  tipos_cuenta          tipos_cuenta      @relation(fields: [tipos_cuenta_id], references: [id_tipos_cuenta], map: "fk_usuarios_tipo")
+  docentes              docentes[]
+  egresados_perfil      egresados[]       @relation("EgresadoPerfil")
+  egresados_verificados egresados[]       @relation("EgresadoVerificador")
 
   @@index([roles_id], map: "fk_usuarios_role")
   @@index([tipos_cuenta_id], map: "idx_usuarios_tipo")
 }
 
 model accounts {
-  id_accounts        String   @id @db.VarChar(191)
-  usuarios_id        Int
-  provider           String   @db.VarChar(50)
-  providerAccountId  String   @db.VarChar(191)
+  id_accounts       String @id @db.VarChar(191)
+  usuarios_id       Int
+  provider          String @db.VarChar(50)
+  providerAccountId String @db.VarChar(191)
 
   usuarios usuarios @relation(fields: [usuarios_id], references: [id_usuarios], onDelete: Cascade)
 }
 
+model egresados {
+  id_egresados               Int       @id @default(autoincrement())
+  usuarios_id                Int
+  
+  titulo                     String?   @db.VarChar(50)
+  puesto                     String?   @db.VarChar(100)
+  matricula                  String    @db.VarChar(50)
+  fecha_egreso               DateTime? @db.DateTime(0)
+  correo_institucional       String?   @db.VarChar(150)
+  empresas_id                Int?
+  academias_ingenierias_id   Int
+  verificado_por_usuarios_id Int?
+  verificado_en              DateTime? @db.DateTime(0)
+  creado_en                  DateTime  @default(now()) @db.DateTime(0)
+  actualizado_en             DateTime  @default(now()) @db.DateTime(0)
+
+  usuarios       usuarios  @relation("EgresadoPerfil", fields: [usuarios_id], references: [id_usuarios], onDelete: Cascade, map: "fk_egresados_usuario")
+  verificado_por usuarios? @relation("EgresadoVerificador", fields: [verificado_por_usuarios_id], references: [id_usuarios], map: "fk_egresados_verificado_por")
+
+  empresas              empresas?             @relation(fields: [empresas_id], references: [id_empresas], map: "fk_egresados_empresa")
+  academias_ingenierias academias_ingenierias @relation(fields: [academias_ingenierias_id], references: [id_academias], map: "fk_egresados_academia")
+
+  @@index([usuarios_id], map: "idx_egresados_usuario")
+  @@index([empresas_id], map: "idx_egresados_empresa")
+  @@index([academias_ingenierias_id], map: "idx_egresados_academia")
+  @@index([verificado_por_usuarios_id], map: "fk_egresados_verificado_por")
+}
+
+model docentes {
+  id_docentes              Int      @id @default(autoincrement())
+  usuarios_id              Int
+  academias_ingenierias_id Int
+  empresas_id              Int
+  titulo                   String?  @db.VarChar(50)
+  puesto                   String?  @db.VarChar(100)
+  creado_en                DateTime @default(now()) @db.DateTime(0)
+  actualizado_en           DateTime @default(now()) @db.DateTime(0)
+
+  usuarios              usuarios              @relation(fields: [usuarios_id], references: [id_usuarios], onDelete: Cascade, map: "fk_docentes_usuario")
+  academias_ingenierias academias_ingenierias @relation(fields: [academias_ingenierias_id], references: [id_academias], map: "fk_docentes_academia")
+  empresas              empresas              @relation(fields: [empresas_id], references: [id_empresas], map: "fk_docentes_empresa")
+
+  @@index([usuarios_id], map: "idx_docentes_usuario")
+  @@index([empresas_id], map: "idx_docentes_empresa")
+  @@index([academias_ingenierias_id], map: "idx_docentes_academia")
+}
+
+model academias_ingenierias {
+  id_academias   Int    @id @default(autoincrement())
+  ingenieria     String @db.VarChar(100)
+  total_semestre Int
+
+  egresados egresados[]
+  docentes  docentes[]
+}
