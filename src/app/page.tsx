@@ -16,7 +16,7 @@ export default function Home() {
       <a href="#" className="flex items-center space-x-3 relative">
         <div className="w-10 h-10 sm:w-12 sm:h-12 relative">
           <Image
-            src="/banner/tecnm.png" // Imagen en /public/banner/image.png
+            src="/banner/tecnm.webp"
             alt="Logo"
             fill
             className="object-contain scale-125"
@@ -90,7 +90,7 @@ export default function Home() {
             </a>
           </motion.div>
 
-          {/* Imagen a la derecha */}
+          {/* Imagen */}
           <motion.div
             className="flex-1 flex justify-center lg:justify-end mb-8 lg:mb-0"
             initial={{ opacity: 0, x: 50 }}
@@ -98,7 +98,7 @@ export default function Home() {
             transition={{ duration: 1, ease: "easeOut", delay: 0.3 }}
           >
             <Image
-              src="/banner/estrecho.png"
+              src="/banner/estrecho.webp"
               alt="Banner convenios y bolsa de trabajo"
               width={600}
               height={400}
@@ -227,7 +227,7 @@ export default function Home() {
           </div>
 
           <div className="text-center text-gray-600 text-sm pb-6">
-            © Copyright 2025. All Rights Reserved.
+            Todos los derechos reservados &copy; 2024 Área de vinculación y bolsa de trabajo ITSVA
           </div>
         </div>
       </footer>
