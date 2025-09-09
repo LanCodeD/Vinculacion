@@ -1,103 +1,237 @@
+"use client";
+import { motion } from "framer-motion";
 import Image from "next/image";
+import { FaFacebook, FaInstagram, FaTwitter, FaYoutube } from "react-icons/fa";
 
 export default function Home() {
   return (
-    <div className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="font-mono list-inside list-decimal text-sm/6 text-center sm:text-left">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] font-mono font-semibold px-1 py-0.5 rounded">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+    <>
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+{/* ================= Header ================= */}
+<header className="w-full">
+  <nav className="border-gray-200 bg-blue-900 py-2.5">
+    <div className="mx-auto flex max-w-screen-xl flex-wrap items-center justify-between px-4">
+
+      {/* Logo e imagen */}
+      <a href="#" className="flex items-center space-x-3 relative">
+        <div className="w-10 h-10 sm:w-12 sm:h-12 relative">
+          <Image
+            src="/banner/tecnm.webp"
+            alt="Logo"
+            fill
+            className="object-contain scale-125"
+          />
+        </div>
+      </a>
+
+      <div className="flex items-center lg:order-2">
+        <a className="rounded-lg border-2 border-white px-4 py-2 text-sm font-medium text-white hover:bg-gray-50 sm:mr-2 lg:px-5 lg:py-2.5" href="/">
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+          </svg>
+        </a>
+        <a className="rounded-lg border-2 border-white px-4 py-2 text-sm font-medium text-white hover:bg-gray-50 sm:mr-2 lg:px-5 lg:py-2.5" href="/guest">
+          Log out
+        </a>
+      </div>
+
+      <div className="hidden w-full items-center justify-between lg:order-1 lg:flex lg:w-auto" id="mobile-menu-2">
+        <ul className="mt-4 flex flex-col font-medium lg:mt-0 lg:flex-row lg:space-x-8">
+          <li><a className="block border-b py-2 pr-4 pl-3 text-gray-200 hover:text-white lg:border-0 lg:p-0" href="/">ITSVA</a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+</header>
+
+
+      {/* ================= Hero ================= */}
+      <section className="min-h-screen bg-white flex items-center">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 flex flex-col-reverse lg:flex-row items-center lg:items-center gap-12 lg:gap-36">
+
+          {/* Texto*/}
+          <motion.div
+            className="flex-1 text-center lg:text-left"
+            initial={{ opacity: 0, x: -50 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 1, ease: "easeOut" }}
+          >
+            <h1 className="max-w-2xl font-manrope font-bold text-3xl sm:text-4xl md:text-5xl text-gray-900 mb-5 leading-snug">
+              Sistema de <span className="text-blue-700">convenios y bolsa de trabajo</span>
+            </h1>
+
+            <p className="max-w-md mx-auto lg:mx-0 text-base sm:text-lg text-gray-500 mb-8">
+              Conoce más sobre nuestros servicios y oportunidades.
+            </p>
+
+            <a
+              href="#"
+              className="inline-flex items-center justify-center py-3 px-7 text-base font-semibold text-white rounded-full bg-blue-700 shadow-lg
+        hover:bg-blue-700 hover:-translate-y-1 hover:scale-110
+        transition-transform duration-300 ease-in-out"
+            >
+              Ingresar
+              <svg
+                className="ml-2"
+                width={20}
+                height={20}
+                viewBox="0 0 20 20"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M7.5 15L11.0858 11.4142C11.7525 10.7475 12.0858 10.4142 12.0858 10C12.0858 9.58579 11.7525 9.25245 11.0858 8.58579L7.5 5"
+                  stroke="white"
+                  strokeWidth={2}
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+            </a>
+          </motion.div>
+
+          {/* Imagen */}
+          <motion.div
+            className="flex-1 flex justify-center lg:justify-end mb-8 lg:mb-0"
+            initial={{ opacity: 0, x: 50 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 1, ease: "easeOut", delay: 0.3 }}
           >
             <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
+              src="/banner/estrecho.webp"
+              alt="Banner convenios y bolsa de trabajo"
+              width={600}
+              height={400}
+              className="w-full max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg h-auto rounded-lg"
             />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
+          </motion.div>
+
+        </div>
+
+        {/* Flecha para scroll */}
+        <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2">
+          <a href="#convenios">
+            <svg
+              className="w-8 h-8 text-indigo-600 animate-bounce"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+            </svg>
           </a>
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
+      </section>
+
+
+      {/* ================= Secciones adicionales ================= */}
+      <section id="convenios" className="bg-blue-50 py-20">
+        <div className="max-w-4xl mx-auto px-4 text-center">
+          <h2 className="text-3xl font-bold mb-4 text-blue-700">Convenios</h2>
+          <div className="flex justify-center mb-4">
+            <p className="text-gray-700 mb-8">
+              Solicitudes.
+            </p>
+          </div>
+
+        </div>
+      </section>
+
+      <section className="bg-gray-50 py-20">
+        <div className="max-w-4xl mx-auto px-4 text-center">
+          <h2 className="text-3xl font-bold mb-4 text-blue-700">Bolsa de trabajo</h2>
+          <p className="text-gray-700 mb-8">
+            Postulaciones.
+          </p>
+        </div>
+      </section>
+
+      <section className="bg-white py-20">
+        <div className="max-w-4xl mx-auto px-4 text-center">
+          <h2 className="text-3xl font-bold mb-4 text-blue-700">Nosotros</h2>
+          <p className="text-gray-700 mb-8">
+            Somos un área dedicada a la gestion de convenios y oportunidades laborales.
+          </p>
+        </div>
+      </section>
+
+      {/* ================= Footer ================= */}
+
+      <footer className="bg-gray-100 pt-10">
+        {/* Contenedor principal */}
+        <div className="max-w-screen-lg mx-auto px-4 sm:px-6 text-gray-800">
+
+          {/* Secciones del footer */}
+          <div className="grid sm:grid-cols-2 md:grid-cols-4 gap-6 pb-10">
+            <div>
+              <h3 className="text-blue-700 font-bold text-xl mb-2">Área de vinculación y bolsa de trabajo</h3>
+              <p className="text-gray-600 text-sm">Texto</p>
+            </div>
+
+            <div>
+              <h4 className="text-blue-700 uppercase font-bold text-sm mb-2">Recursos</h4>
+              <ul className="text-gray-700 text-sm space-y-1">
+                <li><a href="/#" className="hover:text-blue-700">Documentación</a></li>
+                <li><a href="/#" className="hover:text-blue-700">Tutoriales</a></li>
+              </ul>
+            </div>
+
+            <div>
+              <h4 className="text-blue-700 uppercase font-bold text-sm mb-2">Soporte</h4>
+              <ul className="text-gray-700 text-sm space-y-1">
+                <li><a href="/#" className="hover:text-blue-700">Centro de ayuda</a></li>
+                <li><a href="/#" className="hover:text-blue-700">Política de privacidad</a></li>
+                <li><a href="/#" className="hover:text-blue-700">Términos y condiciones</a></li>
+              </ul>
+            </div>
+
+            <div>
+              <h4 className="text-blue-600 uppercase font-bold text-sm mb-2">Contáctanos</h4>
+              <ul className="text-gray-700 text-sm space-y-1">
+                <li>Carretera Valladolid - Tizimin Km 3.5, Valladolid, Yucatán</li>
+                <li><a href="mailto:contact@company.com" className="hover:text-blue-600">contact@company.com</a></li>
+              </ul>
+            </div>
+          </div>
+          {/*Decoración */}
+          <div className="w-full h-1 bg-gradient-to-r from-blue-400 via-purple-400 to-pink-300 rounded-full mb-6"></div>
+
+          <div className="flex flex-row space-x-6 justify-center mb-6">
+            <a
+              href="https://x.com/TecnmValladolid"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-gray-500 hover:text-blue-600"
+            >
+              <FaTwitter className="h-6 w-6" />
+            </a>
+            <a href="https://www.facebook.com/TecNMValladolid"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-gray-500 hover:text-blue-600">
+              <FaFacebook className="h-6 w-6" />
+            </a>
+            <a href="https://www.instagram.com/tecnmvalladolid/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-gray-500 hover:text-blue-600">
+              <FaInstagram className="h-6 w-6" />
+            </a>
+            <a href="http://www.youtube.com/@tecnmcampusvalladolid4146"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-gray-500 hover:text-blue-600">
+              <FaYoutube className="h-6 w-6" />
+            </a>
+          </div>
+
+          <div className="text-center text-gray-600 text-sm pb-6">
+            Todos los derechos reservados &copy; 2024 Área de vinculación y bolsa de trabajo ITSVA
+          </div>
+        </div>
       </footer>
-    </div>
+
+    </>
   );
 }
