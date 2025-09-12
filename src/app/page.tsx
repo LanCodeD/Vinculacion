@@ -1,48 +1,61 @@
 "use client";
+import React, { useState } from "react";
+import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import Image from "next/image";
-import { FaFacebook, FaInstagram, FaTwitter, FaYoutube } from "react-icons/fa";
+import Footer from "./components/footer";
 
 export default function Home() {
+  const router = useRouter();
+  const [loading, setLoading] = useState(false);
+
+  const handleIngresar = () => {
+    setLoading(true);
+
+    // Simula un delay antes de redirigir (puedes reemplazarlo con tu lógica real)
+    setTimeout(() => {
+      router.push("/Registro");
+    }, 800);
+  };
   return (
     <>
 
-{/* ================= Header ================= */}
-<header className="w-full">
-  <nav className="border-gray-200 bg-blue-900 py-2.5">
-    <div className="mx-auto flex max-w-screen-xl flex-wrap items-center justify-between px-4">
+      {/* ================= Header ================= */}
+      <header className="w-full">
+        <nav className="border-gray-200 bg-blue-900 py-2.5">
+          <div className="mx-auto flex max-w-screen-xl flex-wrap items-center justify-between px-4">
 
-      {/* Logo e imagen */}
-      <a href="#" className="flex items-center space-x-3 relative">
-        <div className="w-10 h-10 sm:w-12 sm:h-12 relative">
-          <Image
-            src="/banner/tecnm.webp"
-            alt="Logo"
-            fill
-            className="object-contain scale-125"
-          />
-        </div>
-      </a>
+            {/* Logo e imagen */}
+            <a href="#" className="flex items-center space-x-3 relative">
+              <div className="w-10 h-10 sm:w-12 sm:h-12 relative">
+                <Image
+                  src="/banner/tecnm.webp"
+                  alt="Logo"
+                  fill
+                  className="object-contain scale-125"
+                />
+              </div>
+            </a>
 
-      <div className="flex items-center lg:order-2">
-        <a className="rounded-lg border-2 border-white px-4 py-2 text-sm font-medium text-white hover:bg-gray-50 sm:mr-2 lg:px-5 lg:py-2.5" href="/">
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
-          </svg>
-        </a>
-        <a className="rounded-lg border-2 border-white px-4 py-2 text-sm font-medium text-white hover:bg-gray-50 sm:mr-2 lg:px-5 lg:py-2.5" href="/guest">
-          Log out
-        </a>
-      </div>
+            <div className="flex items-center lg:order-2">
+              <a className="rounded-lg border-2 border-white px-4 py-2 text-sm font-medium text-white hover:bg-gray-50 sm:mr-2 lg:px-5 lg:py-2.5" href="/">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+                </svg>
+              </a>
+              <a className="rounded-lg border-2 border-white px-4 py-2 text-sm font-medium text-white hover:bg-gray-50 sm:mr-2 lg:px-5 lg:py-2.5" href="/guest">
+                Log out
+              </a>
+            </div>
 
-      <div className="hidden w-full items-center justify-between lg:order-1 lg:flex lg:w-auto" id="mobile-menu-2">
-        <ul className="mt-4 flex flex-col font-medium lg:mt-0 lg:flex-row lg:space-x-8">
-          <li><a className="block border-b py-2 pr-4 pl-3 text-gray-200 hover:text-white lg:border-0 lg:p-0" href="/">ITSVA</a></li>
-        </ul>
-      </div>
-    </div>
-  </nav>
-</header>
+            <div className="hidden w-full items-center justify-between lg:order-1 lg:flex lg:w-auto" id="mobile-menu-2">
+              <ul className="mt-4 flex flex-col font-medium lg:mt-0 lg:flex-row lg:space-x-8">
+                <li><a className="block border-b py-2 pr-4 pl-3 text-gray-200 hover:text-white lg:border-0 lg:p-0" href="/">ITSVA</a></li>
+              </ul>
+            </div>
+          </div>
+        </nav>
+      </header>
 
 
       {/* ================= Hero ================= */}
@@ -64,30 +77,62 @@ export default function Home() {
               Conoce más sobre nuestros servicios y oportunidades.
             </p>
 
-            <a
-              href="#"
-              className="inline-flex items-center justify-center py-3 px-7 text-base font-semibold text-white rounded-full bg-blue-700 shadow-lg
-        hover:bg-blue-700 hover:-translate-y-1 hover:scale-110
-        transition-transform duration-300 ease-in-out"
+            {/* ================= Botón con animación de carga ================= */}
+            <button
+              onClick={handleIngresar}
+              disabled={loading}
+              className={`inline-flex items-center justify-center py-3 px-7 text-base font-semibold text-white rounded-full bg-blue-700 shadow-lg
+              hover:bg-blue-700 hover:-translate-y-1 hover:scale-110
+              transition-transform duration-300 ease-in-out
+              ${loading ? "opacity-50 cursor-not-allowed" : ""}`}
             >
-              Ingresar
-              <svg
-                className="ml-2"
-                width={20}
-                height={20}
-                viewBox="0 0 20 20"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  d="M7.5 15L11.0858 11.4142C11.7525 10.7475 12.0858 10.4142 12.0858 10C12.0858 9.58579 11.7525 9.25245 11.0858 8.58579L7.5 5"
-                  stroke="white"
-                  strokeWidth={2}
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
-            </a>
+              {loading ? (
+                <>
+                  {/* Spinner */}
+                  <svg
+                    className="animate-spin h-5 w-5 mr-2 text-white"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                  >
+                    <circle
+                      className="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                    ></circle>
+                    <path
+                      className="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8v4l3-3-3-3v4a8 8 0 00-8 8z"
+                    ></path>
+                  </svg>
+                  Cargando...
+                </>
+              ) : (
+                <>
+                  Ingresar
+                  <svg
+                    className="ml-2"
+                    width={20}
+                    height={20}
+                    viewBox="0 0 20 20"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      d="M7.5 15L11.0858 11.4142C11.7525 10.7475 12.0858 10.4142 12.0858 10C12.0858 9.58579 11.7525 9.25245 11.0858 8.58579L7.5 5"
+                      stroke="white"
+                      strokeWidth={2}
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                  </svg>
+                </>
+              )}
+            </button>
           </motion.div>
 
           {/* Imagen */}
@@ -157,81 +202,7 @@ export default function Home() {
       </section>
 
       {/* ================= Footer ================= */}
-
-      <footer className="bg-gray-100 pt-10">
-        {/* Contenedor principal */}
-        <div className="max-w-screen-lg mx-auto px-4 sm:px-6 text-gray-800">
-
-          {/* Secciones del footer */}
-          <div className="grid sm:grid-cols-2 md:grid-cols-4 gap-6 pb-10">
-            <div>
-              <h3 className="text-blue-700 font-bold text-xl mb-2">Área de vinculación y bolsa de trabajo</h3>
-              <p className="text-gray-600 text-sm">Texto</p>
-            </div>
-
-            <div>
-              <h4 className="text-blue-700 uppercase font-bold text-sm mb-2">Recursos</h4>
-              <ul className="text-gray-700 text-sm space-y-1">
-                <li><a href="/#" className="hover:text-blue-700">Documentación</a></li>
-                <li><a href="/#" className="hover:text-blue-700">Tutoriales</a></li>
-              </ul>
-            </div>
-
-            <div>
-              <h4 className="text-blue-700 uppercase font-bold text-sm mb-2">Soporte</h4>
-              <ul className="text-gray-700 text-sm space-y-1">
-                <li><a href="/#" className="hover:text-blue-700">Centro de ayuda</a></li>
-                <li><a href="/#" className="hover:text-blue-700">Política de privacidad</a></li>
-                <li><a href="/#" className="hover:text-blue-700">Términos y condiciones</a></li>
-              </ul>
-            </div>
-
-            <div>
-              <h4 className="text-blue-600 uppercase font-bold text-sm mb-2">Contáctanos</h4>
-              <ul className="text-gray-700 text-sm space-y-1">
-                <li>Carretera Valladolid - Tizimin Km 3.5, Valladolid, Yucatán</li>
-                <li><a href="mailto:contact@company.com" className="hover:text-blue-600">contact@company.com</a></li>
-              </ul>
-            </div>
-          </div>
-          {/*Decoración */}
-          <div className="w-full h-1 bg-gradient-to-r from-blue-400 via-purple-400 to-pink-300 rounded-full mb-6"></div>
-
-          <div className="flex flex-row space-x-6 justify-center mb-6">
-            <a
-              href="https://x.com/TecnmValladolid"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-gray-500 hover:text-blue-600"
-            >
-              <FaTwitter className="h-6 w-6" />
-            </a>
-            <a href="https://www.facebook.com/TecNMValladolid"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-gray-500 hover:text-blue-600">
-              <FaFacebook className="h-6 w-6" />
-            </a>
-            <a href="https://www.instagram.com/tecnmvalladolid/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-gray-500 hover:text-blue-600">
-              <FaInstagram className="h-6 w-6" />
-            </a>
-            <a href="http://www.youtube.com/@tecnmcampusvalladolid4146"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-gray-500 hover:text-blue-600">
-              <FaYoutube className="h-6 w-6" />
-            </a>
-          </div>
-
-          <div className="text-center text-gray-600 text-sm pb-6">
-            Todos los derechos reservados &copy; 2024 Área de vinculación y bolsa de trabajo ITSVA
-          </div>
-        </div>
-      </footer>
-
+      <Footer />
     </>
   );
 }
