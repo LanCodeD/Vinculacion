@@ -11,7 +11,7 @@ import type {
 
 import PasoTipoCuenta from "./Pasos/PasoTipoCuenta";
 import PasoDatosBasicos from "./Pasos/PasoDatosBasicos";
-//import PasoVerificacion from "./Pasos/PasoVerificacion";
+import PasoVerificacion from "./Pasos/PasoVerificacion";
 //import PasoPerfilEgresado from "./Pasos/PasoPerfilEgresado";
 //import PasoPerfilDocente from "./Pasos/PasoPerfilDocente";
 //import PasoPerfilEmpresa from "./Pasos/PasoPerfilEmpresa";
@@ -41,7 +41,7 @@ export default function RegistroWizard() {
         />
       )}
 
-{/*       {paso === 3 && (
+       {paso === 3 && (
         <PasoVerificacion
           registro={registro}
           setRegistro={setRegistro}
@@ -49,7 +49,7 @@ export default function RegistroWizard() {
           onBack={retroceder}
         />
       )}
-
+{/* 
       {paso === 4 && registro.tipoCuentaId === 1 && (
         <PasoPerfilEgresado registro={registro} setRegistro={setRegistro} onNext={avanzar} onBack={retroceder} />
       )}

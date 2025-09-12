@@ -45,7 +45,7 @@ export interface PerfilEmpresa {
  */
 export interface DatosRegistro {
   tipoCuentaId: number;
-  usuarioId?: number;
+  usuarioId?: number | null; // <- agrega esto
   datosBasicos?: DatosBasicos;
   verificacion?: DatosVerificacion;
   perfilEgresado?: PerfilEgresado;
