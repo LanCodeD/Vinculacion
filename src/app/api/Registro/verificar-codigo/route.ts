@@ -70,6 +70,7 @@ export async function POST(req: Request) {
       data: {
         correo_verificado: 1,
         correo_verificado_en: new Date(),
+        paso_actual: 3,
       },
     });
 

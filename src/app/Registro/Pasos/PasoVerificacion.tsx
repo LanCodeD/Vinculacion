@@ -119,7 +119,7 @@ export default function PasoVerificacion({
         Ingrese el código de 6 dígitos para continuar.
       </p>
 
-      <div className="flex space-x-3 mb-6">
+      <div className="flex space-x-3 mb-6 text-black">
         {codigo.map((digito, i) => (
           <input
             key={i}

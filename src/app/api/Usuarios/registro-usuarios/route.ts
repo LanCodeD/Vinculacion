@@ -89,6 +89,7 @@ export async function POST(req: Request) {
         correo,
         password_hash: hashedPassword,
         celular,
+        paso_actual: 2, // <-- iniciamos el flujo en el paso 1
       },
     });
 

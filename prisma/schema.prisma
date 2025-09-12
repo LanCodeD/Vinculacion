@@ -179,6 +179,7 @@ model usuarios {
   correo_verificado     Int               @default(0) @db.TinyInt
   correo_verificado_en  DateTime?         @db.DateTime(0)
   last_login            DateTime?         @db.DateTime(0)
+  paso_actual           Int               
   creado_en             DateTime          @default(now()) @db.DateTime(0)
   actualizado_en        DateTime          @default(now()) @db.DateTime(0)
   consents              consents[]

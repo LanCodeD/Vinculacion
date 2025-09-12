@@ -1,6 +1,4 @@
-"use client";
-
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import type {
   DatosRegistro,
   DatosBasicos,
@@ -23,8 +21,53 @@ export default function RegistroWizard() {
   const [registro, setRegistro] = useState<DatosRegistro>(initialRegistro);
   const [paso, setPaso] = useState<number>(1);
 
+  // Funciones para avanzar y retroceder
   const avanzar = () => setPaso((p) => p + 1);
   const retroceder = () => setPaso((p) => Math.max(1, p - 1));
+
+  // 🔹 Recuperar paso, usuarioId y tipoCuentaId de session/localStorage
+  useEffect(() => {
+    const pasoGuardado = Number(
+      sessionStorage.getItem("registroPaso") ||
+      localStorage.getItem("registroPaso") ||
+      1
+    );
+
+    const usuarioIdGuardado = sessionStorage.getItem("registroUsuarioId") ||
+      localStorage.getItem("registroUsuarioId") ||
+      null;
+
+    const tipoCuentaGuardado = sessionStorage.getItem("registroTipoCuenta") ||
+      localStorage.getItem("registroTipoCuenta") ||
+      null;
+
+    setPaso(pasoGuardado);
+
+    setRegistro((prev) => ({
+      ...prev,
+      usuarioId: usuarioIdGuardado ? Number(usuarioIdGuardado) : undefined,
+      tipoCuentaId: tipoCuentaGuardado ? Number(tipoCuentaGuardado) : prev.tipoCuentaId,
+    }));
+  }, []);
+
+  // 🔹 Guardar en session/localStorage cada vez que cambia el paso o tipoCuentaId
+  useEffect(() => {
+    sessionStorage.setItem("registroPaso", paso.toString());
+    localStorage.setItem("registroPaso", paso.toString());
+
+    if (registro.usuarioId) {
+      sessionStorage.setItem("registroUsuarioId", registro.usuarioId.toString());
+      localStorage.setItem("registroUsuarioId", registro.usuarioId.toString());
+    }
+
+    if (registro.tipoCuentaId) {
+      sessionStorage.setItem("registroTipoCuenta", registro.tipoCuentaId.toString());
+      localStorage.setItem("registroTipoCuenta", registro.tipoCuentaId.toString());
+    }
+  }, [paso, registro.usuarioId, registro.tipoCuentaId]);
+  console.log("Recuperacion del paso UseEffects",paso)
+  console.log("Recuperacion del usuario UseEffects",registro.usuarioId)
+  console.log("Recuperacion del tipo cuenta UseEffects",registro.tipoCuentaId)
 
   return (
     <div className="w-full h-full flex flex-col items-center justify-center">
@@ -41,7 +84,7 @@ export default function RegistroWizard() {
         />
       )}
 
-       {paso === 3 && (
+      {paso === 3 && (
         <PasoVerificacion
           registro={registro}
           setRegistro={setRegistro}
@@ -49,17 +92,32 @@ export default function RegistroWizard() {
           onBack={retroceder}
         />
       )}
-{/* 
-      {paso === 4 && registro.tipoCuentaId === 1 && (
-        <PasoPerfilEgresado registro={registro} setRegistro={setRegistro} onNext={avanzar} onBack={retroceder} />
+
+     {/*  {paso === 4 && registro.tipoCuentaId === 1 && (
+        <PasoPerfilEgresado
+          registro={registro}
+          setRegistro={setRegistro}
+          onNext={avanzar}
+          onBack={retroceder}
+        />
       )}
 
       {paso === 4 && registro.tipoCuentaId === 2 && (
-        <PasoPerfilDocente registro={registro} setRegistro={setRegistro} onNext={avanzar} onBack={retroceder} />
+        <PasoPerfilDocente
+          registro={registro}
+          setRegistro={setRegistro}
+          onNext={avanzar}
+          onBack={retroceder}
+        />
       )}
 
       {paso === 4 && registro.tipoCuentaId === 3 && (
-        <PasoPerfilEmpresa registro={registro} setRegistro={setRegistro} onNext={avanzar} onBack={retroceder} />
+        <PasoPerfilEmpresa
+          registro={registro}
+          setRegistro={setRegistro}
+          onNext={avanzar}
+          onBack={retroceder}
+        />
       )}
 
       {paso === 5 && <PasoFinal registro={registro} onBack={retroceder} />} */}
