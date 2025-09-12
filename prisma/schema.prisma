@@ -155,6 +155,8 @@ model tokens_usuarios {
   expiracion_en DateTime  @db.DateTime(0)
   usado_en      DateTime? @db.DateTime(0)
   intentos      Int       @default(0)
+  reenvio       Int       @default(0)       // para contar reenvíos
+  ultimo_envio  DateTime? @db.DateTime(0)   // para cooldown de reenvíos
   ip_origen     String?   @db.VarChar(45)
   user_agent    String?   @db.VarChar(255)
   creado_en     DateTime  @default(now()) @db.DateTime(0)
@@ -177,8 +179,7 @@ model usuarios {
   correo_verificado     Int               @default(0) @db.TinyInt
   correo_verificado_en  DateTime?         @db.DateTime(0)
   last_login            DateTime?         @db.DateTime(0)
-  intentos_fallidos     Int               @default(0)
-  bloqueado_hasta       DateTime?         @db.DateTime(0)
+  paso_actual           Int               
   creado_en             DateTime          @default(now()) @db.DateTime(0)
   actualizado_en        DateTime          @default(now()) @db.DateTime(0)
   consents              consents[]
