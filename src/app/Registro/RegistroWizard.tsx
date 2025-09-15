@@ -1,19 +1,13 @@
 import React, { useState, useEffect } from "react";
-import type {
-  DatosRegistro,
-  DatosBasicos,
-  PerfilEgresado,
-  PerfilDocente,
-  PerfilEmpresa,
-} from "@/types/registro";
+import type { DatosRegistro } from "@/types/registro";
 
 import PasoTipoCuenta from "./Pasos/PasoTipoCuenta";
 import PasoDatosBasicos from "./Pasos/PasoDatosBasicos";
 import PasoVerificacion from "./Pasos/PasoVerificacion";
-//import PasoPerfilEgresado from "./Pasos/PasoPerfilEgresado";
-//import PasoPerfilDocente from "./Pasos/PasoPerfilDocente";
-//import PasoPerfilEmpresa from "./Pasos/PasoPerfilEmpresa";
-//import PasoFinal from "./Pasos/PasoFinal";
+import PasoPerfilEgresado from "./Pasos/PasoPerfilEgresado";
+import PasoPerfilDocente from "./Pasos/PasoPerfilDocente";
+import PasoPerfilEmpresa from "./Pasos/PasoPerfilEmpresa";
+import PasoFinal from "./Pasos/PasoFinal";
 
 const initialRegistro: DatosRegistro = { tipoCuentaId: 0 };
 
@@ -21,58 +15,62 @@ export default function RegistroWizard() {
   const [registro, setRegistro] = useState<DatosRegistro>(initialRegistro);
   const [paso, setPaso] = useState<number>(1);
 
-  // Funciones para avanzar y retroceder
   const avanzar = () => setPaso((p) => p + 1);
   const retroceder = () => setPaso((p) => Math.max(1, p - 1));
 
-  // 🔹 Recuperar paso, usuarioId y tipoCuentaId de session/localStorage
+  // 🔹 Recuperar al montar (paso, usuarioId y tipoCuentaId)
   useEffect(() => {
-    const pasoGuardado = Number(
-      sessionStorage.getItem("registroPaso") ||
-      localStorage.getItem("registroPaso") ||
-      1
-    );
-
-    const usuarioIdGuardado = sessionStorage.getItem("registroUsuarioId") ||
-      localStorage.getItem("registroUsuarioId") ||
-      null;
-
-    const tipoCuentaGuardado = sessionStorage.getItem("registroTipoCuenta") ||
-      localStorage.getItem("registroTipoCuenta") ||
-      null;
+    const pasoGuardado = Number(localStorage.getItem("registroPaso") || "1");
+    const usuarioIdGuardado = localStorage.getItem("registroUsuarioId");
+    const tipoCuentaGuardado = localStorage.getItem("registroTipoCuenta");
 
     setPaso(pasoGuardado);
 
     setRegistro((prev) => ({
       ...prev,
       usuarioId: usuarioIdGuardado ? Number(usuarioIdGuardado) : undefined,
-      tipoCuentaId: tipoCuentaGuardado ? Number(tipoCuentaGuardado) : prev.tipoCuentaId,
+      tipoCuentaId: tipoCuentaGuardado
+        ? Number(tipoCuentaGuardado)
+        : prev.tipoCuentaId,
     }));
   }, []);
 
-  // 🔹 Guardar en session/localStorage cada vez que cambia el paso o tipoCuentaId
+  // 🔹 Guardar cada vez que cambie algo
+  // 🔹 Limpieza al terminar el registro
   useEffect(() => {
-    sessionStorage.setItem("registroPaso", paso.toString());
-    localStorage.setItem("registroPaso", paso.toString());
-
-    if (registro.usuarioId) {
-      sessionStorage.setItem("registroUsuarioId", registro.usuarioId.toString());
-      localStorage.setItem("registroUsuarioId", registro.usuarioId.toString());
+    if (paso === 5) {
+      localStorage.removeItem("registroPaso");
+      localStorage.removeItem("registroUsuarioId");
+      localStorage.removeItem("registroTipoCuenta");
+      console.log("LOCALSTORAGE LIMPIADO");
+      return;
     }
 
+    // Guardar si no es paso final
+    localStorage.setItem("registroPaso", paso.toString());
+    console.log("localstorage de paso:", paso);
+    if (registro.usuarioId) {
+      localStorage.setItem("registroUsuarioId", registro.usuarioId.toString());
+
+      console.log("localstorage de usuario:", registro.usuarioId);
+    }
     if (registro.tipoCuentaId) {
-      sessionStorage.setItem("registroTipoCuenta", registro.tipoCuentaId.toString());
-      localStorage.setItem("registroTipoCuenta", registro.tipoCuentaId.toString());
+      localStorage.setItem(
+        "registroTipoCuenta",
+        registro.tipoCuentaId.toString()
+      );
+      console.log("localstorage de tipo de cuenta:", registro.tipoCuentaId);
     }
   }, [paso, registro.usuarioId, registro.tipoCuentaId]);
-  console.log("Recuperacion del paso UseEffects",paso)
-  console.log("Recuperacion del usuario UseEffects",registro.usuarioId)
-  console.log("Recuperacion del tipo cuenta UseEffects",registro.tipoCuentaId)
 
   return (
     <div className="w-full h-full flex flex-col items-center justify-center">
       {paso === 1 && (
-        <PasoTipoCuenta registro={registro} setRegistro={setRegistro} onNext={avanzar} />
+        <PasoTipoCuenta
+          registro={registro}
+          setRegistro={setRegistro}
+          onNext={avanzar}
+        />
       )}
 
       {paso === 2 && (
@@ -93,8 +91,8 @@ export default function RegistroWizard() {
         />
       )}
 
-     {/*  {paso === 4 && registro.tipoCuentaId === 1 && (
-        <PasoPerfilEgresado
+      {paso === 4 && registro.tipoCuentaId === 1 && (
+        <PasoPerfilDocente
           registro={registro}
           setRegistro={setRegistro}
           onNext={avanzar}
@@ -103,7 +101,7 @@ export default function RegistroWizard() {
       )}
 
       {paso === 4 && registro.tipoCuentaId === 2 && (
-        <PasoPerfilDocente
+        <PasoPerfilEgresado
           registro={registro}
           setRegistro={setRegistro}
           onNext={avanzar}
@@ -120,7 +118,7 @@ export default function RegistroWizard() {
         />
       )}
 
-      {paso === 5 && <PasoFinal registro={registro} onBack={retroceder} />} */}
+      {paso === 5 && <PasoFinal registro={registro} onBack={retroceder} />}
     </div>
   );
 }
