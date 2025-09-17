@@ -1,4 +1,7 @@
+"use client";
+
 import React, { useState, useEffect } from "react";
+import { useSearchParams } from "next/navigation"; // 👈 para leer query params
 import type { DatosRegistro } from "@/types/registro";
 
 import PasoTipoCuenta from "./Pasos/PasoTipoCuenta";
@@ -12,14 +15,27 @@ import PasoFinal from "./Pasos/PasoFinal";
 const initialRegistro: DatosRegistro = { tipoCuentaId: 0 };
 
 export default function RegistroWizard() {
+  const searchParams = useSearchParams(); // 👈 leer query params
   const [registro, setRegistro] = useState<DatosRegistro>(initialRegistro);
   const [paso, setPaso] = useState<number>(1);
 
   const avanzar = () => setPaso((p) => p + 1);
   const retroceder = () => setPaso((p) => Math.max(1, p - 1));
 
-  // 🔹 Recuperar al montar (paso, usuarioId y tipoCuentaId)
   useEffect(() => {
+    // 🔹 Ver si viene tipoCuenta desde Google (ej: /Registro?tipoCuenta=1)
+    const tipoCuentaFromUrl = searchParams.get("tipoCuenta");
+
+    if (tipoCuentaFromUrl) {
+      setRegistro((prev) => ({
+        ...prev,
+        tipoCuentaId: Number(tipoCuentaFromUrl),
+      }));
+      setPaso(4); // 👈 Brincamos directo al paso 4
+      return; // ya no leemos localStorage
+    }
+
+    // 🔹 Si no viene de Google → seguimos usando lo del localStorage
     const pasoGuardado = Number(localStorage.getItem("registroPaso") || "1");
     const usuarioIdGuardado = localStorage.getItem("registroUsuarioId");
     const tipoCuentaGuardado = localStorage.getItem("registroTipoCuenta");
@@ -33,10 +49,9 @@ export default function RegistroWizard() {
         ? Number(tipoCuentaGuardado)
         : prev.tipoCuentaId,
     }));
-  }, []);
+  }, [searchParams]);
 
-  // 🔹 Guardar cada vez que cambie algo
-  // 🔹 Limpieza al terminar el registro
+  // 🔹 Guardar en localStorage en cada cambio
   useEffect(() => {
     if (paso === 5) {
       localStorage.removeItem("registroPaso");
@@ -46,12 +61,11 @@ export default function RegistroWizard() {
       return;
     }
 
-    // Guardar si no es paso final
     localStorage.setItem("registroPaso", paso.toString());
     console.log("localstorage de paso:", paso);
+
     if (registro.usuarioId) {
       localStorage.setItem("registroUsuarioId", registro.usuarioId.toString());
-
       console.log("localstorage de usuario:", registro.usuarioId);
     }
     if (registro.tipoCuentaId) {

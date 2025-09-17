@@ -15,12 +15,12 @@ export default function PasoFinal({ registro, onBack }: Props) {
   let mensaje = "";
   let mostrarBotonInicio = true;
 
-  if (tipoCuentaId === 1 || tipoCuentaId === 3) {
+  if (tipoCuentaId === 2 || tipoCuentaId === 3) {
     // 1 = egresado, 3 = empresa
     mensaje =
       "Registro completo. Espere respuesta del administrador para verificar su cuenta.";
     mostrarBotonInicio = true; // el botón siempre aparece, aunque podría estar deshabilitado según tu lógica futura
-  } else if (tipoCuentaId === 2) {
+  } else if (tipoCuentaId === 1) {
     // 2 = docente
     mensaje =
       "Registro completo. Puede iniciar sesión con los datos ingresados.";

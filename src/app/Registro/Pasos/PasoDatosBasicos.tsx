@@ -7,6 +7,7 @@ import type { DatosRegistro, DatosBasicos } from "@/types/registro";
 import type { Dispatch, SetStateAction } from "react";
 import toast from "react-hot-toast";
 import { z } from "zod";
+import BotonGoogle from "./BotonGoogle";
 
 interface Props {
   registro: DatosRegistro;
@@ -81,7 +82,7 @@ export default function PasoDatosBasicos({
         // 🔹 Ya existe → actualizar
         await axios.patch(`/api/Usuarios/registro-usuarios/${usuarioId}`, form);
         toast.success("Datos actualizados con éxito");
-        console.log("Estamos en el PATCH endpoint")
+        console.log("Estamos en el PATCH endpoint");
       } else {
         // 🔹 No existe → crear
         const payload = {
@@ -95,7 +96,7 @@ export default function PasoDatosBasicos({
 
         usuarioId = res.data.id_usuarios ?? res.data.usuarioId ?? res.data.id;
         toast.success("Usuario creado con éxito");
-         console.log("Estamos en el POST endpoint")
+        console.log("Estamos en el POST endpoint");
       }
 
       setRegistro((prev) => ({ ...prev, datosBasicos: form, usuarioId }));
@@ -168,6 +169,12 @@ export default function PasoDatosBasicos({
             {loading ? "Guardando..." : "Continuar"}
           </button>
         </div>
+      </div>
+      <div className="mt-6">
+        <BotonGoogle
+          texto="Registrarse con Google"
+          tipoCuenta={registro.tipoCuentaId?.toString()}
+        />
       </div>
     </div>
   );
