@@ -14,7 +14,6 @@ export interface DatosVerificacion {
 
 export interface PerfilEgresado {
   matricula: string;
-  carrera: string;
   titulo: string;
   puesto: string;
   fechaEgreso: string; // ISO string en frontend

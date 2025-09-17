@@ -7,6 +7,7 @@ import type { DatosRegistro, DatosBasicos } from "@/types/registro";
 import type { Dispatch, SetStateAction } from "react";
 import toast from "react-hot-toast";
 import { z } from "zod";
+import BotonGoogle from "./BotonGoogle";
 
 interface Props {
   registro: DatosRegistro;
@@ -61,44 +62,44 @@ export default function PasoDatosBasicos({
     setForm((s) => ({ ...s, [field]: value }));
   }
 
-  async function handleSubmit() {
-    // 1️⃣ Validación con Zod
+  const handleSubmit = async () => {
     const result = schemaBase.safeParse(form);
-
     if (!result.success) {
       toast.error(result.error.issues[0].message);
       return;
     }
 
-    // 2️⃣ Validar dominio institucional solo si tipoCuentaId === 1 (docentes)
     if (registro.tipoCuentaId === 1 && !regexInstitucional.test(form.correo)) {
-      toast.error(
-        "El correo debe pertenecer al dominio institucional Docente (Dominio del plantel)"
-      );
+      toast.error("El correo debe pertenecer al dominio institucional Docente");
       return;
     }
 
-    // 3️⃣ Llamada al backend
     setLoading(true);
     try {
-      const payload = {
-        tipoCuentaId: registro.tipoCuentaId,
-        datosBasicos: form,
-      };
+      let usuarioId = registro.usuarioId;
 
-      const res = await axios.post("/api/Usuarios/registro-usuarios", payload);
+      if (usuarioId) {
+        // 🔹 Ya existe → actualizar
+        await axios.patch(`/api/Usuarios/registro-usuarios/${usuarioId}`, form);
+        toast.success("Datos actualizados con éxito");
+        console.log("Estamos en el PATCH endpoint");
+      } else {
+        // 🔹 No existe → crear
+        const payload = {
+          tipoCuentaId: registro.tipoCuentaId,
+          datosBasicos: form,
+        };
+        const res = await axios.post(
+          "/api/Usuarios/registro-usuarios",
+          payload
+        );
 
-      interface UsuarioResponse {
-        id_usuarios?: number;
-        usuarioId?: number;
-        id?: number;
+        usuarioId = res.data.id_usuarios ?? res.data.usuarioId ?? res.data.id;
+        toast.success("Usuario creado con éxito");
+        console.log("Estamos en el POST endpoint");
       }
-      const data: UsuarioResponse = res.data;
-      const usuarioId = data.id_usuarios ?? data.usuarioId ?? data.id ?? null;
 
       setRegistro((prev) => ({ ...prev, datosBasicos: form, usuarioId }));
-
-      toast.success("Usuario creado con éxito");
       onNext();
     } catch (error) {
       if (axios.isAxiosError(error)) {
@@ -109,7 +110,7 @@ export default function PasoDatosBasicos({
     } finally {
       setLoading(false);
     }
-  }
+  };
 
   return (
     <div className="w-full h-full flex flex-col items-center justify-center px-6">
@@ -168,6 +169,12 @@ export default function PasoDatosBasicos({
             {loading ? "Guardando..." : "Continuar"}
           </button>
         </div>
+      </div>
+      <div className="mt-6">
+        <BotonGoogle
+          texto="Registrarse con Google"
+          tipoCuenta={registro.tipoCuentaId?.toString()}
+        />
       </div>
     </div>
   );
