@@ -1,9 +1,10 @@
 "use client";
+import Carousel from "@/components/Carrusel";
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import Image from "next/image";
-import Footer from "./components/footer";
+import Footer from "@/components/footer";
 
 export default function Home() {
   const router = useRouter();
@@ -43,7 +44,7 @@ export default function Home() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
                 </svg>
               </a>
-              <a className="rounded-lg border-2 border-white px-4 py-2 text-sm font-medium text-white hover:bg-gray-50 sm:mr-2 lg:px-5 lg:py-2.5" href="/guest">
+              <a className="rounded-lg border-2 border-white px-4 py-2 text-sm font-medium text-white hover:bg-gray-50 sm:mr-2 lg:px-5 lg:py-2.5" href="/MenuPrincipal">
                 Log out
               </a>
             </div>
@@ -60,7 +61,7 @@ export default function Home() {
 
       {/* ================= Hero ================= */}
       <section className="min-h-screen bg-white flex items-center">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 flex flex-col-reverse lg:flex-row items-center lg:items-center gap-12 lg:gap-36">
+        <div className="w-full px-2 sm:px-4 lg:px-6 flex flex-col-reverse lg:flex-row items-center gap-12 lg:gap-20 m-24">
 
           {/* Texto*/}
           <motion.div
@@ -142,14 +143,18 @@ export default function Home() {
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 1, ease: "easeOut", delay: 0.3 }}
           >
-            <Image
-              src="/banner/estrecho.webp"
-              alt="Banner convenios y bolsa de trabajo"
-              width={600}
-              height={400}
-              className="w-full max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg h-auto rounded-lg"
+            <Carousel
+              images={[
+                "/banner/estrecho.webp",
+                "/banner/banner2.webp",
+                "/banner/banner3.webp",
+              ]}
+              autoSlide={true}
+              autoSlideInterval={4000}
             />
           </motion.div>
+
+
 
         </div>
 
