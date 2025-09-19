@@ -29,24 +29,33 @@ export async function POST(req: Request) {
       matricula,
       titulo,
       puesto,
-      fechaEgreso,
-      correoInstitucional,
+      fecha_egreso,
+      correo_institucional,
       academias_ingenierias_id,
     } = body;
 
     // Validaciones
     if (!usuarios_id) {
-      return NextResponse.json({ error: "Se requiere usuariosId" }, { status: 400 });
+      return NextResponse.json(
+        { error: "Se requiere usuariosId" },
+        { status: 400 }
+      );
     }
     if (!matricula || !academias_ingenierias_id) {
-      return NextResponse.json({ error: "Campos obligatorios faltantes" }, { status: 400 });
+      return NextResponse.json(
+        { error: "Campos obligatorios faltantes" },
+        { status: 400 }
+      );
     }
 
     let fecha: Date | null = null;
-    if (fechaEgreso) {
-      fecha = new Date(fechaEgreso);
+    if (fecha_egreso) {
+      fecha = new Date(fecha_egreso);
       if (isNaN(fecha.getTime())) {
-        return NextResponse.json({ error: "Fecha de egreso inválida" }, { status: 400 });
+        return NextResponse.json(
+          { error: "Fecha de egreso inválida" },
+          { status: 400 }
+        );
       }
     }
 
@@ -58,7 +67,7 @@ export async function POST(req: Request) {
         titulo,
         puesto,
         fecha_egreso: fecha,
-        correo_institucional: correoInstitucional,
+        correo_institucional: correo_institucional,
         academias_ingenierias_id: academias_ingenierias_id,
         empresas_id: 1, // Empresa del plantel
       },
@@ -67,6 +76,9 @@ export async function POST(req: Request) {
     return NextResponse.json({ success: true, perfil }, { status: 201 });
   } catch (error) {
     console.error("Error creando perfil de egresado:", error);
-    return NextResponse.json({ error: "Error al crear perfil de egresado" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Error al crear perfil de egresado" },
+      { status: 500 }
+    );
   }
 }
