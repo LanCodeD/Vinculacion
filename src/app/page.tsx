@@ -39,13 +39,16 @@ export default function Home() {
             </a>
 
             <div className="flex items-center lg:order-2">
-              <a className="rounded-lg border-2 border-white px-4 py-2 text-sm font-medium text-white hover:bg-gray-50 sm:mr-2 lg:px-5 lg:py-2.5" href="/">
+              <a className="rounded-lg border-2 border-white px-4 py-2 text-sm font-medium text-white hover:bg-blue-800 sm:mr-2 lg:px-5 lg:py-2.5" href="/">
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
                 </svg>
               </a>
-              <a className="rounded-lg border-2 border-white px-4 py-2 text-sm font-medium text-white hover:bg-gray-50 sm:mr-2 lg:px-5 lg:py-2.5" href="/MenuPrincipal">
-                Log out
+              <a className="rounded-lg border-2 border-white px-4 py-2 text-sm font-medium text-white hover:bg-blue-800 sm:mr-2 lg:px-5 lg:py-2.5" href="/IniciarSesion">
+                Iniciar sesión
+              </a>
+              <a className="rounded-lg border-2 border-white px-4 py-2 text-sm font-medium text-white hover:bg-blue-800 sm:mr-2 lg:px-5 lg:py-2.5" href="/Registro">
+                Regístrate
               </a>
             </div>
 
@@ -146,8 +149,8 @@ export default function Home() {
             <Carousel
               images={[
                 "/banner/estrecho.webp",
-                "/banner/banner2.webp",
-                "/banner/banner3.webp",
+                "/banner/A.webp",
+                "/banner/OIP.webp",
               ]}
               autoSlide={true}
               autoSlideInterval={4000}

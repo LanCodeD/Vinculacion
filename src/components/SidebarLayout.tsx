@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import { signOut } from "next-auth/react";
 import { BiChat } from "react-icons/bi";
 import { FaBell, FaSearch, FaChevronDown, FaChevronRight } from "react-icons/fa";
 import { FaGears } from "react-icons/fa6";
@@ -269,8 +270,14 @@ export default function SidebarLayout({ children }: { children: React.ReactNode 
                     <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Mi perfil</li>
                     <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Configuración</li>
                     <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">
-                      <a href="/Registro">Cerrar sesión</a>
+                              <button
+                                onClick={() => signOut({ callbackUrl: "/" })}
+                                className="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition"
+                              >
+                                Cerrar sesión
+                              </button>
                     </li>
+                    
                   </ul>
                 </div>
               )}

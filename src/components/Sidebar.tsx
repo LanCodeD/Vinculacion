@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import React, { useState } from "react";
 import { BiChat } from "react-icons/bi";
 import { FaChevronDown, FaChevronRight } from "react-icons/fa";
@@ -14,6 +15,7 @@ import {
 import { TiCalendar } from "react-icons/ti";
 
 export default function Sidebar() {
+
   const [open, setOpen] = useState(true);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [subMenus, setSubMenus] = useState<{ [key: string]: boolean }>({
@@ -21,25 +23,33 @@ export default function Sidebar() {
   });
 
   const Menus = [
-    { title: "Dashboard", icon: <MdSpaceDashboard /> },
+    { title: "Menu Principal", icon: <MdSpaceDashboard />, path: "/MenuPrincipal" },
     {
       title: "Servicios",
       icon: <BiChat />,
       gap: true,
-      subMenu: ["Convenios", "Bolsa de trabajo"],
+      subMenu: [
+        { title: "Convenios", path: "/Convenios" },
+        { title: "Bolsa de trabajo", path: "/BolsaTrabajo" }
+      ],
       key: "servicios",
     },
-    { title: "Calendar", icon: <TiCalendar /> },
-    { title: "Tables", icon: <FiTable /> },
-    { title: "Analytics", icon: <GoGraph /> },
-    { title: "Support", icon: <MdOutlineHeadsetMic /> },
+    { title: "Calendar", icon: <TiCalendar />, path: "/calendar" },
+    { title: "Tables", icon: <FiTable />, path: "/tables" },
+    { title: "Analytics", icon: <GoGraph />, path: "/analytics" },
+    { title: "Soporte", icon: <MdOutlineHeadsetMic />, path: "/support" },
     {
-      title: "Setting",
+      title: "Configuración",
       icon: <FaGears />,
-      subMenu: ["General", "Notifications"],
+      subMenu: [
+        { title: "Perfil", path: "/ConfiPerfil" },
+        { title: "Tema", path: "/settings/notifications" },
+        { title: "Gestion", path: "/settings/gestion" },
+      ],
       key: "settings",
     },
   ];
+
 
   const toggleSubMenu = (menu: string) => {
     setSubMenus((prev) => ({
@@ -52,15 +62,13 @@ export default function Sidebar() {
     <>
       {/* Sidebar Desktop */}
       <div
-        className={`hidden md:flex flex-col ${
-          open ? "w-72 p-5" : "w-20 p-4"
-        } bg-zinc-900 h-full pt-8 relative duration-300 ease-in-out`}
+        className={`hidden md:flex flex-col ${open ? "w-72 p-5" : "w-20 p-4"
+          } bg-zinc-900 h-full pt-8 relative duration-300 ease-in-out`}
       >
         {/* Toggle button */}
         <div
-          className={`absolute cursor-pointer -right-4 top-9 w-8 h-8 p-0.5 bg-zinc-50 border-zinc-50 border-2 rounded-full text-xl flex items-center justify-center ${
-            !open && "rotate-180"
-          } transition-all ease-in-out duration-300`}
+          className={`absolute cursor-pointer -right-4 top-9 w-8 h-8 p-0.5 bg-zinc-50 border-zinc-50 border-2 rounded-full text-xl flex items-center justify-center ${!open && "rotate-180"
+            } transition-all ease-in-out duration-300`}
           onClick={() => {
             if (open) {
               setSubMenus({});
@@ -81,9 +89,8 @@ export default function Sidebar() {
             ${open && "rotate-[360deg]"}`}
           />
           <h1
-            className={`text-zinc-50 origin-left font-semibold text-xl duration-200 ease-in-out ${
-              !open && "scale-0"
-            }`}
+            className={`text-zinc-50 origin-left font-semibold text-xl duration-200 ease-in-out ${!open && "scale-0"
+              }`}
           >
             SISTEMA DE BOLSA
           </h1>
@@ -94,29 +101,38 @@ export default function Sidebar() {
           {Menus.map((Menu, index) => (
             <li
               key={index}
-              className={`flex flex-col rounded-md py-3 px-4 cursor-pointer hover:bg-blue-800/50 text-zinc-50 ${
-                Menu.gap ? "mt-9" : "mt-2"
-              } ${index === 0 && "bg-blue-800/40"}`}
+              className={`flex flex-col rounded-md py-3 px-4 cursor-pointer hover:bg-blue-800/50 text-zinc-50 ${Menu.gap ? "mt-9" : "mt-2"
+                } ${index === 0 && "bg-blue-800/40"}`}
             >
-              <div
-                className="flex items-center justify-between gap-x-4"
-                onClick={() => Menu.key && toggleSubMenu(Menu.key)}
-              >
-                <div className="flex items-center gap-2">
+              {/* Caso 1: Menú con path directo */}
+              {Menu.path && !Menu.subMenu ? (
+                <Link href={Menu.path} className="flex items-center gap-x-4">
                   <span className="text-lg">{Menu.icon}</span>
                   <span className={`${!open && "hidden"}`}>{Menu.title}</span>
+                </Link>
+              ) : (
+                /* Caso 2: Menú con submenú desplegable */
+                <div
+                  className="flex items-center justify-between gap-x-4"
+                  onClick={() => Menu.key && toggleSubMenu(Menu.key)}
+                >
+                  <div className="flex items-center gap-2">
+                    <span className="text-lg">{Menu.icon}</span>
+                    <span className={`${!open && "hidden"}`}>{Menu.title}</span>
+                  </div>
+                  {Menu.subMenu && open && (
+                    <span>
+                      {subMenus[Menu.key ?? ""] ? (
+                        <FaChevronDown />
+                      ) : (
+                        <FaChevronRight />
+                      )}
+                    </span>
+                  )}
                 </div>
-                {Menu.subMenu && open && (
-                  <span>
-                    {subMenus[Menu.key ?? ""] ? (
-                      <FaChevronDown />
-                    ) : (
-                      <FaChevronRight />
-                    )}
-                  </span>
-                )}
-              </div>
+              )}
 
+              {/* Render de submenús */}
               {Menu.subMenu && subMenus[Menu.key ?? ""] && (
                 <ul className="pl-3 pt-2 text-zinc-300">
                   {Menu.subMenu.map((sub, subIndex) => (
@@ -124,7 +140,7 @@ export default function Sidebar() {
                       key={subIndex}
                       className="text-sm py-2 px-2 hover:bg-blue-800 rounded-lg"
                     >
-                      {sub}
+                      <Link href={sub.path}>{sub.title}</Link>
                     </li>
                   ))}
                 </ul>
@@ -152,9 +168,8 @@ export default function Sidebar() {
               {Menus.map((Menu, index) => (
                 <li
                   key={index}
-                  className={`flex flex-col rounded-md py-3 px-4 cursor-pointer hover:text-white text-zinc-50 hover:bg-blue-800/50 transition-all ease-in-out duration-300 ${
-                    Menu.gap ? "mt-9" : "mt-2"
-                  } ${index === 0 && "bg-blue-800/40"}`}
+                  className={`flex flex-col rounded-md py-3 px-4 cursor-pointer hover:text-white text-zinc-50 hover:bg-blue-800/50 transition-all ease-in-out duration-300 ${Menu.gap ? "mt-9" : "mt-2"
+                    } ${index === 0 && "bg-blue-800/40"}`}
                 >
                   <div
                     className="flex items-center justify-between gap-x-4"
@@ -180,9 +195,10 @@ export default function Sidebar() {
                         <li
                           key={subIndex}
                           className="text-sm flex items-center gap-x-2 py-3 px-2 hover:bg-blue-800 rounded-lg"
+                          onClick={() => setMobileOpen(false)} // opcional: cerrar sidebar en móvil
                         >
                           <FaChevronRight className="text-xs" />
-                          {subMenu}
+                          <Link href={subMenu.path}>{subMenu.title}</Link>
                         </li>
                       ))}
                     </ul>

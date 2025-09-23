@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import { FaBell, FaSearch } from "react-icons/fa";
+import { signOut } from "next-auth/react";
 
 export default function Navbar() {
   const [showNotifications, setShowNotifications] = useState(false);
@@ -74,7 +75,12 @@ export default function Navbar() {
                     <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Mi perfil</li>
                     <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Configuración</li>
                     <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">
-                      <a href="/Registro">Cerrar sesión</a>
+                              <button
+                                onClick={() => signOut({ callbackUrl: "/" })}
+                                className="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition"
+                              >
+                                Cerrar sesión
+                              </button>
                     </li>
                   </ul>
                 </div>
