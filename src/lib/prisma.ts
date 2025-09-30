@@ -1,4 +1,4 @@
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient, Prisma } from "@prisma/client";
 
 declare global {
   // Extiende el objeto global para que TypeScript reconozca `prisma`
@@ -6,10 +6,16 @@ declare global {
 }
 
 // Configuración de logs según el entorno
-const logOpciones =
+const logOpciones: Prisma.LogDefinition[] =
   process.env.NODE_ENV === "production"
-    ? ["error"] // Producción
-    : ["query", "warn", "error", "info"]; //Desarrollo
+    ? [{ emit: "stdout", level: "error" }]//produccion
+    : [
+        { emit: "stdout", level: "query" },//desarrollo
+        { emit: "stdout", level: "warn" },
+        { emit: "stdout", level: "error" },
+        { emit: "stdout", level: "info" },
+      ];
+
 
 export const prisma =
   global.prisma ||

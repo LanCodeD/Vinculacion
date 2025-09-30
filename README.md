@@ -1,36 +1,69 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+Este proyecto fue creado con [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app) y utiliza App Router con autenticación mediante NextAuth.
 
-## Getting Started
+## Ramas del repositorio
 
-First, run the development server:
+### `main`
+- **Contenido donde se actualiza de las ramas**: En esta rama se va actualizando conforme vaya cambiando de las demas ramas hijas, en esa rama es donde se despliega.
+
+### `alan/convenios`
+- **Rama De Convenios**: Se crea todo el proceso de Relacionado a convenios
+
+### `jesus/bolsaTrabajo`
+- **Rama De Convenios**: Se crea todo el proceso de Relacionado a bolsa de trabajo
+
+> **Nota**: Todos los despliegues deben realizarse desde la rama `main`.
+
+---
+
+### Paso 1: Instalación de dependencias
+
+Instala todos los paquetes necesarios para correr el proyecto localmente.
 
 ```bash
 npm run dev
-# or
+# o
 yarn dev
-# or
+# o
 pnpm dev
-# or
+# o
 bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Abre [http://localhost:3000](http://localhost:3000) con tu navegador para ver el resultado.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Paso 2: Configuración de variables de entorno
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Crea un archivo .env en la raíz del proyecto y define las variables necesarias:
 
-## Learn More
+```bash
+DATABASE_URL=mysql://usuario:contraseña@localhost:0000/mi_base_de_datos
+NEXTAUTH_SECRET=tu_clave_secreta
+NEXTAUTH_URL=URL
 
-To learn more about Next.js, take a look at the following resources:
+## Coloca las credenciales a tu configuración de proyecto
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Paso 3: Ejecutar comando prisma para generar la migración de modelos
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Una vez ejecutado los paquetes de dependencia y haber configurado el .env, toca ejecutar el siguiente comando para traer los modelos a la base de datos
 
-## Deploy on Vercel
+```bash
+npx prisma migrate dev
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Generará el modelo.
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+
+### Paso 4. Ejecutar en modo desarrollo
+
+```bash
+npm run dev
+```
+### Paso 5. Generar build de producción (opcional)
+
+```bash
+npm run build
+npm start
+
+## (Esto es para optimizar y correr en modo producción.)
+```

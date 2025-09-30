@@ -1,8 +1,12 @@
 import CredentialsProvider from "next-auth/providers/credentials";
 import type { NextAuthOptions, User } from "next-auth";
 import bcrypt from "bcrypt";
-
 import { prisma } from "@/lib/prisma"; // tu instancia de prisma
+
+// Validación de entorno
+if (!process.env.NEXTAUTH_SECRET) {
+  throw new Error("NEXTAUTH_SECRET no está definido en el entorno");
+}
 
 export const authOptions: NextAuthOptions = {
   providers: [
@@ -13,81 +17,86 @@ export const authOptions: NextAuthOptions = {
         password: { label: "Contraseña", type: "password" },
       },
       async authorize(credentials) {
-        if (!credentials?.correo || !credentials?.password) {
-          throw new Error("Debe ingresar correo y contraseña");
-        }
+        try {
+          if (!credentials?.correo || !credentials?.password) {
+            throw new Error("Debe ingresar correo y contraseña");
+          }
 
-        // Buscar usuario en DB
-        const usuario = await prisma.usuarios.findUnique({
-          where: { correo: credentials.correo },
-        });
-
-        if (!usuario) {
-          throw new Error("Usuario no encontrado");
-        }
-
-        if (!usuario.password_hash) {
-          throw new Error("El usuario no tiene contraseña configurada");
-        }
-
-        // Validar contraseña
-        const isValid = await bcrypt.compare(
-          credentials.password,
-          usuario.password_hash
-        );
-
-        if (!isValid) {
-          throw new Error("Credenciales inválidas");
-        }
-
-        // 🔹 Validaciones especiales según tipo de cuenta
-        if (usuario.tipos_cuenta_id === 2) {
-          // Egresado
-          const egresado = await prisma.egresados.findFirst({
-            where: { usuarios_id: usuario.id_usuarios },
+          const usuario = await prisma.usuarios.findUnique({
+            where: { correo: credentials.correo },
           });
 
-          if (
-            !egresado ||
-            !egresado.verificado_por_usuarios_id ||
-            !egresado.verificado_en
-          ) {
-            throw new Error(
-              "Tu cuenta de egresado aún no ha sido validada por un administrador."
-            );
+          if (!usuario || !usuario.password_hash) {
+            throw new Error("Usuario o contraseña inválidos");
+          }
+
+          const isValid = await bcrypt.compare(
+            credentials.password,
+            usuario.password_hash
+          );
+
+          if (!isValid) {
+            throw new Error("Usuario o contraseña inválidos");
+          }
+
+          // Validaciones por tipo de cuenta
+          if (usuario.tipos_cuenta_id === 2) {
+            const egresado = await prisma.egresados.findFirst({
+              where: { usuarios_id: usuario.id_usuarios },
+            });
+
+            if (
+              !egresado ||
+              !egresado.verificado_por_usuarios_id ||
+              !egresado.verificado_en
+            ) {
+              throw new Error(
+                "Tu cuenta de egresado aún no ha sido validada por un administrador."
+              );
+            }
+          }
+
+          if (usuario.tipos_cuenta_id === 3) {
+            const empresa = await prisma.empresas.findFirst({
+              where: { usuarios_id: usuario.id_usuarios },
+            });
+
+            if (
+              !empresa ||
+              !empresa.verificado_por_usuarios_id ||
+              !empresa.verificado_en
+            ) {
+              throw new Error(
+                "Tu cuenta de empresa aún no ha sido validada por un administrador."
+              );
+            }
+          }
+
+          return {
+            id: usuario.id_usuarios,
+            nombre: usuario.nombre,
+            correo: usuario.correo,
+            tipoCuentaId: usuario.tipos_cuenta_id,
+            roles_id: usuario.roles_id,
+          };
+        } catch (error: unknown) {
+          if (error instanceof Error) {
+            console.error("Error en authorize:", error.message);
+            throw new Error("Error de autenticación");
+          } else {
+            console.error("Error desconocido en authorize:", error);
+            throw new Error("Error inesperado");
           }
         }
-
-        if (usuario.tipos_cuenta_id === 3) {
-          // Empresa
-          const empresa = await prisma.empresas.findFirst({
-            where: { usuarios_id: usuario.id_usuarios },
-          });
-
-          if (
-            !empresa ||
-            !empresa.verificado_por_usuarios_id ||
-            !empresa.verificado_en
-          ) {
-            throw new Error(
-              "Tu cuenta de empresa aún no ha sido validada por un administrador."
-            );
-          }
-        }
-
-        // ✅ Si todo bien, devolver datos mínimos del usuario
-        return {
-          id: usuario.id_usuarios,
-          nombre: usuario.nombre,
-          correo: usuario.correo,
-          tipoCuentaId: usuario.tipos_cuenta_id,
-          roles_id: usuario.roles_id,
-        };
       },
     }),
   ],
   secret: process.env.NEXTAUTH_SECRET,
 
+  // 👇 Le decimos a NextAuth qué rutas personalizadas usar
+  pages: {
+    signIn: "/IniciarSesion", // tu vista de login
+  },
   callbacks: {
     async jwt({ token, user }) {
       if (user) {
@@ -98,9 +107,12 @@ export const authOptions: NextAuthOptions = {
         token.tipoCuentaId = usuario.tipoCuentaId;
         token.roles_id = usuario.roles_id;
       }
-      console.log("Este es el usuario logueado: ", token.nombre);
-      console.log("Este es el correo logueado: ", token.correo);
-      console.log("Este es el rol logueado: ", token.roles_id);
+      if (process.env.NODE_ENV === "development") {
+        console.log("Usuario logueado:", token.nombre);
+        console.log("Correo logueado:", token.correo);
+        console.log("Rol logueado:", token.roles_id);
+      }
+
       return token;
     },
     async session({ session, token }) {

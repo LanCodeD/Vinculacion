@@ -32,7 +32,8 @@ export default function Home() {
                 <Image
                   src="/banner/tecnm.webp"
                   alt="Logo"
-                  fill
+                  priority
+                  fill 
                   className="object-contain scale-125"
                 />
               </div>

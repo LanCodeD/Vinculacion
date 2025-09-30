@@ -76,7 +76,7 @@ export default function Sidebar() {
             setOpen(!open);
           }}
         >
-          {open ? <TbLayoutSidebarLeftExpand /> : <TbLayoutSidebarLeftCollapse />}
+          {open ? <TbLayoutSidebarLeftExpand className="text-black" /> : <TbLayoutSidebarLeftCollapse className="text-black" />}
         </div>
 
         {/* Logo */}

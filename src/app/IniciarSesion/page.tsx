@@ -30,11 +30,12 @@ export default function LoginForm() {
     } else {
       toast.success("Login correcto 🎉", {
         position: "top-right",
-      });
+        duration: 1500,
+      },);
       // Redirigir después de un pequeño delay
       setTimeout(() => {
         router.push("/MenuPrincipal");
-      }, 1200);
+      }, 1600);
     }
   };
 

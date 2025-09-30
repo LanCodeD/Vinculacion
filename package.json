@@ -9,14 +9,15 @@
     "lint": "eslint"
   },
   "overrides": {
-  "chalk": "4.1.2",
-  "debug": "4.4.1"
+    "chalk": "4.1.2",
+    "debug": "4.4.1"
   },
   "dependencies": {
     "@prisma/client": "^6.15.0",
     "axios": "^1.11.0",
     "bcrypt": "^6.0.0",
     "framer-motion": "^12.23.12",
+    "lucide-react": "^0.544.0",
     "mysql2": "^3.14.4",
     "next": "15.5.2",
     "next-auth": "^4.24.11",
