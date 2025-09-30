@@ -17,7 +17,7 @@ export const USER_MENUS = [
     ],
     key: "servicios",
   },
-  { title: "Calendar", icon: <TiCalendar />, path: "/calendar" },
+  { title: "Calendar", icon: <TiCalendar />, path: "/Admin/PanelAdmin" },
   { title: "Tables", icon: <FiTable />, path: "/tables" },
   { title: "Analytics", icon: <GoGraph />, path: "/analytics" },
   { title: "Soporte", icon: <MdOutlineHeadsetMic />, path: "/support" },
@@ -34,7 +34,7 @@ export const USER_MENUS = [
 ];
 
 export const ADMIN_MENUS = [
-  { title: "Admin", icon: <MdSpaceDashboard />, path: "/PanelAdmin" },
+  { title: "Admin", icon: <MdSpaceDashboard />, path: "/Admin/ConfiguracionAdmin" },
   {
     title: "Gestión",
     icon: <FaGears />,
@@ -54,5 +54,5 @@ export const ADMIN_MENUS = [
     ],
     key: "settings",
   },
-  { title: "Soporte", icon: <MdOutlineHeadsetMic />, path: "/support" },
+  { title: "Soporte", icon: <MdOutlineHeadsetMic />, path: "/Admin/PanelAdmin" },
 ];

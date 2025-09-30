@@ -39,7 +39,7 @@ export default function LoginForm() {
 
       setTimeout(() => {
         if (role === "Administrador") {
-          router.push("../Admin/PanelAdmin"); // vista del admin
+          router.push("../Admin/ConfiguracionAdmin"); // vista del admin
         } else {
           router.push("/MenuPrincipal"); // vista de usuarios normales
         }

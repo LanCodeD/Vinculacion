@@ -15,8 +15,8 @@ export default withAuth(
     if (token) {
       const rol = token.roles_id;
 
-      // Área Admin → solo rol 1
-      if (pathname.startsWith("/admin") && rol !== 1) {
+      // Área Admin → solo rol 4
+      if (pathname.startsWith("/Admin/PanelAdmin") && rol !== 4) {
         return NextResponse.redirect(new URL("/PaginaNoAutorizada", req.url));
       }
 
@@ -43,7 +43,7 @@ export default withAuth(
 export const config = {
   matcher: [
     "/MenuPrincipal/:path*", // Dashboard general
-    "/admin/:path*",
+    "/Admin/:path*",
     "/empresa/:path*",
     "/egresado/:path*",
   ],

@@ -5,7 +5,7 @@ export default function BolsaTrabajo() {
   return (
     <div>
       <div className="min-h-screen text-3xl text-black bg-amber-50">
-        Perfil de administrador
+        Perfil de administrador PROTECCION DE RUTA
       </div>
     </div>
   );
