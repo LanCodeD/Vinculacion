@@ -1,4 +1,5 @@
 import NextAuth, { DefaultSession, DefaultUser } from "next-auth";
+import { AppRole } from "./roles";
 
 declare module "next-auth" {
   interface Session extends DefaultSession {
@@ -8,6 +9,7 @@ declare module "next-auth" {
       correo: string;
       tipoCuentaId: number;
       roles_id: number;
+      role: AppRole;
     } & DefaultSession["user"];
   }
 
@@ -27,5 +29,6 @@ declare module "next-auth/jwt" {
     correo: string;
     tipoCuentaId: number;
     roles_id: number;
+    role: AppRole;
   }
 }

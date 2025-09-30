@@ -1,5 +1,6 @@
 import CredentialsProvider from "next-auth/providers/credentials";
 import type { NextAuthOptions, User } from "next-auth";
+import { ROLE_MAP, AppRole } from "@/types/roles";
 import bcrypt from "bcrypt";
 
 import { prisma } from "@/lib/prisma"; // tu instancia de prisma
@@ -97,7 +98,9 @@ export const authOptions: NextAuthOptions = {
         token.correo = usuario.correo;
         token.tipoCuentaId = usuario.tipoCuentaId;
         token.roles_id = usuario.roles_id;
+        token.role = ROLE_MAP[user.roles_id] ?? "Usuario";
       }
+      
       console.log("Este es el usuario logueado: ", token.nombre);
       console.log("Este es el correo logueado: ", token.correo);
       console.log("Este es el rol logueado: ", token.roles_id);
@@ -108,7 +111,8 @@ export const authOptions: NextAuthOptions = {
         session.user.id = token.id;
         session.user.nombre = token.nombre;
         session.user.correo = token.correo;
-        session.user.tipoCuentaId = token.tipoCuentaId;
+        session.user.tipoCuentaId = token.tipoCuentaId;              // 👇 agrega rol en texto
+        session.user.role = token.role as AppRole;
       }
       return session;
     },
