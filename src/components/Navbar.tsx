@@ -24,7 +24,7 @@ export default function Navbar() {
 
       {/* Notificaciones + Perfil */}
           {/* Notificaciones y perfil */}
-          <div className="flex items-center gap-x-4 md:gap-x-8 ml-2 relative">
+          <div className="flex items-center gap-x-4 md:gap-x-8 ml-2 relative text-black">
 
             {/* Notificaciones */}
             <div className="relative">

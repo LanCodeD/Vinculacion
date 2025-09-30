@@ -4,16 +4,10 @@ import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 
 export default function MenuPrincipalPage() {
-  const { data: session, status } = useSession();
-  const router = useRouter();
-/* 
-  useEffect(() => {
-    if (status === "unauthenticated") {
-      router.push("/IniciarSesion");
-    }
-  }, [status]);
-
-  if (status === "loading") return <div>Cargando...</div>; */
-
-  return <div>Contenido protegido</div>;
+  return (
+    <div>
+      <h1 className="text-2xl font-bold text-black">Bienvenido al Menú Principal</h1>
+      <p className="text-black">Este es el contenido de la página.</p>
+    </div>
+  );
 }

@@ -1,9 +1,10 @@
 "use client";
 
-import { signIn } from "next-auth/react";
+import { signIn, getSession } from "next-auth/react";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import toast, { Toaster } from "react-hot-toast";
+
 
 export default function LoginForm() {
   const [correo, setCorreo] = useState("");
@@ -31,10 +32,17 @@ export default function LoginForm() {
       toast.success("Login correcto 🎉", {
         position: "top-right",
         duration: 1500,
-      },);
-      // Redirigir después de un pequeño delay
+      });
+      // 👇 Obtenemos la sesión actual para saber el rol
+      const session = await getSession();
+      const role = session?.user.role;
+
       setTimeout(() => {
-        router.push("/MenuPrincipal");
+        if (role === "Administrador") {
+          router.push("../Admin/PanelAdmin"); // vista del admin
+        } else {
+          router.push("/MenuPrincipal"); // vista de usuarios normales
+        }
       }, 1600);
     }
   };
