@@ -81,6 +81,9 @@ model empresas {
   egresados egresados[]
   docentes  docentes[]
 
+  // Nuevas relaciones
+  ofertas ofertas[]
+
   @@index([usuarios_id], map: "idx_empresas_usuario")
   @@index([verificado_por_usuarios_id], map: "fk_empresas_verificado_por")
 }
@@ -155,8 +158,8 @@ model tokens_usuarios {
   expiracion_en DateTime  @db.DateTime(0)
   usado_en      DateTime? @db.DateTime(0)
   intentos      Int       @default(0)
-  reenvio       Int       @default(0)       // para contar reenvíos
-  ultimo_envio  DateTime? @db.DateTime(0)   // para cooldown de reenvíos
+  reenvio       Int       @default(0) // para contar reenvíos
+  ultimo_envio  DateTime? @db.DateTime(0) // para cooldown de reenvíos
   ip_origen     String?   @db.VarChar(45)
   user_agent    String?   @db.VarChar(255)
   creado_en     DateTime  @default(now()) @db.DateTime(0)
@@ -179,7 +182,7 @@ model usuarios {
   correo_verificado     Int               @default(0) @db.TinyInt
   correo_verificado_en  DateTime?         @db.DateTime(0)
   last_login            DateTime?         @db.DateTime(0)
-  paso_actual           Int               
+  paso_actual           Int
   creado_en             DateTime          @default(now()) @db.DateTime(0)
   actualizado_en        DateTime          @default(now()) @db.DateTime(0)
   consents              consents[]
@@ -195,6 +198,13 @@ model usuarios {
   egresados_perfil      egresados[]       @relation("EgresadoPerfil")
   egresados_verificados egresados[]       @relation("EgresadoVerificador")
 
+  // Nuevas relaciones
+  ofertas_creadas         ofertas[]       @relation("OfertasCreador")
+  postulaciones           postulaciones[] @relation("PostulacionesUsuario")
+  postulaciones_revisadas postulaciones[] @relation("PostulacionRevisada")
+
+  ofertas_verificadas     ofertas[]       @relation("OfertaVerificador")
+
   @@index([roles_id], map: "fk_usuarios_role")
   @@index([tipos_cuenta_id], map: "idx_usuarios_tipo")
 }
@@ -209,9 +219,11 @@ model accounts {
 }
 
 model egresados {
-  id_egresados               Int       @id @default(autoincrement())
-  usuarios_id                Int
-  
+  id_egresados Int @id @default(autoincrement())
+  usuarios_id  Int
+
+  cv_url String? @db.VarChar(500)
+
   titulo                     String?   @db.VarChar(50)
   puesto                     String?   @db.VarChar(100)
   matricula                  String    @db.VarChar(50)
@@ -262,4 +274,93 @@ model academias_ingenierias {
 
   egresados egresados[]
   docentes  docentes[]
+}
+
+// Bolsa de trabajo - Modulos
+
+model oferta_estados {
+  id_oferta_estados Int       @id @default(autoincrement())
+  nombre_estado     String    @unique(map: "uq_oferta_estado") @db.VarChar(50)
+  descripcion       String?   @db.Text
+  ofertas           ofertas[]
+}
+
+model ofertas {
+  id_ofertas                 Int       @id @default(autoincrement())
+  empresas_id                Int
+  creado_por_usuarios_id     Int?
+  titulo                     String    @db.VarChar(250)
+  puesto                     String?   @db.VarChar(150) // <--- NUEVO CAMPO
+  ubicacion                  String?   @db.VarChar(255)
+  descripcion                String?   @db.Text
+  imagen                     String?   @db.VarChar(500) // <--- NUEVO CAMPO
+  es_flyer                   Int       @default(0) @db.TinyInt
+  flyer_url                  String?   @db.VarChar(500)
+  fecha_publicacion          DateTime? @db.DateTime(0)
+  fecha_cierre               DateTime? @db.DateTime(0)
+  oferta_estados_id          Int       @default(1)
+  creado_en                  DateTime  @default(now()) @db.DateTime(0)
+  actualizado_en             DateTime  @default(now()) @db.DateTime(0)
+  verificado_por_usuarios_id Int? // admin que aprobó
+  verificado_en              DateTime? // fecha de aprobación/publicación
+
+  verificador        usuarios?            @relation("OfertaVerificador", fields: [verificado_por_usuarios_id], references: [id_usuarios])
+  empresas           empresas             @relation(fields: [empresas_id], references: [id_empresas], map: "fk_ofertas_empresa")
+  creador            usuarios?            @relation("OfertasCreador", fields: [creado_por_usuarios_id], references: [id_usuarios], map: "fk_ofertas_creador")
+  estado             oferta_estados       @relation(fields: [oferta_estados_id], references: [id_oferta_estados], map: "fk_ofertas_estado")
+  postulaciones      postulaciones[]
+  categorias_ofertas ofertas_categorias[]
+
+  @@index([empresas_id], map: "idx_ofertas_empresa")
+  @@index([oferta_estados_id], map: "idx_ofertas_estado")
+  @@index([empresas_id, oferta_estados_id], map: "idx_ofertas_empresa_estado")
+}
+
+model postulacion_estados {
+  id_postulacion_estados Int             @id @default(autoincrement())
+  nombre_estado          String          @unique(map: "uq_postulacion_estado") @db.VarChar(50)
+  descripcion            String?         @db.Text
+  postulaciones          postulaciones[]
+}
+
+model postulaciones {
+  id_postulaciones         Int       @id @default(autoincrement())
+  ofertas_id               Int
+  usuarios_id              Int
+  mensaje                  String?   @db.Text
+  postulacion_estados_id   Int       @default(1)
+  revisado_por_usuarios_id Int?
+  revisado_en              DateTime? @db.DateTime(0)
+  creado_en                DateTime  @default(now()) @db.DateTime(0)
+  actualizado_en           DateTime  @default(now()) @db.DateTime(0)
+
+  oferta       ofertas             @relation(fields: [ofertas_id], references: [id_ofertas], map: "fk_postu_oferta")
+  usuario      usuarios            @relation("PostulacionesUsuario", fields: [usuarios_id], references: [id_usuarios], map: "fk_postu_usuario")
+  estado       postulacion_estados @relation(fields: [postulacion_estados_id], references: [id_postulacion_estados], map: "fk_postu_estado")
+  revisado_por usuarios?           @relation("PostulacionRevisada", fields: [revisado_por_usuarios_id], references: [id_usuarios], map: "fk_postu_revisado")
+
+  @@unique([ofertas_id, usuarios_id], map: "uq_postu_oferta_usuario")
+  @@index([ofertas_id], map: "idx_postu_oferta")
+  @@index([usuarios_id], map: "idx_postu_usuario")
+  @@index([ofertas_id, postulacion_estados_id], map: "idx_postu_oferta_estado")
+}
+
+//Nuevo ofertas_categorias
+
+model categorias {
+  id_categorias Int                  @id @default(autoincrement())
+  nombre        String               @unique(map: "uq_categorias_nombre") @db.VarChar(100)
+  descripcion   String?              @db.VarChar(255)
+  ofertas       ofertas_categorias[]
+}
+
+model ofertas_categorias {
+  ofertas_id    Int
+  categorias_id Int
+
+  oferta    ofertas    @relation(fields: [ofertas_id], references: [id_ofertas], map: "fk_oferta_categoria_oferta")
+  categoria categorias @relation(fields: [categorias_id], references: [id_categorias], map: "fk_oferta_categoria_categoria")
+
+  @@id([ofertas_id, categorias_id])
+  @@index([categorias_id], map: "idx_categoria_id")
 }

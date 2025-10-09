@@ -21,16 +21,27 @@ export default function Perfil() {
   const [user, setUser] = useState<UserProfile | null>(null);
 
   useEffect(() => {
-    if (status !== 'authenticated') return;
+    console.log("Estado de sesión:", status);
+    console.log("Sesión:", session);
+
+    if (status !== "authenticated") return;
 
     const userId = session?.user?.id;
+    console.log("UserID:", userId);
+
     if (!userId) return;
 
     fetch(`/api/Users/${userId}`)
-      .then(res => res.json())
-      .then(data => setUser(data))
-      .catch(err => console.error(err));
+      .then(async (res) => {
+        console.log("Respuesta cruda:", res);
+        const text = await res.text();
+        console.log("Texto recibido:", text);
+        return JSON.parse(text);
+      })
+      .then((data) => setUser(data))
+      .catch((err) => console.error("Error al parsear JSON:", err));
   }, [status, session]);
+
 
   if (status === 'loading') return <div>Cargando sesión...</div>;
   if (!user) return <div>Cargando datos del usuario...</div>;
