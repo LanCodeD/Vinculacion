@@ -19,7 +19,7 @@ export const USER_MENUS = [
         title: "Bolsa de trabajo",
         key : "bolsa",
         subMenu: [
-          { title: "Información", path: "/" },
+          { title: "Información", path: "/BolsaTrabajo/InformacionBolsa" },
           { title: "Vacantes", path: "/BolsaTrabajo" },
           { title: "Mis Postulaciones", path: "/" },
         ],

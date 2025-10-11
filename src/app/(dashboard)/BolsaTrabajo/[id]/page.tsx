@@ -9,12 +9,13 @@ export const dynamic = "force-dynamic";
 interface VacantePageProps {
     params: { id: string };
 }
-
 export default async function VacantePage({ params }: VacantePageProps) {
-    const id = Number(params.id); // ✅ Next.js App Router compatible
+    const { id } = await params; // ✅ Esperamos la promesa
+    const vacanteId = Number(id);
+
 
     const vacante = await prisma.ofertas.findUnique({
-        where: { id_ofertas: id },
+        where: { id_ofertas: vacanteId },
         select: {
             titulo: true,
             puesto: true,
@@ -23,6 +24,7 @@ export default async function VacantePage({ params }: VacantePageProps) {
             ubicacion: true,
         },
     });
+
 
     if (!vacante) {
         return <p className="text-center text-gray-500 mt-20">Vacante no encontrada</p>;
