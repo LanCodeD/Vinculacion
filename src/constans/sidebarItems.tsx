@@ -5,17 +5,26 @@ import { TiCalendar } from "react-icons/ti";
 import { FiTable } from "react-icons/fi";
 import { GoGraph } from "react-icons/go";
 import { FaGears } from "react-icons/fa6";
+import { sub } from "framer-motion/client";
 
 export const USER_MENUS = [
   { title: "Menu Principal", icon: <MdSpaceDashboard />, path: "/MenuPrincipal" },
   {
     title: "Servicios",
     icon: <BiChat />,
+    key: "servicios",
     subMenu: [
       { title: "Convenios", path: "/Convenios" },
-      { title: "Bolsa de trabajo", path: "/BolsaTrabajo" }
+      {
+        title: "Bolsa de trabajo",
+        key : "bolsa",
+        subMenu: [
+          { title: "Información", path: "/" },
+          { title: "Vacantes", path: "/BolsaTrabajo" },
+          { title: "Mis Postulaciones", path: "/" },
+        ],
+      },
     ],
-    key: "servicios",
   },
   { title: "Calendar", icon: <TiCalendar />, path: "/Admin/PanelAdmin" },
   { title: "Tables", icon: <FiTable />, path: "/tables" },
@@ -33,6 +42,8 @@ export const USER_MENUS = [
   },
 ];
 
+
+
 export const ADMIN_MENUS = [
   { title: "Admin", icon: <MdSpaceDashboard />, path: "/Admin/ConfiguracionAdmin" },
   {
@@ -41,6 +52,7 @@ export const ADMIN_MENUS = [
     subMenu: [
       { title: "Usuarios", path: "/Admin/GestionUsuarios" },
       { title: "Convenios", path: "/Admin/GestionConvenios" },
+      { title: "Bolsa de Trabajo", path: "/Admin/BolsaTrabajoAD" },
     ],
     key: "gestion",
   },

@@ -1,58 +1,93 @@
-import { NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
-
-export async function GET(req: Request) {
-  const url = new URL(req.url);
-  const rol = url.searchParams.get('rol'); // 'admin', 'empresa', 'egresado'
-  const empresaIdParam = url.searchParams.get('empresaId');
-
-  let where: any = {};
-
-  if (rol === 'egresado') {
-    where = { oferta_estados_id: 2 }; // Solo publicadas
-  } else if (rol === 'empresa' && empresaIdParam) {
-    where = { empresas_id: parseInt(empresaIdParam) };
-  }
-
-  const ofertas = await prisma.ofertas.findMany({
-    where,
-    include: { empresas: true, estado: true },
-    orderBy: { creado_en: 'desc' },
-  });
-
-  return NextResponse.json({ ok: true, ofertas });
-}
+// src/app/api/Ofertas/route.ts
+import { NextResponse } from "next/server";
+import { prisma } from "@/lib/prisma";
+import { getServerSession } from "next-auth/next";
+import { authOptions } from "@/app/api/auth/[...nextauth]/authOptions";
+import { ROLE_MAP, AppRole } from "@/types/roles";
 
 export async function POST(req: Request) {
   try {
-    const body = await req.json();
-    const titulo = body.titulo;
-    const descripcion = body.descripcion;
-    const empresaId = parseInt(body.empresaId);
-    const usuarioId = parseInt(body.usuarioId);
+    // Obtener sesión
+    const session = await getServerSession(authOptions);
+    if (!session?.user) {
+      return NextResponse.json(
+        { ok: false, error: "No autorizado" },
+        { status: 401 }
+      );
+    }
 
+    // Validar rol usando ROLE_MAP
+    const userRole: AppRole = ROLE_MAP[session.user.roles_id];
+    if (userRole !== "Empresa") {
+      return NextResponse.json(
+        { ok: false, error: "Solo cuentas de empresa pueden crear ofertas" },
+        { status: 403 }
+      );
+    }
+
+    const body = await req.json();
+
+    // Validar campos obligatorios
+    const requiredFields = [
+      "titulo",
+      "descripcion",
+      "puesto",
+      "ubicacion",
+      "imagen",
+      "fecha_cierre",
+    ];
+    for (const field of requiredFields) {
+      if (!body[field]) {
+        return NextResponse.json(
+          { ok: false, error: `Falta el campo obligatorio: ${field}` },
+          { status: 400 }
+        );
+      }
+    }
+
+    // Buscar empresa asociada al usuario logeado
+    const empresa = await prisma.empresas.findFirst({
+      where: { usuarios_id: session.user.id },
+    });
+
+    if (!empresa) {
+      return NextResponse.json(
+        { ok: false, error: "No se encontró empresa asociada al usuario" },
+        { status: 404 }
+      );
+    }
+
+    const { titulo, descripcion, puesto, ubicacion, imagen, fecha_cierre } =
+      body;
+
+    // Crear la oferta
     const oferta = await prisma.ofertas.create({
       data: {
         titulo,
         descripcion,
-        empresas_id: empresaId,
-        creado_por_usuarios_id: usuarioId,
-        oferta_estados_id: 1, // Pendiente
+        puesto,
+        ubicacion,
+        imagen,
+        fecha_cierre: new Date(fecha_cierre),
+        empresas_id: empresa.id_empresas,
+        creado_por_usuarios_id: session.user.id,
+        fecha_publicacion: new Date(),
+        oferta_estados_id: 2, // pendiente de revisión
       },
     });
 
-    // Notificar admins/subadmins
+    // Notificar admins y subadmins
     const admins = await prisma.usuarios.findMany({
       where: { roles_id: { in: [4, 5] } }, // 4=Admin, 5=Subadmin
     });
 
     if (admins.length > 0) {
       await prisma.notificaciones.createMany({
-        data: admins.map(a => ({
+        data: admins.map((a) => ({
           usuarios_id: a.id_usuarios,
-          tipo: 'nueva_vacante',
-          titulo: 'Nueva vacante pendiente de aprobación',
-          mensaje: `Una empresa ha creado la vacante "${titulo}".`,
+          tipo: "nueva_vacante",
+          titulo: "Nueva vacante pendiente de aprobación",
+          mensaje: `La empresa "${empresa.nombre_comercial}" ha creado la vacante "${titulo}".`,
         })),
       });
     }
@@ -60,6 +95,9 @@ export async function POST(req: Request) {
     return NextResponse.json({ ok: true, oferta });
   } catch (error) {
     console.error(error);
-    return NextResponse.json({ ok: false, error: 'Error al crear vacante' }, { status: 500 });
+    return NextResponse.json(
+      { ok: false, error: "Error al crear la vacante" },
+      { status: 500 }
+    );
   }
 }

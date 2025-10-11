@@ -1,3 +1,4 @@
+// src/components/VacanteDetail.tsx
 "use client";
 
 import React from 'react';

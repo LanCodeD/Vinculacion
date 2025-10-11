@@ -2,6 +2,7 @@
 import React from 'react';
 import VacanteCard from '@/components/VacanteCard';
 import { prisma } from '@/lib/prisma';
+import Link from 'next/link';
 
 export default async function BolsaTrabajoPage() {
   // Obtener vacantes activas
@@ -31,6 +32,16 @@ export default async function BolsaTrabajoPage() {
           <p className="lg:w-1/2 w-full leading-relaxed text-gray-500">
             Explora las oportunidades de trabajo que tenemos disponibles. Haz click en cada vacante para más información.
           </p>
+        </div>
+
+        {/* 🔹 Botón "Crear" independiente */}
+        <div className="mb-6">
+          <Link
+            href="/BolsaTrabajo/CreacionVacante"
+            className="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg transition-colors duration-200"
+          >
+            Crear Vacante
+          </Link>
         </div>
 
         <div className="flex flex-wrap -m-4">

@@ -202,7 +202,6 @@ model usuarios {
   ofertas_creadas         ofertas[]       @relation("OfertasCreador")
   postulaciones           postulaciones[] @relation("PostulacionesUsuario")
   postulaciones_revisadas postulaciones[] @relation("PostulacionRevisada")
-
   ofertas_verificadas     ofertas[]       @relation("OfertaVerificador")
 
   @@index([roles_id], map: "fk_usuarios_role")

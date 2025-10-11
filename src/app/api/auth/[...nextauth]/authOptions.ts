@@ -1,55 +1,106 @@
-// src/lib/authOptions.ts
-import GoogleProvider from "next-auth/providers/google";
-import type { NextAuthOptions } from "next-auth";
+import CredentialsProvider from "next-auth/providers/credentials";
+import type { NextAuthOptions, User } from "next-auth";
+import { ROLE_MAP, AppRole } from "@/types/roles";
+import bcrypt from "bcrypt";
+import { prisma } from "@/lib/prisma"; // tu instancia de Prisma
 
-// ⚡ Tu regex institucional
-const regexInstitucional =
-  /^(?=(?:[A-Za-z0-9.#+-][A-Za-z]){2,})(?!.*[.#+-]{2,})(?!^[.#+-])(?!.*[.#+-]$)[A-Za-z0-9._#+-]+@valladolid\.tecnm\.mx$/;
+if (!process.env.NEXTAUTH_SECRET) {
+  throw new Error("NEXTAUTH_SECRET no está definido en el entorno");
+}
 
 export const authOptions: NextAuthOptions = {
   providers: [
-    GoogleProvider({
-      clientId: process.env.GOOGLE_CLIENT_ID!,
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+    CredentialsProvider({
+      name: "Credentials",
+      credentials: {
+        correo: { label: "Correo", type: "text" },
+        password: { label: "Contraseña", type: "password" },
+      },
+      async authorize(credentials) {
+        if (!credentials?.correo || !credentials?.password) {
+          throw new Error("Debe ingresar correo y contraseña");
+        }
+
+        //Buscar usuario usando el campo único 'correo'
+        const usuario = await prisma.usuarios.findUnique({
+          where: { correo: credentials.correo },
+        });
+
+        if (!usuario || !usuario.password_hash) {
+          throw new Error("Usuario o contraseña inválidos");
+        }
+
+        const isValid = await bcrypt.compare(
+          credentials.password,
+          usuario.password_hash
+        );
+
+        if (!isValid) {
+          throw new Error("Usuario o contraseña inválidos");
+        }
+
+        // Validaciones de verificación según tipo de cuenta
+        if (usuario.tipos_cuenta_id === 2) {
+          const egresado = await prisma.egresados.findFirst({
+            where: { usuarios_id: usuario.id_usuarios },
+          });
+          if (!egresado?.verificado_por_usuarios_id || !egresado?.verificado_en) {
+            throw new Error(
+              "Tu cuenta de egresado aún no ha sido validada por un administrador."
+            );
+          }
+        }
+
+        if (usuario.tipos_cuenta_id === 3) {
+          const empresa = await prisma.empresas.findFirst({
+            where: { usuarios_id: usuario.id_usuarios },
+          });
+          if (!empresa?.verificado_por_usuarios_id || !empresa?.verificado_en) {
+            throw new Error(
+              "Tu cuenta de empresa aún no ha sido validada por un administrador."
+            );
+          }
+        }
+
+        // ✅ Retornar un objeto con los campos que luego usaremos en session y token
+        return {
+          id: usuario.id_usuarios,
+          nombre: usuario.nombre,
+          correo: usuario.correo,
+          tipoCuentaId: usuario.tipos_cuenta_id,
+          roles_id: usuario.roles_id,
+        };
+      },
     }),
   ],
   secret: process.env.NEXTAUTH_SECRET,
-
+  pages: {
+    signIn: "/IniciarSesion",
+  },
   callbacks: {
-    /**
-     * 🚀 Validación antes de permitir login
-     */
-    async signIn({ user, account }) {
-      const rawUrl =
-        (account?.["callbackUrl"] as string) ?? "http://localhost:3000";
-      const url = new URL(rawUrl);
-      const tipoCuenta = url.searchParams.get("tipoCuenta");
-      console.log("Este es el tipo de cuenta en google: ",tipoCuenta)
-
-      if (tipoCuenta === "1") {
-        if (!user.email || !regexInstitucional.test(user.email)) {
-          console.log("❌ Correo no válido para tipoCuenta=1");
-          return false;
-        }
-      }
-
-      return true;
-    },
-
-    async jwt({ token, account }) {
-      const rawUrl = account?.["callbackUrl"] as string | undefined;
-      if (rawUrl) {
-        const tipoCuenta = new URL(rawUrl).searchParams.get("tipoCuenta");
-        if (tipoCuenta) token.tipoCuenta = tipoCuenta;
+    async jwt({ token, user }) {
+      if (user) {
+        token.id = Number(user.id); // asegúrate que sea número
+        token.nombre = user.nombre;
+        token.correo = user.correo;
+        token.tipoCuentaId = Number(user.tipoCuentaId); // también a número
+        token.roles_id = Number(user.roles_id); // 👈 forzar número
+        token.role = ROLE_MAP[Number(user.roles_id)] ?? "Usuario";
       }
       return token;
     },
 
     async session({ session, token }) {
-      if (token.tipoCuenta) {
-        session.user.tipoCuentaId = token.tipoCuentaId;
+      if (session.user) {
+        session.user.id = Number(token.id);
+        session.user.nombre = token.nombre;
+        session.user.correo = token.correo;
+        session.user.tipoCuentaId = Number(token.tipoCuentaId);
+        session.user.roles_id = Number(token.roles_id!);
+        session.user.role = token.role as AppRole;
       }
       return session;
     },
+
   },
 };

@@ -1,34 +1,39 @@
-import { NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
+import { NextResponse } from "next/server";
+import { prisma } from "@/lib/prisma";
 
 export async function PATCH(req: Request, { params }: { params: { id: string } }) {
   try {
     const id = parseInt(params.id);
-    const { nuevoEstadoId, revisadoPorUsuarioId } = await req.json();
+    const { accion, revisadoPorUsuarioId } = await req.json();
 
-    const post = await prisma.postulaciones.update({
-      where: { id_postulaciones: id },
+    const nuevoEstadoId = accion === "aprobar" ? 3 : 4; // 3=publicada, 4=rechazada
+
+    const oferta = await prisma.ofertas.update({
+      where: { id_ofertas: id },
       data: {
-        postulacion_estados_id: parseInt(nuevoEstadoId),
-        revisado_por_usuarios_id: parseInt(revisadoPorUsuarioId),
-        revisado_en: new Date(),
+        oferta_estados_id: nuevoEstadoId,
+        verificado_por_usuarios_id: revisadoPorUsuarioId,
+        verificado_en: new Date(),
       },
-      include: { usuario: true, oferta: true },
+      include: { empresas: true },
     });
 
+    // Notificaciones
     await prisma.notificaciones.create({
       data: {
-        usuarios_id: post.usuario.id_usuarios,
-        tipo: 'postulacion_actualizada',
-        titulo: 'Actualización en tu postulación',
-        mensaje: `Tu postulación a "${post.oferta.titulo}" fue ${parseInt(nuevoEstadoId) === 3 ? 'aceptada' : 'rechazada'}.`,
+        usuarios_id: oferta.empresas.usuarios_id,
+        tipo: "oferta_actualizada",
+        titulo: "Tu vacante fue revisada",
+        mensaje: `Tu oferta "${oferta.titulo}" fue ${nuevoEstadoId === 3 ? "aprobada y publicada" : "rechazada"}.`,
       },
     });
 
-    return NextResponse.json({ ok: true, post });
+    return NextResponse.json({ ok: true, oferta });
   } catch (error) {
     console.error(error);
-    return NextResponse.json({ ok: false, error: 'Error al actualizar postulación' }, { status: 500 });
+    return NextResponse.json(
+      { ok: false, error: "Error al actualizar estado de la vacante" },
+      { status: 500 }
+    );
   }
 }
-
