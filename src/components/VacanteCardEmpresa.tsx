@@ -1,4 +1,3 @@
-// src/components/VacanteCardEmpresa.tsx
 "use client";
 import Link from "next/link";
 import React from "react";
@@ -37,20 +36,23 @@ const VacanteCard: React.FC<VacanteCardProps> = ({
   onDelete,
 }) => {
   return (
-    <div className="xl:w-1/3 md:w-1/2 p-4">
-      <div className="bg-white p-6 rounded-xl shadow-md border hover:shadow-lg transition duration-300 relative flex flex-col justify-between h-full">
+    <div className="p-4">
+      <div className="bg-white p-6 rounded-xl shadow-md border hover:shadow-lg hover:-translate-y-1 transition duration-300 flex flex-col justify-between h-full">
         {/* Imagen */}
         <img
           className="h-44 rounded-lg w-full object-cover object-center mb-4"
           src={imagen}
-          alt={titulo}
         />
 
         {/* Contenido */}
         <div>
           <h3 className="text-sm text-blue-600 font-semibold">{titulo}</h3>
-          <h2 className="text-lg text-gray-900 font-medium title-font mb-2">{puesto}</h2>
-          <p className="leading-relaxed text-sm text-gray-600 line-clamp-3">{descripcion}</p>
+          <h2 className="text-lg text-gray-900 font-medium title-font mb-2">
+            {puesto}
+          </h2>
+          <p className="leading-relaxed text-sm text-gray-600 line-clamp-3">
+            {descripcion}
+          </p>
         </div>
 
         {/* Estado de la oferta */}
@@ -67,15 +69,15 @@ const VacanteCard: React.FC<VacanteCardProps> = ({
           <div className="mt-4 flex gap-2">
             <Link
               href={`EditarVacantes/${id}`}
-              className="flex-1 bg-blue-500 hover:bg-blue-600 text-white text-sm font-semibold py-2 px-3 rounded-lg text-center transition"
+              className="flex-1 bg-blue-700 hover:bg-blue-600 text-white text-sm font-semibold py-2 px-3 rounded-lg text-center transition"
             >
-              ✏️ Editar
+              Editar
             </Link>
             <button
               onClick={() => onDelete?.(id)}
               className="flex-1 bg-red-500 hover:bg-red-600 text-white text-sm font-semibold py-2 px-3 rounded-lg transition"
             >
-              🗑️ Eliminar
+              Eliminar
             </button>
           </div>
         )}

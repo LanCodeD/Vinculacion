@@ -1,6 +1,7 @@
 'use client';
 import { useState } from 'react';
 import { useSession } from 'next-auth/react';
+import toast from 'react-hot-toast';
 
 export default function CrearOferta() {
   const { data: session } = useSession();
@@ -55,9 +56,16 @@ export default function CrearOferta() {
       const data = await res.json();
 
       if (!data.ok) {
-        setError(data.error || 'Error al crear la oferta.');
+        toast.error(data.error || 'Error al crear la oferta.', {
+          position: 'top-right',
+        });
       } else {
-        setSuccess('✅ Oferta creada correctamente y enviada para revisión.');
+        toast.success('✅ Oferta creada correctamente y enviada para revisión.', {
+          position: 'top-right',
+          duration: 1500,
+        });
+
+        // Limpiar formulario
         setTitulo('');
         setDescripcion('');
         setPuesto('');

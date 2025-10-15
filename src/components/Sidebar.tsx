@@ -23,7 +23,7 @@ export default function Sidebar({ role }: { role: AppRole }) {
     }));
   };
 
-  // 🔹 Función recursiva para renderizar submenús
+  // Función recursiva para renderizar submenús
   const renderSubMenu = (menu: any, depth = 1) => {
     return (
       <ul

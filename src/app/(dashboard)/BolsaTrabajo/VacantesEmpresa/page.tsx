@@ -39,9 +39,11 @@ export default function VacantesEmpresa() {
 
   return (
     <section className="text-gray-700 body-font">
-      <div className="container px-5 py-24 mx-auto">
+      <div className="container px-5 py-24 mx-auto -max-lg:px-0 -mt-15">
         <h1 className="text-2xl font-bold mb-6">Mis Vacantes</h1>
-        <div className="flex flex-wrap -m-4">
+
+        {/* Grid responsive */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
           {vacantes.length > 0 ? (
             vacantes.map((v) => (
               <VacanteCard
