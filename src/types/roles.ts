@@ -1,17 +1,17 @@
 // utils/roles.ts
 export type AppRole =
-  | "Usuario"
-  | "Supervisor"
-  | "Editor"
+  | "Docente"
+  | "Egresado"
+  | "Empresa"
   | "Administrador"
-  | "Invitado"
-  | "Root"; // 👈 aquí defines los nombres de los 6 roles
+  | "Sub-Administrador"
+  | "Personal-Plantel"; // 👈 aquí defines los nombres de los 6 roles
 
 export const ROLE_MAP: Record<number, AppRole> = {
-  1: "Usuario",
-  2: "Supervisor",
-  3: "Editor",
+  1: "Docente",
+  2: "Egresado",
+  3: "Empresa",
   4: "Administrador",
-  5: "Invitado",
-  6: "Root",
+  5: "Sub-Administrador",
+  6: "Personal-Plantel",
 };

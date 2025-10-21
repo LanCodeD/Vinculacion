@@ -5,6 +5,7 @@ import { TiCalendar } from "react-icons/ti";
 import { FiTable } from "react-icons/fi";
 import { GoGraph } from "react-icons/go";
 import { FaGears } from "react-icons/fa6";
+import { sub } from "framer-motion/client";
 
 export const USER_MENUS = [
   { title: "Menu Principal", icon: <MdSpaceDashboard />, path: "/MenuPrincipal" },
@@ -22,11 +23,20 @@ export const USER_MENUS = [
         { title: "Convenio Específico", path: "/Convenios/Especificos" }
       ]
     },
-    { title: "Bolsa de trabajo", path: "/BolsaTrabajo" }
+{
+        title: "Bolsa de trabajo",
+        key : "bolsa",
+        subMenu: [
+          { title: "Información", path: "/BolsaTrabajo/InformacionBolsa" },
+          { title: "Vacantes", path: "/BolsaTrabajo" },
+          { title: "Mis Postulaciones", path: "/" },
+        ],
+      },
   ]
 },
+
   { title: "Calendar", icon: <TiCalendar />, path: "/Admin/PanelAdmin" },
-  { title: "Tables", icon: <FiTable />, path: "/tables" },
+  { title: "Tables", icon: <FiTable />, path: "/BolsaTrabajo/Postulaciones" },
   { title: "Analytics", icon: <GoGraph />, path: "/analytics" },
   { title: "Soporte", icon: <MdOutlineHeadsetMic />, path: "/support" },
   {
@@ -40,6 +50,8 @@ export const USER_MENUS = [
     key: "settings",
   },
 ];
+
+
 
 export const ADMIN_MENUS = [
   { title: "Admin", icon: <MdSpaceDashboard />, path: "/Admin/ConfiguracionAdmin" },
@@ -58,6 +70,7 @@ export const ADMIN_MENUS = [
             { title: "Convenio Firmado", path: "/Admin/Convenios/Concretados" },
           ],
         },
+        { title: "Bolsa de Trabajo", path: "/Admin/BolsaTrabajoAD" },
       ],
     },
     {

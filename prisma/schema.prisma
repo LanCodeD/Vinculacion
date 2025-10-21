@@ -81,6 +81,9 @@ model empresas {
   egresados egresados[]
   docentes  docentes[]
 
+  // Nuevas relaciones
+  ofertas ofertas[]
+
   @@index([usuarios_id], map: "idx_empresas_usuario")
   @@index([verificado_por_usuarios_id], map: "fk_empresas_verificado_por")
 }
@@ -182,6 +185,10 @@ model usuarios {
   paso_actual           Int
   creado_en             DateTime              @default(now()) @db.DateTime(0)
   actualizado_en        DateTime              @default(now()) @db.DateTime(0)
+
+  // NUEVO CAMPO
+  foto_perfil String? @db.VarChar(500)
+
   consents              consents[]
   contactos             contactos[]
   empresas_perfil       empresas[]            @relation("EmpresaPerfil")
@@ -196,6 +203,12 @@ model usuarios {
   egresados_verificados egresados[]           @relation("EgresadoVerificador")
   solicitudesCreadas    solicitud_convenios[] @relation("SolicitudesCreadas")
   solicitudesRevisadas  solicitud_convenios[] @relation("SolicitudesRevisadas")
+
+  // Nuevas relaciones
+  ofertas_creadas         ofertas[]       @relation("OfertasCreador")
+  postulaciones           postulaciones[] @relation("PostulacionesUsuario")
+  postulaciones_revisadas postulaciones[] @relation("PostulacionRevisada")
+  ofertas_verificadas     ofertas[]       @relation("OfertaVerificador")
 
   @@index([roles_id], map: "fk_usuarios_role")
   @@index([tipos_cuenta_id], map: "idx_usuarios_tipo")
@@ -213,7 +226,7 @@ model accounts {
 model egresados {
   id_egresados Int @id @default(autoincrement())
   usuarios_id  Int
-
+  cv_url String? @db.VarChar(500)
   titulo                     String?   @db.VarChar(50)
   puesto                     String?   @db.VarChar(100)
   matricula                  String    @db.VarChar(50)
@@ -264,6 +277,88 @@ model academias_ingenierias {
 
   egresados egresados[]
   docentes  docentes[]
+  ofertas   ofertas_ingenierias[]
+}
+
+// Bolsa de trabajo - Modulos
+
+model oferta_estados {
+  id_oferta_estados Int       @id @default(autoincrement())
+  nombre_estado     String    @unique(map: "uq_oferta_estado") @db.VarChar(50)
+  descripcion       String?   @db.Text
+  ofertas           ofertas[]
+}
+
+model ofertas {
+  id_ofertas                 Int       @id @default(autoincrement())
+  empresas_id                Int
+  creado_por_usuarios_id     Int?
+  titulo                     String    @db.VarChar(250)
+  puesto                     String?   @db.VarChar(150) // <--- NUEVO CAMPO
+  ubicacion                  String?   @db.VarChar(255)
+  descripcion                String?   @db.Text
+  imagen                     String?   @db.VarChar(500) // <--- NUEVO CAMPO
+  es_flyer                   Int       @default(0) @db.TinyInt
+  flyer_url                  String?   @db.VarChar(500)
+  fecha_publicacion          DateTime? @db.DateTime(0)
+  fecha_cierre               DateTime? @db.DateTime(0)
+  oferta_estados_id          Int       @default(1)
+  creado_en                  DateTime  @default(now()) @db.DateTime(0)
+  actualizado_en             DateTime  @default(now()) @db.DateTime(0)
+  verificado_por_usuarios_id Int? // admin que aprobó
+  verificado_en              DateTime? // fecha de aprobación/publicación
+
+  verificador        usuarios?            @relation("OfertaVerificador", fields: [verificado_por_usuarios_id], references: [id_usuarios])
+  empresas           empresas             @relation(fields: [empresas_id], references: [id_empresas], map: "fk_ofertas_empresa")
+  creador            usuarios?            @relation("OfertasCreador", fields: [creado_por_usuarios_id], references: [id_usuarios], map: "fk_ofertas_creador")
+  estado             oferta_estados       @relation(fields: [oferta_estados_id], references: [id_oferta_estados], map: "fk_ofertas_estado")
+  postulaciones      postulaciones[]
+  ingenierias_ofertas ofertas_ingenierias[]
+
+  @@index([empresas_id], map: "idx_ofertas_empresa")
+  @@index([oferta_estados_id], map: "idx_ofertas_estado")
+  @@index([empresas_id, oferta_estados_id], map: "idx_ofertas_empresa_estado")
+}
+
+model postulacion_estados {
+  id_postulacion_estados Int             @id @default(autoincrement())
+  nombre_estado          String          @unique(map: "uq_postulacion_estado") @db.VarChar(50)
+  descripcion            String?         @db.Text
+  postulaciones          postulaciones[]
+}
+
+model postulaciones {
+  id_postulaciones         Int       @id @default(autoincrement())
+  ofertas_id               Int
+  usuarios_id              Int
+  mensaje                  String?   @db.Text
+  postulacion_estados_id   Int       @default(1)
+  revisado_por_usuarios_id Int?
+  revisado_en              DateTime? @db.DateTime(0)
+  creado_en                DateTime  @default(now()) @db.DateTime(0)
+  actualizado_en           DateTime  @default(now()) @db.DateTime(0)
+
+  oferta       ofertas             @relation(fields: [ofertas_id], references: [id_ofertas], map: "fk_postu_oferta")
+  usuario      usuarios            @relation("PostulacionesUsuario", fields: [usuarios_id], references: [id_usuarios], map: "fk_postu_usuario")
+  estado       postulacion_estados @relation(fields: [postulacion_estados_id], references: [id_postulacion_estados], map: "fk_postu_estado")
+  revisado_por usuarios?           @relation("PostulacionRevisada", fields: [revisado_por_usuarios_id], references: [id_usuarios], map: "fk_postu_revisado")
+
+  @@unique([ofertas_id, usuarios_id], map: "uq_postu_oferta_usuario")
+  @@index([ofertas_id], map: "idx_postu_oferta")
+  @@index([usuarios_id], map: "idx_postu_usuario")
+  @@index([ofertas_id, postulacion_estados_id], map: "idx_postu_oferta_estado")
+}
+
+
+model ofertas_ingenierias {
+  ofertas_id   Int
+  academias_id Int
+
+  oferta   ofertas               @relation(fields: [ofertas_id], references: [id_ofertas], onDelete: Cascade, map: "fk_oferta_ingenieria_oferta")
+  academia academias_ingenierias @relation(fields: [academias_id], references: [id_academias], map: "fk_oferta_ingenieria_academia")
+
+  @@id([ofertas_id, academias_id])
+  @@index([academias_id], map: "idx_ingenieria_id")
 }
 
 // ========================

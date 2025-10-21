@@ -52,10 +52,17 @@ export default function Sidebar({ role }: { role: AppRole }) {
   return (
     <>
       {/* Sidebar Desktop */}
-      <div className={`hidden md:flex flex-col ${open ? "w-72 p-5" : "w-20 p-4"} bg-zinc-900 h-full pt-8 relative duration-300 ease-in-out`}>
+
+      <div
+        className={`hidden md:flex flex-col ${
+          open ? "w-72 p-5" : "w-20 p-4"
+        } bg-zinc-900 h-full pt-8 relative duration-300 ease-in-out`}
+      >
         {/* Toggle button */}
         <div
-          className={`absolute cursor-pointer -right-4 top-9 w-8 h-8 p-0.5 bg-zinc-50 border-zinc-50 border-2 rounded-full text-xl flex items-center justify-center ${!open && "rotate-180"} transition-all ease-in-out duration-300`}
+          className={`absolute cursor-pointer -right-4 top-9 w-8 h-8 p-0.5 bg-zinc-50 border-zinc-50 border-2 rounded-full text-xl flex items-center justify-center ${
+            !open && "rotate-180"
+          } transition-all ease-in-out duration-300`}
           onClick={() => setOpen(!open)}
         >
           {open ? <TbLayoutSidebarLeftExpand className="text-zinc-900" /> : <TbLayoutSidebarLeftCollapse className="text-zinc-900" />}
@@ -68,7 +75,11 @@ export default function Sidebar({ role }: { role: AppRole }) {
             alt="logo"
             className={`w-10 h-10 md:w-12 md:h-12 rounded-full object-cover object-center cursor-pointer transition-transform duration-300 ease-in-out hover:scale-110 ${open && "rotate-[360deg]"}`}
           />
-          <h1 className={`text-zinc-50 origin-left font-semibold text-xl duration-200 ease-in-out ${!open && "scale-0"}`}>
+          <h1
+            className={`text-zinc-50 origin-left font-semibold text-xl duration-200 ease-in-out ${
+              !open && "scale-0"
+            }`}
+          >
             SISTEMA DE BOLSA
           </h1>
         </div>
@@ -76,7 +87,10 @@ export default function Sidebar({ role }: { role: AppRole }) {
         {/* Menus Desktop */}
         <ul className="pt-6 space-y-0.5">
           {Menus.map((Menu, index) => (
-            <li key={index} className="flex flex-col rounded-md py-3 px-4 cursor-pointer hover:bg-blue-800/50 text-zinc-50">
+            <li
+              key={index}
+              className="flex flex-col rounded-md py-3 px-4 cursor-pointer hover:bg-blue-800/50 text-zinc-50"
+            >
               {Menu.path && !Menu.subMenu ? (
                 <Link href={Menu.path} className="flex items-center gap-x-4">
                   <span className="text-lg">{Menu.icon}</span>
@@ -103,8 +117,6 @@ export default function Sidebar({ role }: { role: AppRole }) {
                   )}
                 </div>
               )}
-
-              {open && Menu.subMenu && subMenus[Menu.key ?? ""] && renderSubMenu(Menu.subMenu)}
             </li>
           ))}
         </ul>
@@ -113,32 +125,55 @@ export default function Sidebar({ role }: { role: AppRole }) {
       {/* Sidebar Mobile */}
       {mobileOpen && (
         <div className="fixed inset-0 z-50 flex md:hidden">
-          <div className="fixed inset-0 bg-black/30" onClick={() => setMobileOpen(false)} />
+
+          <div
+            className="fixed inset-0 bg-black/30"
+            onClick={() => setMobileOpen(false)}
+          />
           <div className="relative w-72 bg-zinc-900 p-5">
-            <button className="absolute top-5 right-5 text-white text-xl" onClick={() => setMobileOpen(false)}>
+            <button
+              className="absolute top-5 right-5 text-white text-xl"
+              onClick={() => setMobileOpen(false)}
+            >
               &times;
             </button>
             <ul className="pt-6 space-y-0.5">
               {Menus.map((Menu, index) => (
-                <li key={index} className="flex flex-col rounded-md py-3 px-4 cursor-pointer hover:bg-blue-800/50 text-zinc-50">
+                <li
+                  key={index}
+                  className="flex flex-col rounded-md py-3 px-4 cursor-pointer hover:bg-blue-800/50 text-zinc-50"
+                >
                   {Menu.path && !Menu.subMenu ? (
-                    <Link href={Menu.path} className="flex items-center gap-x-4" onClick={() => setMobileOpen(false)}>
+                    <Link
+                      href={Menu.path}
+                      className="flex items-center gap-x-4"
+                      onClick={() => setMobileOpen(false)}
+                    >
                       <span className="text-lg">{Menu.icon}</span>
                       <span>{Menu.title}</span>
                     </Link>
                   ) : (
-                    <div className="flex items-center justify-between gap-x-4" onClick={() => Menu.key && toggleSubMenu(Menu.key)}>
+
+                    <div
+                      className="flex items-center justify-between gap-x-4"
+                      onClick={() => Menu.key && toggleSubMenu(Menu.key)}
+                    >
                       <div className="flex items-center gap-2">
                         <span className="text-lg">{Menu.icon}</span>
                         <span>{Menu.title}</span>
                       </div>
                       {Menu.subMenu && (
-                        <span>{subMenus[Menu.key ?? ""] ? <FaChevronDown /> : <FaChevronRight />}</span>
+
+                        <span>
+                          {subMenus[Menu.key ?? ""] ? (
+                            <FaChevronDown />
+                          ) : (
+                            <FaChevronRight />
+                          )}
+                        </span>
                       )}
                     </div>
                   )}
-
-                  {Menu.subMenu && subMenus[Menu.key ?? ""] && renderSubMenu(Menu.subMenu)}
                 </li>
               ))}
             </ul>

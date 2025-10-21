@@ -1,26 +1,28 @@
-"use client";
-
+// app/(dashboard)/layout.tsx
 import Sidebar from "@/components/Sidebar";
 import Navbar from "@/components/Navbar";
-import { useSession } from "next-auth/react";
-import { useRouter } from "next/navigation";
+import { authOptions } from "@/app/api/auth/[...nextauth]/authOptions";
+import { getServerSession } from "next-auth";
+import { redirect } from "next/navigation";
 import { AppRole } from "@/types/roles";
 
-export default function DashboardLayout({ children }: { children: React.ReactNode }) {
-  const router = useRouter();
-  const { data: session, status } = useSession();
+export default async function DashboardLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  // 🚀 Obtener sesión directamente en el servidor
+  const session = await getServerSession(authOptions);
 
-  if (status === "loading") return null;
   if (!session?.user) {
-    router.push("/");
-    return null;
+    redirect("/"); // Redirige sin parpadeos
   }
 
-  // 👇 Ya lo obtienes directo de la sesión
   const role = session.user.role as AppRole;
 
   return (
     <div className="flex h-screen w-screen overflow-hidden">
+      {/* ✅ Ya no hay retraso en obtener el rol */}
       <Sidebar role={role} />
       <div className="flex flex-col flex-1 min-h-0 bg-zinc-100">
         <Navbar />

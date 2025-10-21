@@ -1,0 +1,31 @@
+// src/app/Admin/BolsaTrabajoAD/[id]/page.tsx
+import { prisma } from "@/lib/prisma";
+import AdminVacanteDetailClient from "@/components/Componentes_administrador/VacanteDetailClient";
+
+type Props = { params: { id: string } };
+
+export default async function AdminVacanteDetailPage({ params }: Props) {
+    const { id } = await params; // ✅ Esperamos la promesa
+    const vacanteId = Number(id);
+
+    const vacante = await prisma.ofertas.findUnique({
+        where: { id_ofertas: vacanteId },
+        include: {
+            empresas: { select: { nombre_comercial: true, usuarios_id: true } },
+            estado: { select: { nombre_estado: true } },
+            ingenierias_ofertas: {
+                include: {
+                    academia: {
+                        select: { ingenieria: true }
+                    }
+                }
+            }
+        }
+    });
+
+    if (!vacante) {
+        return <p className="p-6 text-red-500">Vacante no encontrada</p>;
+    }
+
+    return <AdminVacanteDetailClient vacante={vacante} />;
+}
