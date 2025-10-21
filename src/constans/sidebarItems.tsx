@@ -8,15 +8,23 @@ import { FaGears } from "react-icons/fa6";
 
 export const USER_MENUS = [
   { title: "Menu Principal", icon: <MdSpaceDashboard />, path: "/MenuPrincipal" },
-  {
-    title: "Servicios",
-    icon: <BiChat />,
-    subMenu: [
-      { title: "Convenios", path: "/Convenios" },
-      { title: "Bolsa de trabajo", path: "/BolsaTrabajo" }
-    ],
-    key: "servicios",
-  },
+{
+  title: "Servicios",
+  icon: <BiChat />,
+  key: "servicios",
+  subMenu: [
+    {
+      title: "Convenios",
+      key: "convenios",
+      subMenu: [
+        { title: "Información General", path: "/Convenios" },
+        { title: "Convenio General", path: "/Convenios/Generales" },
+        { title: "Convenio Específico", path: "/Convenios/Especificos" }
+      ]
+    },
+    { title: "Bolsa de trabajo", path: "/BolsaTrabajo" }
+  ]
+},
   { title: "Calendar", icon: <TiCalendar />, path: "/Admin/PanelAdmin" },
   { title: "Tables", icon: <FiTable />, path: "/tables" },
   { title: "Analytics", icon: <GoGraph />, path: "/analytics" },
@@ -35,15 +43,23 @@ export const USER_MENUS = [
 
 export const ADMIN_MENUS = [
   { title: "Admin", icon: <MdSpaceDashboard />, path: "/Admin/ConfiguracionAdmin" },
-  {
-    title: "Gestión",
-    icon: <FaGears />,
-    subMenu: [
-      { title: "Usuarios", path: "/Admin/GestionUsuarios" },
-      { title: "Convenios", path: "/Admin/GestionConvenios" },
-    ],
-    key: "gestion",
-  },
+    {
+      title: "Gestión",
+      icon: <FaGears />,
+      key: "gestion",
+      subMenu: [
+        { title: "Usuarios", path: "/Admin/GestionUsuarios" },
+        {
+          title: "Solicitudes Convenios",
+          key: "admin-convenios",
+          subMenu: [
+            { title: "Convenio General", path: "/Admin/Convenios/Generales" },
+            { title: "Convenio Específico", path: "/Admin/Convenios/Especificos" },
+            { title: "Convenio Firmado", path: "/Admin/Convenios/Concretados" },
+          ],
+        },
+      ],
+    },
     {
     title: "Configuración",
     icon: <FaGears />,
