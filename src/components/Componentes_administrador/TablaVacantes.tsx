@@ -7,7 +7,10 @@ type Vacante = {
   id_ofertas: number;
   titulo: string;
   puesto: string | null;
-  empresas: { nombre_comercial: string } | null;
+  empresas: { nombre_comercial: string;
+    correo: string | null;
+    telefono: string | null;
+   } | null;
   estado: { nombre_estado: string } | null;
 };
 
@@ -31,11 +34,11 @@ export default function TablaVacantes({ vacantes }: Props) {
 
   const estadoBadge = (estado: string | undefined) => {
     switch (estado?.toLowerCase()) {
-      case 'active':
+      case 'PUBLICADA':
         return <span className="px-3 py-1 rounded-full bg-green-100 text-green-800 text-xs font-semibold">{estado}</span>;
-      case 'not active':
+      case 'RECHAZADA':
         return <span className="px-3 py-1 rounded-full bg-red-100 text-red-800 text-xs font-semibold">{estado}</span>;
-      case 'disabled':
+      case 'PENDIENTE_REVISION':
         return <span className="px-3 py-1 rounded-full bg-orange-100 text-orange-800 text-xs font-semibold">{estado}</span>;
       default:
         return <span className="px-3 py-1 rounded-full bg-gray-100 text-gray-800 text-xs font-semibold">{estado}</span>;
@@ -43,7 +46,7 @@ export default function TablaVacantes({ vacantes }: Props) {
   };
 
   return (
-    <div className="py-4 overflow-x-auto sm:px-6 lg:px-8">
+    <div className="py-4 overflow-x-auto sm:px-6 lg:px-0">
       {/* Buscador */}
       <div className="flex justify-between items-center mb-4">
         <input
@@ -60,9 +63,10 @@ export default function TablaVacantes({ vacantes }: Props) {
         <table className="min-w-full divide-y divide-gray-200">
           <thead className="bg-gradient-to-r from-blue-100 to-blue-50">
             <tr>
-              <th className="px-6 py-3 text-left text-xs font-medium text-blue-700 uppercase tracking-wider">ID</th>
               <th className="px-6 py-3 text-left text-xs font-medium text-blue-700 uppercase tracking-wider">Título</th>
               <th className="px-6 py-3 text-left text-xs font-medium text-blue-700 uppercase tracking-wider">Empresa</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-blue-700 uppercase tracking-wider">Correo</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-blue-700 uppercase tracking-wider">Teléfono</th>
               <th className="px-6 py-3 text-left text-xs font-medium text-blue-700 uppercase tracking-wider">Estado</th>
               <th className="px-6 py-3 text-left text-xs font-medium text-blue-700 uppercase tracking-wider">Acciones</th>
             </tr>
@@ -70,9 +74,10 @@ export default function TablaVacantes({ vacantes }: Props) {
           <tbody className="bg-white divide-y divide-gray-200">
             {vacantesFiltradas.map((v) => (
               <tr key={v.id_ofertas} className="hover:bg-gray-50 transition-colors">
-                <td className="px-6 py-4 whitespace-nowrap text-gray-700">{v.id_ofertas}</td>
                 <td className="px-6 py-4 whitespace-nowrap text-blue-900">{v.titulo}</td>
                 <td className="px-6 py-4 whitespace-nowrap text-blue-900">{v.empresas?.nombre_comercial ?? 'Sin empresa'}</td>
+                <td className="px-6 py-4 whitespace-nowrap">{v.empresas?.correo ?? 'N/A'}</td>
+                <td className="px-6 py-4 whitespace-nowrap">{v.empresas?.telefono ?? 'N/A'}</td>
                 <td className="px-6 py-4 whitespace-nowrap">{estadoBadge(v.estado?.nombre_estado)}</td>
                 <td className="px-6 py-4 whitespace-nowrap text-right">
                   <Link

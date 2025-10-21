@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
-import VacanteCard from "@/components/VacanteCardEmpresa";
+import VacanteCard from "@/components/Componentes_empresas/VacanteCardEmpresa";
 
 interface Vacante {
   id_ofertas: number;

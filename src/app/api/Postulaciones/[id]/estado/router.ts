@@ -1,3 +1,4 @@
+// src/app/api/Postulaciones/[id]/estado/route.ts
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
@@ -6,33 +7,65 @@ export async function PATCH(req: Request, { params }: { params: { id: string } }
     const id = parseInt(params.id);
     const { accion, revisadoPorUsuarioId } = await req.json();
 
-    const nuevoEstadoId = accion === "aprobar" ? 3 : 4; // 3=publicada, 4=rechazada
+    if (!accion || !revisadoPorUsuarioId) {
+      return NextResponse.json(
+        { ok: false, error: "Faltan datos requeridos (acción o usuario revisor)" },
+        { status: 400 }
+      );
+    }
 
-    const oferta = await prisma.ofertas.update({
-      where: { id_ofertas: id },
+    // Estados de postulaciones:
+    // 1 = Enviada
+    // 2 = En revisión
+    // 3 = Aprobada
+    // 4 = Rechazada
+    const nuevoEstadoId =
+      accion === "aprobar" ? 3 : accion === "rechazar" ? 4 : 2;
+
+    // ✅ Actualizamos la postulación
+    const postulacion = await prisma.postulaciones.update({
+      where: { id_postulaciones: id },
       data: {
-        oferta_estados_id: nuevoEstadoId,
-        verificado_por_usuarios_id: revisadoPorUsuarioId,
-        verificado_en: new Date(),
+        postulacion_estados_id: nuevoEstadoId,
+        revisado_por_usuarios_id: revisadoPorUsuarioId,
+        revisado_en: new Date(),
       },
-      include: { empresas: true },
+      include: {
+        usuario: true, // el egresado
+        oferta: { include: { empresas: true } },
+      },
     });
 
-    // Notificaciones
+    // ✅ Creamos notificación para el egresado
     await prisma.notificaciones.create({
       data: {
-        usuarios_id: oferta.empresas.usuarios_id,
-        tipo: "oferta_actualizada",
-        titulo: "Tu vacante fue revisada",
-        mensaje: `Tu oferta "${oferta.titulo}" fue ${nuevoEstadoId === 3 ? "aprobada y publicada" : "rechazada"}.`,
+        usuarios_id: postulacion.usuarios_id,
+        tipo: "postulacion_actualizada",
+        titulo:
+          nuevoEstadoId === 3
+            ? "Tu postulación fue aprobada"
+            : nuevoEstadoId === 4
+            ? "Tu postulación fue rechazada"
+            : "Tu postulación está en revisión",
+        mensaje: `Tu postulación a la vacante "${postulacion.oferta.titulo}" fue ${
+          nuevoEstadoId === 3
+            ? "aprobada ✅"
+            : nuevoEstadoId === 4
+            ? "rechazada ❌"
+            : "marcada como en revisión 🔍"
+        }.`,
       },
     });
 
-    return NextResponse.json({ ok: true, oferta });
+    return NextResponse.json({
+      ok: true,
+      postulacion,
+      message: "Estado de postulación actualizado correctamente",
+    });
   } catch (error) {
-    console.error(error);
+    console.error("❌ Error al actualizar postulación:", error);
     return NextResponse.json(
-      { ok: false, error: "Error al actualizar estado de la vacante" },
+      { ok: false, error: "Error al actualizar el estado de la postulación" },
       { status: 500 }
     );
   }

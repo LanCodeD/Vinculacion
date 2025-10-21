@@ -4,6 +4,7 @@ import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/app/api/auth/[...nextauth]/authOptions";
 import { prisma } from "@/lib/prisma";
 import { ROLE_MAP, AppRole } from "@/types/roles";
+import { enviarCorreo } from "@/lib/mailer";
 
 export async function GET() {
   try {
@@ -14,6 +15,11 @@ export async function GET() {
         { status: 401 }
       );
     }
+
+    console.log("[GET] Usuario logueado:", session.user.nombre);
+    console.log("[GET] Rol:", session.user.role);
+    console.log("[GET] roles_id:", session.user.roles_id);
+    console.log("[GET] ID usuario:", session.user.id);
 
     // Buscar la empresa asociada al usuario
     const empresa = await prisma.empresas.findFirst({
@@ -44,7 +50,7 @@ export async function GET() {
 
     return NextResponse.json({ ok: true, vacantes });
   } catch (error) {
-    console.error(error);
+    console.error("Error en GET /api/Ofertas:", error);
     return NextResponse.json(
       { ok: false, error: "Error al obtener vacantes" },
       { status: 500 }
@@ -62,9 +68,16 @@ export async function POST(req: Request) {
       );
     }
 
+    // Mostrar información de depuración
+    console.log("[POST] Usuario logueado:", session.user.nombre);
+    console.log("[POST] Rol:", session.user.role);
+    console.log("[POST] roles_id:", session.user.roles_id);
+    console.log("[POST] ID usuario:", session.user.id);
+
     // Validar rol usando ROLE_MAP
     const userRole: AppRole = ROLE_MAP[session.user.roles_id];
     if (userRole !== "Empresa") {
+      console.log("Rol no autorizado para crear ofertas:", userRole);
       return NextResponse.json(
         { ok: false, error: "Solo cuentas de empresa pueden crear ofertas" },
         { status: 403 }
@@ -91,7 +104,7 @@ export async function POST(req: Request) {
       }
     }
 
-    // Buscar empresa asociada al usuario logeado
+    // Buscar empresa asociada al usuario logueado
     const empresa = await prisma.empresas.findFirst({
       where: { usuarios_id: session.user.id },
     });
@@ -103,7 +116,8 @@ export async function POST(req: Request) {
       );
     }
 
-    const { titulo, descripcion, puesto, ubicacion, imagen, fecha_cierre } = body;
+    const { titulo, descripcion, puesto, ubicacion, imagen, fecha_cierre } =
+      body;
 
     // Crear la oferta
     const oferta = await prisma.ofertas.create({
@@ -117,9 +131,20 @@ export async function POST(req: Request) {
         empresas_id: empresa.id_empresas,
         creado_por_usuarios_id: session.user.id,
         fecha_publicacion: new Date(),
-        oferta_estados_id: 2, // pendiente de revisión
+        oferta_estados_id: 2, // Pendiente de revisión
       },
     });
+
+    const { ingenierias } = body; // array de IDs
+    if (ingenierias && ingenierias.length > 0) {
+      await prisma.ofertas_ingenierias.createMany({
+        data: ingenierias.map((ingId: number) => ({
+          ofertas_id: oferta.id_ofertas,
+          academias_id: ingId
+        })),
+      });
+    }
+
 
     // Notificar admins y subadmins
     const admins = await prisma.usuarios.findMany({
@@ -135,11 +160,30 @@ export async function POST(req: Request) {
           mensaje: `La empresa "${empresa.nombre_comercial}" ha creado la vacante "${titulo}".`,
         })),
       });
+      // Enviar correos a admins
+      for (const admin of admins) {
+        if (admin.correo) {
+          enviarCorreo({
+            to: admin.correo,
+            subject: "Nueva vacante pendiente de aprobación",
+            html: `<p>Hola ${admin.nombre},</p>
+                   <p>La empresa "<strong>${empresa.nombre_comercial}</strong>" ha creado la vacante "<strong>${titulo}</strong>".</p>
+                   <p>Por favor, revisa y aprueba o rechaza la vacante en el panel de administración.</p>
+          
+                   <p>Saludos,<br/>Equipo de Vinculación</p>`,
+          }).catch((err) =>
+            console.error("Error al enviar correo al admin:", err)
+          );
+          console.log("Correo enviado a admin:", admin.correo);
+        }
+      }
     }
+
+    console.log("Vacante creada correctamente:", oferta.titulo);
 
     return NextResponse.json({ ok: true, oferta });
   } catch (error) {
-    console.error(error);
+    console.error("Error en POST /api/Ofertas:", error);
     return NextResponse.json(
       { ok: false, error: "Error al crear la vacante" },
       { status: 500 }

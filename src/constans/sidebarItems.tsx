@@ -27,7 +27,7 @@ export const USER_MENUS = [
     ],
   },
   { title: "Calendar", icon: <TiCalendar />, path: "/Admin/PanelAdmin" },
-  { title: "Tables", icon: <FiTable />, path: "/tables" },
+  { title: "Tables", icon: <FiTable />, path: "/BolsaTrabajo/Postulaciones" },
   { title: "Analytics", icon: <GoGraph />, path: "/analytics" },
   { title: "Soporte", icon: <MdOutlineHeadsetMic />, path: "/support" },
   {

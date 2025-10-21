@@ -1,3 +1,4 @@
+// src/components/Componentes_administrador/VacanteDetailClient.tsx
 "use client";
 
 import { useState } from "react";
@@ -18,6 +19,7 @@ type VacanteDetail = {
   actualizado_en?: Date;
   empresas: { nombre_comercial: string };
   estado: { nombre_estado: string };
+  ingenierias_ofertas: { academia: { ingenieria: string } }[];
 };
 
 
@@ -77,6 +79,14 @@ export default function AdminVacanteDetailClient({ vacante }: Props) {
       <p><strong>Empresa:</strong> {vacante.empresas.nombre_comercial}</p>
       <p><strong>Estado:</strong> {vacante.estado.nombre_estado}</p>
       <p><strong>Puesto:</strong> {vacante.puesto ?? "Sin puesto"}</p>
+
+      <p>
+        <strong>Ingenierías:</strong>{" "}
+        {vacante.ingenierias_ofertas && vacante.ingenierias_ofertas.length > 0
+          ? vacante.ingenierias_ofertas.map(c => c.academia.ingenieria).join(", ")
+          : "Sin ingenierías"}
+      </p>
+
       <p><strong>Ubicación:</strong> {vacante.ubicacion ?? "Sin ubicación"}</p>
       <p><strong>Descripción:</strong> {vacante.descripcion ?? "Sin descripción"}</p>
       <p><strong>ID de la Vacante:</strong> {vacante.id_ofertas}</p>

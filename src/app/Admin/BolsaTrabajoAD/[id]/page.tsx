@@ -1,5 +1,6 @@
+// src/app/Admin/BolsaTrabajoAD/[id]/page.tsx
 import { prisma } from "@/lib/prisma";
-import AdminVacanteDetailClient from "@/components/VacanteDetailClient";
+import AdminVacanteDetailClient from "@/components/Componentes_administrador/VacanteDetailClient";
 
 type Props = { params: { id: string } };
 
@@ -12,7 +13,14 @@ export default async function AdminVacanteDetailPage({ params }: Props) {
         include: {
             empresas: { select: { nombre_comercial: true, usuarios_id: true } },
             estado: { select: { nombre_estado: true } },
-        },
+            ingenierias_ofertas: {
+                include: {
+                    academia: {
+                        select: { ingenieria: true }
+                    }
+                }
+            }
+        }
     });
 
     if (!vacante) {

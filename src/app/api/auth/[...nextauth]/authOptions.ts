@@ -1,3 +1,4 @@
+// src/app/api/auth/[...nextauth]/authOptions.ts
 import CredentialsProvider from "next-auth/providers/credentials";
 import type { NextAuthOptions, User } from "next-auth";
 import { ROLE_MAP, AppRole } from "@/types/roles";
@@ -62,7 +63,7 @@ export const authOptions: NextAuthOptions = {
           }
         }
 
-        // ✅ Retornar un objeto con los campos que luego usaremos en session y token
+        // Retornar un objeto con los campos que luego usaremos en session y token
         return {
           id: usuario.id_usuarios,
           nombre: usuario.nombre,
@@ -84,7 +85,7 @@ export const authOptions: NextAuthOptions = {
         token.nombre = user.nombre;
         token.correo = user.correo;
         token.tipoCuentaId = Number(user.tipoCuentaId); // también a número
-        token.roles_id = Number(user.roles_id); // 👈 forzar número
+        token.roles_id = Number(user.roles_id); // forzar número
         token.role = ROLE_MAP[Number(user.roles_id)] ?? "Usuario";
       }
       return token;

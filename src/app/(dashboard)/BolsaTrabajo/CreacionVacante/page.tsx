@@ -1,7 +1,7 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useSession } from 'next-auth/react';
-import toast from 'react-hot-toast';
+import toast, { Toaster } from 'react-hot-toast';
 
 export default function CrearOferta() {
   const { data: session } = useSession();
@@ -13,29 +13,45 @@ export default function CrearOferta() {
   const [imagen, setImagen] = useState('');
   const [fechaCierre, setFechaCierre] = useState('');
 
+  const [ingenierias, setIngenierias] = useState<number[]>([]);
+  const [listaIngenierias, setListaIngenierias] = useState<{ id_academias: number; ingenieria: string }[]>([]);
+
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
 
   const hoy = new Date().toISOString().split('T')[0]; // fecha mínima válida
+
+  // Cargar categorías
+  useEffect(() => {
+    fetch("/api/Ingenierias")
+      .then(res => res.json())
+      .then(data => {
+        if (data.ok) setListaIngenierias(data.ingenierias);
+      })
+      .catch(err => console.error(err));
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
     setSuccess('');
 
-    if (!titulo || !descripcion || !puesto || !ubicacion || !imagen || !fechaCierre) {
-      setError('Por favor, completa todos los campos obligatorios.');
+    if (!titulo || !descripcion || !puesto || !ubicacion || !imagen || !fechaCierre || ingenierias.length === 0) {
+      toast.error('Por favor, completa todos los campos obligatorios y selecciona al menos una ingeniería.', {
+        duration: 4000,
+        position: 'top-right',
+      });
       return;
     }
 
     const fechaSeleccionada = new Date(fechaCierre);
     if (fechaSeleccionada < new Date()) {
-      setError('La fecha de cierre no puede ser anterior a hoy.');
+      toast.error('La fecha de cierre no puede ser anterior a hoy.', { duration: 3000 });
       return;
     }
 
     if (!session || session.user.role !== 'Empresa') {
-      setError('Solo cuentas de empresa pueden crear vacantes.');
+      toast.error('Solo cuentas de empresa pueden crear vacantes.', { duration: 3000 });
       return;
     }
 
@@ -50,20 +66,16 @@ export default function CrearOferta() {
           ubicacion,
           imagen,
           fecha_cierre: fechaCierre,
+          ingenierias,
         }),
       });
 
       const data = await res.json();
 
       if (!data.ok) {
-        toast.error(data.error || 'Error al crear la oferta.', {
-          position: 'top-right',
-        });
+        toast.error(data.error || 'Error al crear la oferta.', { duration: 3000 });
       } else {
-        toast.success('✅ Oferta creada correctamente y enviada para revisión.', {
-          position: 'top-right',
-          duration: 1500,
-        });
+        toast.success('✅ Oferta creada correctamente y enviada para revisión.', { duration: 3000 });
 
         // Limpiar formulario
         setTitulo('');
@@ -72,6 +84,7 @@ export default function CrearOferta() {
         setUbicacion('');
         setImagen('');
         setFechaCierre('');
+        setIngenierias([]);
       }
     } catch (err) {
       console.error(err);
@@ -83,19 +96,43 @@ export default function CrearOferta() {
 
   return (
     <div className="p-6 bg-white rounded-xl shadow-lg max-w-xl mx-auto mt-10 text-black">
-      <h1 className="text-3xl font-bold mb-6 text-center text-blue-700">Crear nueva oferta</h1>
+      {/* Toast container */}
+      <Toaster
+        position="top-right"
+        reverseOrder={false}
+        toastOptions={{
+          duration: 3000,
+          style: {
+            borderRadius: '12px',
+            padding: '14px 20px',
+            color: '#111',
+            fontWeight: 500,
+          },
+          success: {
+            style: {
+              backgroundColor: '#bbf7d0', // bg-green-200
+              color: '#065f46',           // texto verde oscuro
+            },
+          },
+          error: {
+            style: {
+              backgroundColor: '#fecaca', // bg-red-200
+              color: '#991b1b',           // texto rojo oscuro
+            },
+          },
+        }}
+      />
 
-      {error && <p className="text-red-600 text-center mb-3">{error}</p>}
-      {success && <p className="text-green-600 text-center mb-3">{success}</p>}
+      <h1 className="text-3xl font-bold mb-6 text-center text-blue-700">Crear nueva oferta</h1>
 
       <form onSubmit={handleSubmit} className="space-y-5">
         <div>
-          <label className="block font-medium mb-1">Título *</label>
+          <label className="block font-medium mb-1">Nombre de la empresa *</label>
           <input
             value={titulo}
             onChange={e => setTitulo(e.target.value)}
             className="w-full border p-2 rounded-lg focus:ring focus:ring-blue-200"
-            placeholder="Ej. Desarrollador Frontend"
+            placeholder="Empresa"
           />
         </div>
 
@@ -111,7 +148,7 @@ export default function CrearOferta() {
         </div>
 
         <div>
-          <label className="block font-medium mb-1">Puesto *</label>
+          <label className="block font-medium mb-1">Puesto a desempeñar *</label>
           <input
             value={puesto}
             onChange={e => setPuesto(e.target.value)}
@@ -121,12 +158,38 @@ export default function CrearOferta() {
         </div>
 
         <div>
-          <label className="block font-medium mb-1">Ubicación *</label>
+          <label className="block font-medium mb-1">Ingenierías requeridas *</label>
+          <div className="flex flex-wrap gap-2">
+            {listaIngenierias.map(i => (
+              <label key={i.id_academias} className="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  value={i.id_academias}
+                  checked={ingenierias.includes(i.id_academias)}
+                  onChange={e => {
+                    const id = parseInt(e.target.value);
+                    if (e.target.checked) {
+                      setIngenierias([...ingenierias, id]);
+                    } else {
+                      setIngenierias(ingenierias.filter(cat => cat !== id));
+                    }
+                  }}
+                  className="w-4 h-4 accent-blue-600"
+                />
+                <span>{i.ingenieria}</span>
+              </label>
+            ))}
+          </div>
+        </div>
+
+
+        <div>
+          <label className="block font-medium mb-1">Ubicación del puesto *</label>
           <input
             value={ubicacion}
             onChange={e => setUbicacion(e.target.value)}
             className="w-full border p-2 rounded-lg focus:ring focus:ring-blue-200"
-            placeholder="Ej. Guadalajara, Jalisco"
+            placeholder="Ej. Valladolid, Yucatán"
           />
         </div>
 
@@ -155,7 +218,7 @@ export default function CrearOferta() {
         </div>
 
         <div>
-          <label className="block font-medium mb-1">Fecha de cierre *</label>
+          <label className="block font-medium mb-1">Fecha de cierre de la oferta*</label>
           <input
             type="date"
             value={fechaCierre}

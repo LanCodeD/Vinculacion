@@ -1,3 +1,4 @@
+// src/components/Componentes_empresas/VacanteCardEmpresa.tsx
 "use client";
 import Link from "next/link";
 import React from "react";
@@ -68,7 +69,7 @@ const VacanteCard: React.FC<VacanteCardProps> = ({
         {showActions && (
           <div className="mt-4 flex gap-2">
             <Link
-              href={`EditarVacantes/${id}`}
+              href={`/BolsaTrabajo/EditarVacantes/${id}`}
               className="flex-1 bg-blue-700 hover:bg-blue-600 text-white text-sm font-semibold py-2 px-3 rounded-lg text-center transition"
             >
               Editar
@@ -79,6 +80,13 @@ const VacanteCard: React.FC<VacanteCardProps> = ({
             >
               Eliminar
             </button>
+            <Link
+              href={`/BolsaTrabajo/Postulaciones/${id}`}
+              className="flex-1 bg-green-600 hover:bg-green-700 text-white text-sm font-semibold py-2 px-3 rounded-lg text-center transition"
+            >
+              Ver postulaciones
+            </Link>
+
           </div>
         )}
       </div>

@@ -171,14 +171,18 @@ model tokens_usuarios {
 }
 
 model usuarios {
-  id_usuarios           Int               @id @default(autoincrement())
-  nombre                String            @db.VarChar(120)
-  apellido              String            @db.VarChar(120)
-  correo                String            @unique(map: "uq_usuarios_correo") @db.VarChar(255)
-  password_hash         String?           @db.VarChar(255)
-  celular               String?           @db.VarChar(20)
-  tipos_cuenta_id       Int
-  roles_id              Int
+  id_usuarios     Int     @id @default(autoincrement())
+  nombre          String  @db.VarChar(120)
+  apellido        String  @db.VarChar(120)
+  correo          String  @unique(map: "uq_usuarios_correo") @db.VarChar(255)
+  password_hash   String? @db.VarChar(255)
+  celular         String? @db.VarChar(20)
+  tipos_cuenta_id Int
+  roles_id        Int
+
+  // NUEVO CAMPO
+  foto_perfil String? @db.VarChar(500)
+
   correo_verificado     Int               @default(0) @db.TinyInt
   correo_verificado_en  DateTime?         @db.DateTime(0)
   last_login            DateTime?         @db.DateTime(0)
@@ -273,6 +277,7 @@ model academias_ingenierias {
 
   egresados egresados[]
   docentes  docentes[]
+  ofertas   ofertas_ingenierias[]
 }
 
 // Bolsa de trabajo - Modulos
@@ -308,7 +313,7 @@ model ofertas {
   creador            usuarios?            @relation("OfertasCreador", fields: [creado_por_usuarios_id], references: [id_usuarios], map: "fk_ofertas_creador")
   estado             oferta_estados       @relation(fields: [oferta_estados_id], references: [id_oferta_estados], map: "fk_ofertas_estado")
   postulaciones      postulaciones[]
-  categorias_ofertas ofertas_categorias[]
+  ingenierias_ofertas ofertas_ingenierias[]
 
   @@index([empresas_id], map: "idx_ofertas_empresa")
   @@index([oferta_estados_id], map: "idx_ofertas_estado")
@@ -344,22 +349,14 @@ model postulaciones {
   @@index([ofertas_id, postulacion_estados_id], map: "idx_postu_oferta_estado")
 }
 
-//Nuevo ofertas_categorias
 
-model categorias {
-  id_categorias Int                  @id @default(autoincrement())
-  nombre        String               @unique(map: "uq_categorias_nombre") @db.VarChar(100)
-  descripcion   String?              @db.VarChar(255)
-  ofertas       ofertas_categorias[]
-}
+model ofertas_ingenierias {
+  ofertas_id   Int
+  academias_id Int
 
-model ofertas_categorias {
-  ofertas_id    Int
-  categorias_id Int
+  oferta   ofertas               @relation(fields: [ofertas_id], references: [id_ofertas], onDelete: Cascade, map: "fk_oferta_ingenieria_oferta")
+  academia academias_ingenierias @relation(fields: [academias_id], references: [id_academias], map: "fk_oferta_ingenieria_academia")
 
-  oferta    ofertas    @relation(fields: [ofertas_id], references: [id_ofertas], map: "fk_oferta_categoria_oferta")
-  categoria categorias @relation(fields: [categorias_id], references: [id_categorias], map: "fk_oferta_categoria_categoria")
-
-  @@id([ofertas_id, categorias_id])
-  @@index([categorias_id], map: "idx_categoria_id")
+  @@id([ofertas_id, academias_id])
+  @@index([academias_id], map: "idx_ingenieria_id")
 }
