@@ -1,4 +1,4 @@
-// src/app/api/Postulaciones/[id]/estado/route.ts
+// src/app/api/Postulaciones/[id]/estadoVacante/router.ts
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
@@ -31,7 +31,8 @@ export async function PATCH(req: Request, { params }: { params: { id: string } }
         revisado_en: new Date(),
       },
       include: {
-        usuario: true, // el egresado
+        usuario: true,
+        estado: true,
         oferta: { include: { empresas: true } },
       },
     });
@@ -45,15 +46,14 @@ export async function PATCH(req: Request, { params }: { params: { id: string } }
           nuevoEstadoId === 3
             ? "Tu postulación fue aprobada"
             : nuevoEstadoId === 4
-            ? "Tu postulación fue rechazada"
-            : "Tu postulación está en revisión",
-        mensaje: `Tu postulación a la vacante "${postulacion.oferta.titulo}" fue ${
-          nuevoEstadoId === 3
+              ? "Tu postulación fue rechazada"
+              : "Tu postulación está en revisión",
+        mensaje: `Tu postulación a la vacante "${postulacion.oferta.titulo}" fue ${nuevoEstadoId === 3
             ? "aprobada ✅"
             : nuevoEstadoId === 4
-            ? "rechazada ❌"
-            : "marcada como en revisión 🔍"
-        }.`,
+              ? "rechazada ❌"
+              : "marcada como en revisión 🔍"
+          }.`,
       },
     });
 

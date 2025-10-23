@@ -1,14 +1,16 @@
-import { NextResponse } from "next/server";
+import { NextResponse, NextRequest } from "next/server";
 import { prisma } from "@/lib/prisma";
 
 export async function GET(
-  req: Request,
-  { params }: { params: { usuarioId: string } }
+  req: NextRequest,
+  context: { params: Promise<{ usuarioId: string }> }
 ) {
   try {
-    const usuarioId = parseInt(params.usuarioId);
+    const { usuarioId } = await context.params;
+    const id = parseInt(usuarioId);
+
     const egresado = await prisma.egresados.findFirst({
-      where: { usuarios_id: usuarioId },
+      where: { usuarios_id: id },
       select: { cv_url: true },
     });
 

@@ -2,8 +2,11 @@
 import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
 
-export async function GET(req: Request, { params }: { params: { id: string } }) {
-  const { id } = params;
+export async function GET(
+  req: Request,
+  context: { params: Promise<{ id: string }> }
+) {
+  const { id } = await context.params; // 👈 Se espera el contexto
   const userId = parseInt(id);
 
   if (isNaN(userId))
@@ -17,9 +20,9 @@ export async function GET(req: Request, { params }: { params: { id: string } }) 
         roles: {
           include: {
             roles_permisos: {
-              include: { permisos: true }
-            }
-          }
+              include: { permisos: true },
+            },
+          },
         },
         egresados_perfil: true,
         empresas_perfil: true,
@@ -29,9 +32,9 @@ export async function GET(req: Request, { params }: { params: { id: string } }) 
     if (!user)
       return NextResponse.json({ error: "Usuario no encontrado" }, { status: 404 });
 
-    const permisos = user.roles.roles_permisos?.map(rp => rp.permisos.nombre) || [];
+    const permisos =
+      user.roles.roles_permisos?.map((rp) => rp.permisos.nombre) || [];
 
-    // Datos base del usuario
     const data: any = {
       id: user.id_usuarios,
       nombre: user.nombre,
@@ -43,12 +46,11 @@ export async function GET(req: Request, { params }: { params: { id: string } }) 
       last_login: user.last_login,
       paso_actual: user.paso_actual,
       permisos,
-      imagen_perfil: user.foto_perfil || null, // <--- ahora la foto viene de usuarios
+      imagen_perfil: user.foto_perfil || null,
     };
 
-    // Egresado
     if (user.roles.nombre === "Egresado" && user.egresados_perfil.length > 0) {
-      data.egresados = user.egresados_perfil.map(e => ({
+      data.egresados = user.egresados_perfil.map((e) => ({
         id_egresados: e.id_egresados,
         titulo: e.titulo,
         puesto: e.puesto,
@@ -59,9 +61,8 @@ export async function GET(req: Request, { params }: { params: { id: string } }) 
       }));
     }
 
-    // Empresa
     if (user.roles.nombre === "Empresa" && user.empresas_perfil.length > 0) {
-      data.empresas = user.empresas_perfil.map(emp => ({
+      data.empresas = user.empresas_perfil.map((emp) => ({
         id_empresas: emp.id_empresas,
         nombre_comercial: emp.nombre_comercial,
         razon_social: emp.razon_social,
@@ -73,7 +74,6 @@ export async function GET(req: Request, { params }: { params: { id: string } }) 
     }
 
     return NextResponse.json(data);
-
   } catch (error) {
     console.error(error);
     return NextResponse.json({ error: "Error interno" }, { status: 500 });

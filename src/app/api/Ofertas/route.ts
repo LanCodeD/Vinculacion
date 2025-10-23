@@ -15,12 +15,6 @@ export async function GET() {
         { status: 401 }
       );
     }
-
-    console.log("[GET] Usuario logueado:", session.user.nombre);
-    console.log("[GET] Rol:", session.user.role);
-    console.log("[GET] roles_id:", session.user.roles_id);
-    console.log("[GET] ID usuario:", session.user.id);
-
     // Buscar la empresa asociada al usuario
     const empresa = await prisma.empresas.findFirst({
       where: { usuarios_id: session.user.id },
@@ -67,12 +61,6 @@ export async function POST(req: Request) {
         { status: 401 }
       );
     }
-
-    // Mostrar información de depuración
-    console.log("[POST] Usuario logueado:", session.user.nombre);
-    console.log("[POST] Rol:", session.user.role);
-    console.log("[POST] roles_id:", session.user.roles_id);
-    console.log("[POST] ID usuario:", session.user.id);
 
     // Validar rol usando ROLE_MAP
     const userRole: AppRole = ROLE_MAP[session.user.roles_id];

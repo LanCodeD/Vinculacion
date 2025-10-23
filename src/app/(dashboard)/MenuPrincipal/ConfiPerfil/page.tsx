@@ -82,7 +82,6 @@ export default function Perfil() {
           <p className='text-gray-600'>{user.correo}</p>
           {user.celular && <p className='text-gray-600'>{user.celular}</p>}
           {/* Subir foto de perfil */}
-          {/* Subir foto de perfil */}
           <UploadFile
             userId={user.id}
             tipo="foto_usuario" // <-- ahora es global

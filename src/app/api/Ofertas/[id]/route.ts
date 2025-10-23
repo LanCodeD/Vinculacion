@@ -1,18 +1,21 @@
 // src/app/api/Ofertas/[id]/route.ts
-import { NextResponse } from "next/server";
+import { NextResponse, NextRequest } from "next/server";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/app/api/auth/[...nextauth]/authOptions";
 import { prisma } from "@/lib/prisma";
 import { a } from "framer-motion/client";
 
 // Obtener detalle de la vacante
-export async function GET(req: Request, { params }: { params: { id: string } }) {
+export async function GET(
+  req: NextRequest,
+  context: { params: Promise<{ id: string }> }
+) {
   try {
     const session = await getServerSession(authOptions);
     if (!session?.user)
       return NextResponse.json({ ok: false, error: "No autorizado" }, { status: 401 });
 
-    const { id } = await params;
+    const { id } = await context.params; // ✅ resolver la promesa
     const idNumber = parseInt(id);
 
     if (isNaN(idNumber))
@@ -57,15 +60,17 @@ export async function GET(req: Request, { params }: { params: { id: string } }) 
 }
 
 // Eliminar vacante
-export async function DELETE(req: Request, { params }: { params: { id: string } }) {
+export async function DELETE(
+  req: NextRequest,
+  context: { params: Promise<{ id: string }> }
+) {
   try {
     const session = await getServerSession(authOptions);
     if (!session?.user)
       return NextResponse.json({ ok: false, error: "No autorizado" }, { status: 401 });
 
-    const { id } = await params;
+    const { id } = await context.params;
     const idNumber = parseInt(id);
-
     if (isNaN(idNumber))
       return NextResponse.json({ ok: false, error: "ID inválido" }, { status: 400 });
 
@@ -88,13 +93,16 @@ export async function DELETE(req: Request, { params }: { params: { id: string } 
 }
 
 // Editar vacante
-export async function PATCH(req: Request, { params }: { params: { id: string } }) {
+export async function PATCH(
+  req: NextRequest,
+  context: { params: Promise<{ id: string }> }
+) {
   try {
     const session = await getServerSession(authOptions);
     if (!session?.user)
       return NextResponse.json({ ok: false, error: "No autorizado" }, { status: 401 });
 
-    const { id } = await params;
+    const { id } = await context.params;
     const idNumber = parseInt(id);
 
     if (isNaN(idNumber))
