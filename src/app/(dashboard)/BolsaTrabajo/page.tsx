@@ -6,13 +6,21 @@ import { authOptions } from "@/app/api/auth/[...nextauth]/authOptions";
 import VacanteCard from "@/components/Componentes_vacantes/VacanteCard";
 import VacantesEmpresaLista from "@/components/Componentes_empresas/VacanteEmpresaLista";
 import Link from "next/link";
+import Filtros from "@/components/Filtros";
 
+interface BolsaTrabajoPageProps {
+  searchParams: {
+    ingenieria?: string | string[];
+    puesto?: string;
+    ubicacion?: string;
+  };
+}
 
-export default async function BolsaTrabajoPage() {
+export default async function BolsaTrabajoPage({ searchParams }: BolsaTrabajoPageProps) {
+  const resolvedParams = await searchParams;
   const session = await getServerSession(authOptions);
   const userRoleId = session?.user?.roles_id;
 
-  // Si no hay sesión
   if (!session?.user) {
     return (
       <div className="text-center py-24 text-gray-500">
@@ -21,11 +29,9 @@ export default async function BolsaTrabajoPage() {
     );
   }
 
-  // Solo egresados (rol 2) pueden ver vacantes
   const esEgresado = userRoleId === 2;
   const esEmpresa = userRoleId === 3;
 
-  // Si no es egresado ni empresa
   if (!esEgresado && !esEmpresa) {
     return (
       <div className="text-center py-24 text-gray-500">
@@ -34,43 +40,50 @@ export default async function BolsaTrabajoPage() {
     );
   }
 
-  // Si es empresa, verificar permiso para crear vacantes
   let puedeCrearVacante = false;
   if (esEmpresa) {
     const permiso = await prisma.roles_permisos.findFirst({
-      where: {
-        roles_id: userRoleId,
-        permisos: { nombre: "crear_vacante" },
-      },
+      where: { roles_id: userRoleId, permisos: { nombre: "crear_vacante" } },
       include: { permisos: true },
     });
     puedeCrearVacante = Boolean(permiso);
   }
 
-  // Si es egresado, verificar permiso para ver bolsa de trabajo
   let puedeVerBolsa = false;
   if (esEgresado) {
     const permiso = await prisma.roles_permisos.findFirst({
-      where: {
-        roles_id: userRoleId,
-        permisos: { nombre: "ver_bolsa_trabajo" },
-      },
+      where: { roles_id: userRoleId, permisos: { nombre: "ver_bolsa_trabajo" } },
       include: { permisos: true },
     });
     puedeVerBolsa = Boolean(permiso);
   }
 
-  // Mostrar vacantes solo si tiene permiso
+  // --- FILTROS ---
+  const ingenieriasSeleccionadas = resolvedParams?.ingenieria
+    ? Array.isArray(resolvedParams.ingenieria)
+      ? resolvedParams.ingenieria.map(Number)
+      : [Number(resolvedParams.ingenieria)]
+    : [];
+
+  const puestoFiltro = resolvedParams?.puesto ?? "";
+  const ubicacionFiltro = resolvedParams?.ubicacion ?? "";
+
+  // --- CONSULTA DE VACANTES ---
   let vacantes: any[] = [];
   if (puedeVerBolsa) {
     vacantes = await prisma.ofertas.findMany({
-      where: { oferta_estados_id: 3 }, // Activas
-      select: {
-        id_ofertas: true,
-        titulo: true,
-        puesto: true,
-        descripcion: true,
-        imagen: true,
+      where: {
+        oferta_estados_id: 3, // Activas
+        ...(ingenieriasSeleccionadas.length > 0 && {
+          ingenierias_ofertas: {
+            some: { academias_id: { in: ingenieriasSeleccionadas } },
+          },
+        }),
+        ...(puestoFiltro && { puesto: { contains: puestoFiltro } }),
+        ...(ubicacionFiltro && { ubicacion: { contains: ubicacionFiltro } }),
+      },
+      include: {
+        ingenierias_ofertas: { include: { academia: true } },
       },
       orderBy: { fecha_publicacion: "desc" },
     });
@@ -94,7 +107,7 @@ export default async function BolsaTrabajoPage() {
         </div>
 
         {/* Botones solo visibles para empresas */}
-        {(esEmpresa && puedeCrearVacante) && (
+        {esEmpresa && puedeCrearVacante && (
           <div className="flex gap-4 mb-6 -mt-15">
             <Link
               href="/BolsaTrabajo/CreacionVacante"
@@ -103,6 +116,15 @@ export default async function BolsaTrabajoPage() {
               Crear Vacante
             </Link>
           </div>
+        )}
+
+        {/* Filtros solo para egresados */}
+        {esEgresado && puedeVerBolsa && (
+          <Filtros
+            ingenieriasSeleccionadas={ingenieriasSeleccionadas}
+            puestoFiltro={puestoFiltro}
+            ubicacionFiltro={ubicacionFiltro}
+          />
         )}
 
         {/* Vacantes públicas solo visibles para egresados */}
@@ -115,8 +137,11 @@ export default async function BolsaTrabajoPage() {
                   id={v.id_ofertas}
                   titulo={v.titulo}
                   puesto={v.puesto ?? "Sin puesto especificado"}
-                  descripcion={v.descripcion ?? "Sin descripción disponible"}
+                  ubicacion={v.ubicacion ?? "Ubicación no especificada"}
                   imagen={v.imagen ?? "https://dummyimage.com/720x400"}
+                  ingenierias={v.ingenierias_ofertas.map(
+                    (io: { academia: { id_academias: number; ingenieria: string } }) => io.academia.ingenieria
+                  )}
                 />
               ))
             ) : (

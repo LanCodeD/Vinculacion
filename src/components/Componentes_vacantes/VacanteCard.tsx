@@ -1,3 +1,4 @@
+// src/components/Componentes_vacantes/VacanteCard.tsx
 import Link from 'next/link';
 import React from 'react';
 
@@ -5,11 +6,19 @@ interface VacanteCardProps {
   id: number;
   titulo: string;
   puesto: string;
-  descripcion: string;
+  ubicacion: string;
   imagen: string;
+  ingenierias?: string[]; // opcional
 }
 
-const VacanteCard: React.FC<VacanteCardProps> = ({ id, titulo, puesto, descripcion, imagen }) => {
+const VacanteCard: React.FC<VacanteCardProps> = ({
+  id,
+  titulo,
+  puesto,
+  ubicacion,
+  imagen,
+  ingenierias = [], // <- agregamos ingenierias
+}) => {
   return (
     <div className="xl:w-1/4 md:w-1/2 p-4">
       <div className="bg-gray-100 p-6 rounded-lg border-2 border-gray-200 border-opacity-60 hover:shadow-lg transition duration-300">
@@ -19,7 +28,8 @@ const VacanteCard: React.FC<VacanteCardProps> = ({ id, titulo, puesto, descripci
         />
         <h3 className="tracking-widest text-blue-500 text-xs font-medium title-font">{titulo}</h3>
         <h2 className="text-lg text-gray-900 font-medium title-font mb-4">{puesto}</h2>
-        <p className="leading-relaxed text-base mb-4">{descripcion}</p>
+        <p className="leading-relaxed text-sm text-gray-600 mb-4">{ubicacion}</p>
+
         <Link
           href={`/BolsaTrabajo/${id}`}
           className="text-blue-500 inline-flex items-center focus:outline-none hover:underline"

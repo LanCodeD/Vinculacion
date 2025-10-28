@@ -18,9 +18,13 @@ export default async function VacantePage({ params }: VacantePageProps) {
             id_ofertas: true,
             titulo: true,
             puesto: true,
-            descripcion: true,
+            descripcion_general: true,
+            requisitos: true,
+            horario: true,
+            modalidad: true,
             imagen: true,
             ubicacion: true,
+            fecha_cierre: true,
         },
     });
 
@@ -34,9 +38,17 @@ export default async function VacantePage({ params }: VacantePageProps) {
             id={vacante.id_ofertas}
             titulo={vacante.titulo}
             puesto={vacante.puesto ?? 'Sin puesto especificado'}
-            descripcion={vacante.descripcion ?? 'Sin descripción disponible'}
+            descripcion={vacante.descripcion_general ?? 'Sin descripción disponible'}
+            requisitos={vacante.requisitos ?? 'Sin requisitos especificados'}
+            horario={vacante.horario ?? 'No especificado'}
+            modalidad={vacante.modalidad ?? 'No especificada'}
             imagen={vacante.imagen ?? 'https://dummyimage.com/720x400'}
             ubicacion={vacante.ubicacion ?? 'No especificada'}
+            fecha_cierre={
+                vacante.fecha_cierre
+                    ? new Date(vacante.fecha_cierre).toISOString() 
+                    : null
+            }
         />
     );
 }

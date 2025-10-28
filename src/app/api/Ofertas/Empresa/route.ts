@@ -23,7 +23,7 @@ export async function GET() {
       id_ofertas: true,
       titulo: true,
       puesto: true,
-      descripcion: true,
+      descripcion_general: true,
       imagen: true,
       oferta_estados_id: true,
     },

@@ -6,7 +6,10 @@ import { useParams, useRouter } from "next/navigation";
 interface Vacante {
   id_ofertas: number;
   titulo: string;
-  descripcion: string;
+  descripcion_general: string;
+  requisitos: string;
+  horario: string;
+  modalidad: string;
   puesto: string;
   ubicacion: string;
   imagen: string;
@@ -169,13 +172,53 @@ export default function EditarVacantePage() {
             Descripción
           </label>
           <textarea
-            name="descripcion"
-            value={vacante.descripcion}
+            name="descripcion_general"
+            value={vacante.descripcion_general}
             onChange={handleChange}
             rows={4}
             className="mt-1 block w-full rounded-md border border-gray-300 p-2"
           />
         </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700">
+            Requisitos
+          </label>
+          <textarea
+            name="requisitos"
+            value={vacante.requisitos}
+            onChange={handleChange}
+            rows={4}
+            className="mt-1 block w-full rounded-md border border-gray-300 p-2"
+          />
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700">
+            Horario
+          </label>
+          <textarea
+            name="horario"
+            value={vacante.horario}
+            onChange={handleChange}
+            rows={4}
+            className="mt-1 block w-full rounded-md border border-gray-300 p-2"
+          />
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700">
+            Modalidad
+          </label>
+          <textarea
+            name="modalidad"
+            value={vacante.modalidad}
+            onChange={handleChange}
+            rows={4}
+            className="mt-1 block w-full rounded-md border border-gray-300 p-2"
+          />
+        </div>
+
 
         <div>
           <label className="block text-sm font-medium text-gray-700">

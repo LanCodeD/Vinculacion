@@ -7,7 +7,7 @@ interface Vacante {
   id_ofertas: number;
   titulo: string;
   puesto: string;
-  descripcion: string;
+  descripcion_general: string;
   imagen: string;
   oferta_estados_id: number;
 }
@@ -25,7 +25,7 @@ export default function VacantesEmpresaList() {
             id_ofertas: v.id_ofertas,
             titulo: v.titulo ?? "",
             puesto: v.puesto ?? "Sin puesto especificado",
-            descripcion: v.descripcion ?? "Sin descripción disponible",
+            descripcion_general: v.descripcion_general ?? "Sin descripción disponible",
             imagen: v.imagen ?? "https://dummyimage.com/720x400",
             oferta_estados_id: v.oferta_estados_id ?? 2,
           }));
@@ -58,7 +58,7 @@ export default function VacantesEmpresaList() {
           id={v.id_ofertas}
           titulo={v.titulo}
           puesto={v.puesto}
-          descripcion={v.descripcion}
+          descripcion_general={v.descripcion_general}
           imagen={v.imagen}
           estado={v.oferta_estados_id}
           showActions
