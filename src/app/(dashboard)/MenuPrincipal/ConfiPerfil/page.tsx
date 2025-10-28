@@ -118,8 +118,8 @@ export default function Perfil() {
               <p><strong>Matrícula:</strong> {eg.matricula}</p>
               {eg.fecha_egreso && <p><strong>Fecha de Egreso:</strong> {new Date(eg.fecha_egreso).toLocaleDateString()}</p>}
               {eg.correo_institucional && <p><strong>Correo Institucional:</strong> {eg.correo_institucional}</p>}
-              {eg.cv_url && <p><strong>CV:</strong> <a href={eg.cv_url} target="_blank" className='text-blue-600 underline'>Ver PDF</a></p>}
-
+              {/* {eg.cv_url && <p><strong>CV:</strong> <a href={eg.cv_url} target="_blank" className='text-blue-600 underline'>Ver PDF</a>?? "-" </p>} */}
+              <p><strong>CV:</strong>  {eg.cv_url ? <a href={eg.cv_url} target="_blank" className='text-blue-600 underline'>Ver PDF</a> : "-"}</p>
               {/* Subir CV */}
               <UploadFile
                 userId={user.id}

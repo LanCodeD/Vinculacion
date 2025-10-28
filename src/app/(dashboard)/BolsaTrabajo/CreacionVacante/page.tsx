@@ -7,7 +7,10 @@ export default function CrearOferta() {
   const { data: session } = useSession();
 
   const [titulo, setTitulo] = useState('');
-  const [descripcion, setDescripcion] = useState('');
+  const [descripcion_general, setDescripcion_general] = useState('');
+  const [requisitos, setRequisitos] = useState('');
+  const [horario, setHorario] = useState('');
+  const [modalidad, setModalidad] = useState('');
   const [puesto, setPuesto] = useState('');
   const [ubicacion, setUbicacion] = useState('');
   const [imagen, setImagen] = useState('');
@@ -36,7 +39,7 @@ export default function CrearOferta() {
     setError('');
     setSuccess('');
 
-    if (!titulo || !descripcion || !puesto || !ubicacion || !imagen || !fechaCierre || ingenierias.length === 0) {
+    if (!titulo || !descripcion_general || !puesto || !ubicacion || !imagen || !fechaCierre || ingenierias.length === 0) {
       toast.error('Por favor, completa todos los campos obligatorios y selecciona al menos una ingeniería.', {
         duration: 4000,
         position: 'top-right',
@@ -61,7 +64,10 @@ export default function CrearOferta() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           titulo,
-          descripcion,
+          descripcion_general,
+          requisitos,
+          horario,
+          modalidad,
           puesto,
           ubicacion,
           imagen,
@@ -79,7 +85,10 @@ export default function CrearOferta() {
 
         // Limpiar formulario
         setTitulo('');
-        setDescripcion('');
+        setDescripcion_general('');
+        setRequisitos('');
+        setHorario('');
+        setModalidad('');
         setPuesto('');
         setUbicacion('');
         setImagen('');
@@ -139,11 +148,41 @@ export default function CrearOferta() {
         <div>
           <label className="block font-medium mb-1">Descripción *</label>
           <textarea
-            value={descripcion}
-            onChange={e => setDescripcion(e.target.value)}
+            value={descripcion_general}
+            onChange={e => setDescripcion_general(e.target.value)}
             className="w-full border p-2 rounded-lg focus:ring focus:ring-blue-200"
             placeholder="Describe las responsabilidades y requisitos del puesto..."
             rows={4}
+          />
+        </div>
+        <div>
+          <label className="block font-medium mb-1">Requisitos *</label>
+          <textarea
+            value={requisitos}
+            onChange={e => setRequisitos(e.target.value)}
+            className="w-full border p-2 rounded-lg focus:ring focus:ring-blue-200"
+            placeholder="Ej. Título universitario en Ingeniería..."
+            rows={4}
+          />
+        </div>
+
+        <div>
+          <label className="block font-medium mb-1">Horario *</label>
+          <input
+            value={horario}
+            onChange={e => setHorario(e.target.value)}
+            className="w-full border p-2 rounded-lg focus:ring focus:ring-blue-200"
+            placeholder="Ej. Lunes a Viernes, 9am - 6pm"
+          />
+        </div>
+
+        <div>
+          <label className="block font-medium mb-1">Modalidad *</label>
+          <input
+            value={modalidad}
+            onChange={e => setModalidad(e.target.value)}
+            className="w-full border p-2 rounded-lg focus:ring focus:ring-blue-200"
+            placeholder="Ej. Presencial, Remoto"
           />
         </div>
 

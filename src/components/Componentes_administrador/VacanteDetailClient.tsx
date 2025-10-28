@@ -11,7 +11,10 @@ type VacanteDetail = {
   titulo: string;
   puesto: string | null;
   ubicacion?: string | null;
-  descripcion: string | null;
+  descripcion_general: string | null;
+  requisitos: string | null;
+  horario: string | null;
+  modalidad: string | null;
   imagen?: string | null;
   fecha_publicacion?: Date | null;
   fecha_cierre?: Date | null;
@@ -88,7 +91,10 @@ export default function AdminVacanteDetailClient({ vacante }: Props) {
       </p>
 
       <p><strong>Ubicación:</strong> {vacante.ubicacion ?? "Sin ubicación"}</p>
-      <p><strong>Descripción:</strong> {vacante.descripcion ?? "Sin descripción"}</p>
+      <p><strong>Descripción:</strong> {vacante.descripcion_general ?? "Sin descripción"}</p>
+      <p><strong>Requisitos:</strong> {vacante.requisitos ?? "Sin requisitos"}</p>
+      <p><strong>Horario:</strong> {vacante.horario ?? "Sin horario"}</p>
+      <p><strong>Modalidad:</strong> {vacante.modalidad ?? "Sin modalidad"}</p>
       <p><strong>ID de la Vacante:</strong> {vacante.id_ofertas}</p>
 
       <p><strong>Fecha de publicación:</strong> {vacante.fecha_publicacion ? new Date(vacante.fecha_publicacion).toLocaleDateString() : "No publicada"}</p>

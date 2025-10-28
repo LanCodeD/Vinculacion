@@ -171,20 +171,20 @@ model tokens_usuarios {
 }
 
 model usuarios {
-  id_usuarios           Int                   @id @default(autoincrement())
-  nombre                String                @db.VarChar(120)
-  apellido              String                @db.VarChar(120)
-  correo                String                @unique(map: "uq_usuarios_correo") @db.VarChar(255)
-  password_hash         String?               @db.VarChar(255)
-  celular               String?               @db.VarChar(20)
-  tipos_cuenta_id       Int
-  roles_id              Int
-  correo_verificado     Int                   @default(0) @db.TinyInt
-  correo_verificado_en  DateTime?             @db.DateTime(0)
-  last_login            DateTime?             @db.DateTime(0)
-  paso_actual           Int
-  creado_en             DateTime              @default(now()) @db.DateTime(0)
-  actualizado_en        DateTime              @default(now()) @db.DateTime(0)
+  id_usuarios          Int       @id @default(autoincrement())
+  nombre               String    @db.VarChar(120)
+  apellido             String    @db.VarChar(120)
+  correo               String    @unique(map: "uq_usuarios_correo") @db.VarChar(255)
+  password_hash        String?   @db.VarChar(255)
+  celular              String?   @db.VarChar(20)
+  tipos_cuenta_id      Int
+  roles_id             Int
+  correo_verificado    Int       @default(0) @db.TinyInt
+  correo_verificado_en DateTime? @db.DateTime(0)
+  last_login           DateTime? @db.DateTime(0)
+  paso_actual          Int
+  creado_en            DateTime  @default(now()) @db.DateTime(0)
+  actualizado_en       DateTime  @default(now()) @db.DateTime(0)
 
   // NUEVO CAMPO
   foto_perfil String? @db.VarChar(500)
@@ -224,9 +224,9 @@ model accounts {
 }
 
 model egresados {
-  id_egresados Int @id @default(autoincrement())
-  usuarios_id  Int
-  cv_url String? @db.VarChar(500)
+  id_egresados               Int       @id @default(autoincrement())
+  usuarios_id                Int
+  cv_url                     String?   @db.VarChar(500)
   titulo                     String?   @db.VarChar(50)
   puesto                     String?   @db.VarChar(100)
   matricula                  String    @db.VarChar(50)
@@ -294,10 +294,13 @@ model ofertas {
   empresas_id                Int
   creado_por_usuarios_id     Int?
   titulo                     String    @db.VarChar(250)
-  puesto                     String?   @db.VarChar(150) // <--- NUEVO CAMPO
+  puesto                     String?   @db.VarChar(150)
   ubicacion                  String?   @db.VarChar(255)
-  descripcion                String?   @db.Text
-  imagen                     String?   @db.VarChar(500) // <--- NUEVO CAMPO
+  descripcion_general        String?   @db.Text
+  requisitos                 String?   @db.Text
+  horario                    String?   @db.VarChar(100)
+  modalidad                  String?   @db.VarChar(50)
+  imagen                     String?   @db.VarChar(500)
   es_flyer                   Int       @default(0) @db.TinyInt
   flyer_url                  String?   @db.VarChar(500)
   fecha_publicacion          DateTime? @db.DateTime(0)
@@ -308,11 +311,11 @@ model ofertas {
   verificado_por_usuarios_id Int? // admin que aprobó
   verificado_en              DateTime? // fecha de aprobación/publicación
 
-  verificador        usuarios?            @relation("OfertaVerificador", fields: [verificado_por_usuarios_id], references: [id_usuarios])
-  empresas           empresas             @relation(fields: [empresas_id], references: [id_empresas], map: "fk_ofertas_empresa")
-  creador            usuarios?            @relation("OfertasCreador", fields: [creado_por_usuarios_id], references: [id_usuarios], map: "fk_ofertas_creador")
-  estado             oferta_estados       @relation(fields: [oferta_estados_id], references: [id_oferta_estados], map: "fk_ofertas_estado")
-  postulaciones      postulaciones[]
+  verificador         usuarios?             @relation("OfertaVerificador", fields: [verificado_por_usuarios_id], references: [id_usuarios])
+  empresas            empresas              @relation(fields: [empresas_id], references: [id_empresas], map: "fk_ofertas_empresa")
+  creador             usuarios?             @relation("OfertasCreador", fields: [creado_por_usuarios_id], references: [id_usuarios], map: "fk_ofertas_creador")
+  estado              oferta_estados        @relation(fields: [oferta_estados_id], references: [id_oferta_estados], map: "fk_ofertas_estado")
+  postulaciones       postulaciones[]
   ingenierias_ofertas ofertas_ingenierias[]
 
   @@index([empresas_id], map: "idx_ofertas_empresa")
@@ -348,7 +351,6 @@ model postulaciones {
   @@index([usuarios_id], map: "idx_postu_usuario")
   @@index([ofertas_id, postulacion_estados_id], map: "idx_postu_oferta_estado")
 }
-
 
 model ofertas_ingenierias {
   ofertas_id   Int
@@ -460,23 +462,23 @@ model solicitud_convenio_detalle {
   solicitante_telefono_movil     String?   @db.VarChar(50)
   solicitante_telefono_oficina   String?   @db.VarChar(50)
   solicitante_ext_oficina        String?   @db.VarChar(10)
-  contacto_nombre               String?   @db.VarChar(250)
-  contacto_email                String?   @db.VarChar(150)
-  contacto_telefono_movil       String?   @db.VarChar(50)
-  contacto_telefono_oficina     String?   @db.VarChar(50)
-  contacto_ext_oficina          String?   @db.VarChar(10)
+  contacto_nombre                String?   @db.VarChar(250)
+  contacto_email                 String?   @db.VarChar(150)
+  contacto_telefono_movil        String?   @db.VarChar(50)
+  contacto_telefono_oficina      String?   @db.VarChar(50)
+  contacto_ext_oficina           String?   @db.VarChar(10)
 
-  entregables_empresa            String?   @db.Text
-  fecha_inicio                   DateTime? @db.Date
-  fecha_conclusion               DateTime? @db.Date
-  ceremonia_realizara            Boolean   @default(false)
-  ceremonia_fecha_hora           DateTime? @db.DateTime(0)
-  ceremonia_lugar                String?   @db.VarChar(255)
-  requerimientos_evento          String?   @db.Text
-  otros_campos                   Json?
-  nombre_proyecto                String?   @db.VarChar(250)
-  created_at                     DateTime  @default(now()) @db.DateTime(0)
-  updated_at                     DateTime  @default(now()) @db.DateTime(0)
+  entregables_empresa   String?   @db.Text
+  fecha_inicio          DateTime? @db.Date
+  fecha_conclusion      DateTime? @db.Date
+  ceremonia_realizara   Boolean   @default(false)
+  ceremonia_fecha_hora  DateTime? @db.DateTime(0)
+  ceremonia_lugar       String?   @db.VarChar(255)
+  requerimientos_evento String?   @db.Text
+  otros_campos          Json?
+  nombre_proyecto       String?   @db.VarChar(250)
+  created_at            DateTime  @default(now()) @db.DateTime(0)
+  updated_at            DateTime  @default(now()) @db.DateTime(0)
 
   solicitud solicitud_convenios @relation(fields: [id_solicitud], references: [id_solicitud])
 }
@@ -592,4 +594,3 @@ model convenio_concretado {
 
   solicitud solicitud_convenios @relation(fields: [id_solicitud], references: [id_solicitud])
 }
-

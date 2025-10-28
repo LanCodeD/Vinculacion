@@ -12,7 +12,7 @@ export async function GET() {
       include: {
         estado: true,
         oferta: {
-          include: { 
+          include: {
             empresas: true, // si tienes descripción de la oferta
           },
         },
@@ -23,6 +23,7 @@ export async function GET() {
     const mapped = postulaciones.map(p => ({
       id_postulaciones: p.id_postulaciones,
       mensaje: p.mensaje,
+      creado_en: p.creado_en,
       estado: {
         id_postulacion_estados: p.postulacion_estados_id,
         nombre_estado: p.estado?.nombre_estado || "Desconocido",
@@ -30,8 +31,9 @@ export async function GET() {
       oferta: {
         id_ofertas: p.ofertas_id,
         titulo: p.oferta.titulo,
+        vacante: p.oferta.puesto,
         empresa: p.oferta.empresas.nombre_comercial,
-        descripcion: p.oferta.descripcion || "No hay descripción",
+        descripcion_general: p.oferta.descripcion_general || "No hay descripción",
       },
     }));
 

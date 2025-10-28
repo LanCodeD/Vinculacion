@@ -7,7 +7,7 @@ interface VacanteCardProps {
   id: number;
   titulo: string;
   puesto: string;
-  descripcion: string;
+  descripcion_general: string;
   imagen: string;
   estado?: number;
   showActions?: boolean;
@@ -30,7 +30,7 @@ const VacanteCard: React.FC<VacanteCardProps> = ({
   id,
   titulo,
   puesto,
-  descripcion,
+  descripcion_general,
   imagen,
   estado,
   showActions = false,
@@ -52,7 +52,7 @@ const VacanteCard: React.FC<VacanteCardProps> = ({
             {puesto}
           </h2>
           <p className="leading-relaxed text-sm text-gray-600 line-clamp-3">
-            {descripcion}
+            {descripcion_general}
           </p>
         </div>
 

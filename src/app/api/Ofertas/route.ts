@@ -34,10 +34,14 @@ export async function GET() {
         id_ofertas: true,
         titulo: true,
         puesto: true,
-        descripcion: true,
+        descripcion_general: true,
+        requisitos: true,
+        horario: true,
+        modalidad: true,
         imagen: true,
         oferta_estados_id: true,
         fecha_publicacion: true,
+        fecha_cierre: true,  // ✅ Agregado
       },
       orderBy: { fecha_publicacion: "desc" },
     });
@@ -77,7 +81,10 @@ export async function POST(req: Request) {
     // Validar campos obligatorios
     const requiredFields = [
       "titulo",
-      "descripcion",
+      "descripcion_general",
+      "requisitos",
+      "horario",
+      "modalidad",
       "puesto",
       "ubicacion",
       "imagen",
@@ -104,14 +111,17 @@ export async function POST(req: Request) {
       );
     }
 
-    const { titulo, descripcion, puesto, ubicacion, imagen, fecha_cierre } =
+    const { titulo, descripcion_general, requisitos, horario, modalidad, puesto, ubicacion, imagen, fecha_cierre } =
       body;
 
     // Crear la oferta
     const oferta = await prisma.ofertas.create({
       data: {
         titulo,
-        descripcion,
+        descripcion_general,
+        requisitos,
+        horario,
+        modalidad,
         puesto,
         ubicacion,
         imagen,
@@ -151,20 +161,22 @@ export async function POST(req: Request) {
       // Enviar correos a admins
       for (const admin of admins) {
         if (admin.correo) {
-          enviarCorreo({
-            to: admin.correo,
-            subject: "Nueva vacante pendiente de aprobación",
-            html: `<p>Hola ${admin.nombre},</p>
-                   <p>La empresa "<strong>${empresa.nombre_comercial}</strong>" ha creado la vacante "<strong>${titulo}</strong>".</p>
-                   <p>Por favor, revisa y aprueba o rechaza la vacante en el panel de administración.</p>
-          
-                   <p>Saludos,<br/>Equipo de Vinculación</p>`,
-          }).catch((err) =>
-            console.error("Error al enviar correo al admin:", err)
-          );
-          console.log("Correo enviado a admin:", admin.correo);
+          try {
+            await enviarCorreo({
+              to: admin.correo,
+              subject: "Nueva vacante pendiente de aprobación",
+              html: `<p>Hola ${admin.nombre},</p>
+               <p>La empresa "<strong>${empresa.nombre_comercial}</strong>" ha creado la vacante "<strong>${titulo}</strong>".</p>
+               <p>Por favor, revisa y aprueba o rechaza la vacante en el panel de administración.</p>
+               <p>Saludos,<br/>Equipo de Vinculación</p>`,
+            });
+            console.log("📧 Correo enviado a admin:", admin.correo);
+          } catch (err) {
+            console.error("❌ Error al enviar correo al admin:", admin.correo, err);
+          }
         }
       }
+
     }
 
     console.log("Vacante creada correctamente:", oferta.titulo);

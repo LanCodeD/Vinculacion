@@ -1,3 +1,4 @@
+// src/app/%28dashboard%29/BolsaTrabajo/VacantesEmpresa/page.tsx
 "use client";
 import { useEffect, useState } from "react";
 import VacanteCard from "@/components/Componentes_empresas/VacanteCardEmpresa";
@@ -6,7 +7,7 @@ interface Vacante {
   id_ofertas: number;
   titulo: string;
   puesto: string;
-  descripcion: string;
+  descripcion_general: string;
   imagen: string;
   oferta_estados_id: number;
 }
@@ -51,7 +52,7 @@ export default function VacantesEmpresa() {
                 id={v.id_ofertas}
                 titulo={v.titulo}
                 puesto={v.puesto}
-                descripcion={v.descripcion}
+                descripcion_general={v.descripcion_general}
                 imagen={v.imagen}
                 estado={v.oferta_estados_id}
                 showActions

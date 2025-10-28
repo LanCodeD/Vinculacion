@@ -3,7 +3,6 @@ import { NextResponse, NextRequest } from "next/server";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/app/api/auth/[...nextauth]/authOptions";
 import { prisma } from "@/lib/prisma";
-import { a } from "framer-motion/client";
 
 // Obtener detalle de la vacante
 export async function GET(
@@ -33,12 +32,16 @@ export async function GET(
       select: {
         id_ofertas: true,
         titulo: true,
-        descripcion: true,
+        descripcion_general: true,
+        requisitos: true,
+        horario: true,
+        modalidad: true,
         puesto: true,
         ubicacion: true,
         imagen: true,
         fecha_cierre: true,
         empresas_id: true,
+        oferta_estados_id: true,
         ingenierias_ofertas: {
           select: {
             academia: {
@@ -119,13 +122,16 @@ export async function PATCH(
     if (!vacante || vacante.empresas_id !== empresa.id_empresas)
       return NextResponse.json({ ok: false, error: "Acceso denegado" }, { status: 403 });
 
-    const { titulo, descripcion, puesto, ubicacion, imagen, fecha_cierre, ingenierias } = body;
+    const { titulo, descripcion_general, requisitos, horario, modalidad, puesto, ubicacion, imagen, fecha_cierre, ingenierias } = body;
 
     const updated = await prisma.ofertas.update({
       where: { id_ofertas: idNumber },
       data: {
         titulo,
-        descripcion,
+        descripcion_general,
+        requisitos,
+        horario,
+        modalidad,
         puesto,
         ubicacion,
         imagen,
