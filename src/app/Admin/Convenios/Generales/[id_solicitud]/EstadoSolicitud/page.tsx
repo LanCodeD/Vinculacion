@@ -72,7 +72,9 @@ export default function EstadoSolicitudAdmin() {
   const pasos = ["TipoConvenio", "DatosEmpresa", "Solicitante", "Eventos"];
 
   const estados = ["", "PENDIENTE", "EN_REVISIÓN", "APROBADO", "CORREGIR"];
-  const bloqueado = solicitud?.estado?.nombre_estado === "FINALIZADA";
+  const bloqueado =
+    solicitud?.estado?.nombre_estado === "FINALIZADA" ||
+    solicitud?.estado?.nombre_estado === "CONVENIO CONCRETADO";
 
   return (
     <div className="max-w-5xl mx-auto py-8 space-y-6 text-black">

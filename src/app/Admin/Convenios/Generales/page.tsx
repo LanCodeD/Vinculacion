@@ -58,7 +58,7 @@ export default function AdminSolicitudesPage() {
     };
     cargar();
   }, []);
-  console.log(solicitudes);
+
 
   const confirmarEliminar = async () => {
     if (!modalEliminar.id) return;
@@ -170,6 +170,8 @@ export default function AdminSolicitudesPage() {
                       ? "text-green-600"
                       : s.estado.nombre_estado === "FINALIZADA"
                       ? "text-cyan-600"
+                      : s.estado.nombre_estado === "CONVENIO CONCRETADO"
+                      ? "text-teal-600"
                       : "text-yellow-600"
                   }`}
                 >

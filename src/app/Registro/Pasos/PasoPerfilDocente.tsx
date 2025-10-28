@@ -3,6 +3,11 @@ import type { DatosRegistro, PerfilDocente } from "@/types/registro";
 import axios from "axios";
 import toast from "react-hot-toast";
 
+interface Academia {
+  id_academias: number;
+  ingenieria: string;
+}
+
 interface Props {
   registro: DatosRegistro;
   setRegistro: React.Dispatch<React.SetStateAction<DatosRegistro>>;
@@ -22,18 +27,17 @@ export default function PasoPerfilDocente({
     academiasIngenieriasId: 0,
   };
 
-  const [academias, setAcademias] = useState<
-    { id_academias: number; ingenieria: string }[]
-  >([]);
+  const [academias, setAcademias] = useState<Academia[]>([]);
   const [loading, setLoading] = useState(false);
 
   // 🔹 Cargar academias y empresas al montar
   useEffect(() => {
     axios
-      .get("/api/academias")
+      .get("/api/Registro/perfil-egresado")
       .then((res) => setAcademias(res.data))
       .catch((err) => console.error(err));
   }, []);
+
 
   const handleChange = (field: keyof typeof perfil, value: string | number) => {
     setRegistro((prev) => ({
@@ -62,7 +66,7 @@ export default function PasoPerfilDocente({
 
     setLoading(true);
     try {
-      await axios.post("/api/perfiles/docentes", payload);
+      await axios.post("/api/Registro/perfil-docente", payload);
       toast.success("Perfil de docente guardado con éxito");
       onNext();
     } catch (error) {
@@ -77,7 +81,7 @@ export default function PasoPerfilDocente({
   };
 
   return (
-    <div className="w-full max-w-md flex flex-col gap-4">
+    <div className="w-full max-w-md flex flex-col gap-4 text-black">
       <h2 className="text-xl font-bold">Perfil de Docente</h2>
 
       <input
@@ -85,7 +89,7 @@ export default function PasoPerfilDocente({
         placeholder="Título"
         value={perfil.titulo}
         onChange={(e) => handleChange("titulo", e.target.value)}
-        className="border rounded p-2"
+        className="border rounded p-2 placeholder:text-black"
       />
 
       <input
@@ -93,7 +97,7 @@ export default function PasoPerfilDocente({
         placeholder="Puesto"
         value={perfil.puesto}
         onChange={(e) => handleChange("puesto", e.target.value)}
-        className="border rounded p-2"
+        className="border rounded p-2 placeholder:text-black"
       />
 
       <select

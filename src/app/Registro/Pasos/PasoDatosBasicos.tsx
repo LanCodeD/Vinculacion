@@ -170,12 +170,12 @@ export default function PasoDatosBasicos({
           </button>
         </div>
       </div>
-      <div className="mt-6">
+{/*       <div className="mt-6">
         <BotonGoogle
           texto="Registrarse con Google"
           tipoCuenta={registro.tipoCuentaId?.toString()}
         />
-      </div>
+      </div> */}
     </div>
   );
 }
