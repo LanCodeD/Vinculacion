@@ -41,3 +41,7 @@ yarn-error.log*
 next-env.d.ts
 
 /src/generated/prisma
+
+# ignorar el contenido de la carpeta
+uploads/Subir_documentos/convenios_concretados/*
+!uploads/Subir_documentos/convenios_concretados/.gitkeep
