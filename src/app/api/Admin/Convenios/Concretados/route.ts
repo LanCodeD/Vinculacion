@@ -1,3 +1,4 @@
+// src/app/api/Admin/Convenios/Concretados/route.ts
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getSessionUser } from "@/lib/auth"; // ⚠️ ya lo usas antes, así que mantenemos consistencia

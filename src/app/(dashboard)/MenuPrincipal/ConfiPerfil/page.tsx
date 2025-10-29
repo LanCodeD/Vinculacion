@@ -48,11 +48,16 @@ export default function Perfil() {
     fetch(`/api/Users/${userId}`)
       .then(res => res.json())
       .then(data => {
-        // Ajustar imagen de perfil
+        // Ajustar imagen de perfil usando API de usuarios
         if (data.rol === 'Egresado' && data.egresados?.[0]?.foto_perfil) {
-          data.imagen_perfil = data.egresados[0].foto_perfil;
+          // Extraemos solo el nombre del archivo
+          const parts = data.egresados[0].foto_perfil.split('/');
+          const nombreArchivo = parts[parts.length - 1];
+          data.imagen_perfil = `/api/Usuarios/archivos/Perfiles/${encodeURIComponent(nombreArchivo)}`;
         } else if (data.rol === 'Empresa' && data.empresas?.[0]?.foto_perfil) {
-          data.imagen_perfil = data.empresas[0].foto_perfil;
+          const parts = data.empresas[0].foto_perfil.split('/');
+          const nombreArchivo = parts[parts.length - 1];
+          data.imagen_perfil = `/api/Usuarios/archivos/Perfiles/${encodeURIComponent(nombreArchivo)}`;
         }
         setUser(data);
       })
@@ -69,7 +74,7 @@ export default function Perfil() {
         {user.imagen_perfil ? (
           <img
             src={user.imagen_perfil}
-            alt="Imagen de perfil"
+            alt=""
             className="w-24 h-24 rounded-full object-cover border"
           />
         ) : (
@@ -124,6 +129,7 @@ export default function Perfil() {
               <UploadFile
                 userId={user.id}
                 tipo="cv"
+                idEgresado={eg.id_egresados}
                 onUploaded={(url) => setUser(prev => prev ? {
                   ...prev,
                   egresados: prev.egresados?.map(e => e.id_egresados === eg.id_egresados ? { ...e, cv_url: url } : e)

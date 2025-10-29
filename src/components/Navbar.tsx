@@ -1,12 +1,56 @@
-"use client";
+'use client';
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { FaBell, FaSearch } from "react-icons/fa";
 import { signOut } from "next-auth/react";
+
+interface UserProfile {
+  id: number;
+  nombre: string;
+  apellido: string;
+  rol: string;
+  egresados?: {
+    foto_perfil?: string;
+  }[];
+  empresas?: {
+    foto_perfil?: string;
+  }[];
+  imagen_perfil?: string;
+}
 
 export default function Navbar() {
   const [showNotifications, setShowNotifications] = useState(false);
   const [showProfile, setShowProfile] = useState(false);
+  const [user, setUser] = useState<UserProfile | null>(null);
+
+  useEffect(() => {
+    // Obtener id de sesión desde el backend o sesión de next-auth
+    fetch("/api/auth/session")
+      .then(res => res.json())
+      .then(sessionData => {
+        const userId = sessionData?.user?.id;
+        if (!userId) return;
+
+        // Obtener datos del usuario
+        fetch(`/api/Users/${userId}`)
+          .then(res => res.json())
+          .then(data => {
+            // Ajustar imagen de perfil
+            if (data.rol === "Egresado" && data.egresados?.[0]?.foto_perfil) {
+              const parts = data.egresados[0].foto_perfil.split('/');
+              data.imagen_perfil = `/api/Usuarios/archivos/Perfiles/${encodeURIComponent(parts[parts.length - 1])}`;
+            } else if (data.rol === "Empresa" && data.empresas?.[0]?.foto_perfil) {
+              const parts = data.empresas[0].foto_perfil.split('/');
+              data.imagen_perfil = `/api/Usuarios/archivos/Perfiles/${encodeURIComponent(parts[parts.length - 1])}`;
+            }
+            setUser(data);
+          })
+          .catch(err => console.error("Error al obtener usuario:", err));
+      })
+      .catch(err => console.error("Error al obtener sesión:", err));
+  }, []);
+
+  const profileImage = user?.imagen_perfil ?? "https://cdn.pixabay.com/photo/2016/11/21/11/17/model-1844729_640.jpg";
 
   return (
     <div className="w-full h-[8ch] px-4 md:px-12 bg-zinc-50 shadow-md flex items-center justify-between">
@@ -24,17 +68,15 @@ export default function Navbar() {
 
       {/* Notificaciones y perfil */}
       <div className="flex items-center gap-x-4 md:gap-x-8 ml-2 relative text-black">
-
         {/* Notificaciones */}
         <div className="relative">
           <button
             onClick={() => {
               setShowNotifications(!showNotifications);
-              if (!showNotifications) setShowProfile(false); // cierra perfil si se abre notificaciones
+              if (!showNotifications) setShowProfile(false);
             }}
             className="relative focus:outline-none"
           >
-            {/* Ping effect */}
             <span className="absolute top-0 right-0 flex h-3 w-3">
               <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-red-400 opacity-75"></span>
               <span className="relative inline-flex h-3 w-3 rounded-full bg-red-600"></span>
@@ -42,7 +84,6 @@ export default function Navbar() {
             <FaBell className="text-xl text-black" />
           </button>
 
-          {/* Dropdown de notificaciones */}
           {showNotifications && (
             <div className="absolute right-0 mt-2 w-64 bg-white shadow-lg rounded-lg overflow-hidden z-50">
               <div className="p-3 border-b font-semibold">Notificaciones</div>
@@ -58,16 +99,15 @@ export default function Navbar() {
         {/* Perfil */}
         <div className="relative">
           <img
-            src="https://cdn.pixabay.com/photo/2016/11/21/11/17/model-1844729_640.jpg"
+            src={profileImage}
             alt="profile"
             className="w-11 h-11 rounded-full object-cover object-center cursor-pointer"
             onClick={() => {
               setShowProfile(!showProfile);
-              if (!showProfile) setShowNotifications(false); // cierra notificaciones si se abre perfil
+              if (!showProfile) setShowNotifications(false);
             }}
           />
 
-          {/* Dropdown de perfil */}
           {showProfile && (
             <div className="absolute right-0 mt-2 w-48 bg-white shadow-lg rounded-lg overflow-hidden z-50">
               <ul>
@@ -86,7 +126,6 @@ export default function Navbar() {
           )}
         </div>
       </div>
-
     </div>
   );
 }

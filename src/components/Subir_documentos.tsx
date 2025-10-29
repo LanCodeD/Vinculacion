@@ -1,13 +1,15 @@
+// src/components/Subir_documentos.tsx
 'use client';
 import { useState } from 'react';
 
 interface UploadProps {
   userId: number;
   tipo: 'cv' | 'foto_usuario'; // Cambiado para foto de perfil global
+  idEgresado?: number;
   onUploaded?: (url: string) => void;
 }
 
-export default function UploadFile({ userId, tipo, onUploaded }: UploadProps) {
+export default function UploadFile({ userId, tipo, idEgresado, onUploaded }: UploadProps) {
   const [file, setFile] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
 
@@ -20,8 +22,12 @@ export default function UploadFile({ userId, tipo, onUploaded }: UploadProps) {
     formData.append("userId", userId.toString());
     formData.append("tipo", tipo);
 
+    if (tipo === "cv" && idEgresado) {
+      formData.append("idEgresado", idEgresado.toString());
+    }
+
     try {
-      const res = await fetch("/api/Users/Subir_archivos", { method: "POST", body: formData });
+      const res = await fetch("/api/Admin/BolsaTrabajo/Subir_IMG_PDF", { method: "POST", body: formData });
       const data = await res.json();
       if (data.ok && data.url && onUploaded) {
         onUploaded(data.url);
