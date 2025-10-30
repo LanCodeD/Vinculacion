@@ -7,10 +7,7 @@ export async function GET(req: NextRequest) {
     const usuario = await getSessionUser();
 
     // Validar rol del usuario
-    if (
-      !usuario ||
-      (usuario.role !== "Administrador" && usuario.role !== "Root")
-    ) {
+    if (!usuario || usuario.role !== "Administrador") {
       return NextResponse.json({ error: "No autorizado" }, { status: 403 });
     }
 
