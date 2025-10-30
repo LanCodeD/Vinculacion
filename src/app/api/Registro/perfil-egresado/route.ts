@@ -69,7 +69,7 @@ export async function POST(req: Request) {
         fecha_egreso: fecha,
         correo_institucional: correo_institucional,
         academias_ingenierias_id: academias_ingenierias_id,
-        empresas_id: 1, // Empresa del plantel
+        empresas_id: 2, // Empresa del plantel
       },
     });
 

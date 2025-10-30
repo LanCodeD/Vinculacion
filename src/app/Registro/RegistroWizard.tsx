@@ -11,6 +11,7 @@ import PasoPerfilEgresado from "./Pasos/PasoPerfilEgresado";
 import PasoPerfilDocente from "./Pasos/PasoPerfilDocente";
 import PasoPerfilEmpresa from "./Pasos/PasoPerfilEmpresa";
 import PasoFinal from "./Pasos/PasoFinal";
+import PasoAvisoPrivacidad from "./Pasos/PasoAvisoPrivacidad";
 
 const initialRegistro: DatosRegistro = { tipoCuentaId: 0 };
 
@@ -53,7 +54,7 @@ export default function RegistroWizard() {
 
   // 🔹 Guardar en localStorage en cada cambio
   useEffect(() => {
-    if (paso === 5) {
+    if (paso === 6) {
       localStorage.removeItem("registroPaso");
       localStorage.removeItem("registroUsuarioId");
       localStorage.removeItem("registroTipoCuenta");
@@ -132,7 +133,14 @@ export default function RegistroWizard() {
         />
       )}
 
-      {paso === 5 && <PasoFinal registro={registro} onBack={retroceder} />}
+      {paso === 5 && (
+        <PasoAvisoPrivacidad
+          onNext={avanzar}   // Avaza al paso final
+          onBack={retroceder} // Puede volver al paso anterior si quiere
+        />
+      )}
+
+      {paso === 6 && <PasoFinal registro={registro} onBack={retroceder} />}
     </div>
   );
 }
