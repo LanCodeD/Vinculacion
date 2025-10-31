@@ -40,7 +40,7 @@ export const USER_MENUS = [
   },
   { title: "Calendario", icon: <TiCalendar />, path: "/Calendar" },
   { title: "Tablas", icon: <FiTable />, path: "/BolsaTrabajo/Postulaciones" },
-  { title: "Estadísticas", icon: <GoGraph />, path: "/analytics" },
+  { title: "Historial", icon: <GoGraph />, path: "/Historial" },
   { title: "Soporte", icon: <MdOutlineHeadsetMic />, path: "/support" },
   {
     title: "Configuración",

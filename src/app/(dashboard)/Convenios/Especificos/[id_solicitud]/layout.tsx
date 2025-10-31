@@ -3,6 +3,7 @@
 
 import Link from "next/link";
 import { useParams, usePathname } from "next/navigation";
+import { Toaster } from "react-hot-toast";
 
 const pasos = [
   { id: "TipoConvenio", nombre: "Tipo de Convenio" },
@@ -25,6 +26,7 @@ export default function LayoutConvenioEspecifico({
 
   return (
     <div className="min-h-screen bg-gray-50">
+      <Toaster position="top-right" />
       {/* Header */}
       <header className="bg-[#011848] text-white py-4 px-8 flex items-center justify-between">
         <h1 className="text-lg font-semibold">

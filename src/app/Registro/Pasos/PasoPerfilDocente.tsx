@@ -38,7 +38,6 @@ export default function PasoPerfilDocente({
       .catch((err) => console.error(err));
   }, []);
 
-
   const handleChange = (field: keyof typeof perfil, value: string | number) => {
     setRegistro((prev) => ({
       ...prev,
@@ -81,49 +80,74 @@ export default function PasoPerfilDocente({
   };
 
   return (
-    <div className="w-full max-w-md flex flex-col gap-4 text-black">
-      <h2 className="text-xl font-bold">Perfil de Docente</h2>
+    <div className="w-full min-h-screen bg-gradient-to-br from-sky-50 via-white to-sky-100 flex flex-col items-center justify-center px-6 py-12">
+      <div className="w-full max-w-7xl">
+        <h2 className="text-4xl font-extrabold text-center text-sky-700 mb-14 drop-shadow-sm">
+          Perfil de Docente
+        </h2>
 
-      <input
-        type="text"
-        placeholder="Título"
-        value={perfil.titulo}
-        onChange={(e) => handleChange("titulo", e.target.value)}
-        className="border rounded p-2 placeholder:text-black"
-      />
+        <form className="grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-8 text-gray-800">
+          {/* Título */}
+          <div className="flex flex-col">
+            <label className="text-sm font-semibold text-gray-700 mb-2">
+              Título
+            </label>
+            <input
+              type="text"
+              value={perfil.titulo}
+              onChange={(e) => handleChange("titulo", e.target.value)}
+              className="p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-sky-500 outline-none placeholder:text-gray-400 transition"
+              placeholder="Lic., Ing., Mtro."
+            />
+          </div>
 
-      <input
-        type="text"
-        placeholder="Puesto"
-        value={perfil.puesto}
-        onChange={(e) => handleChange("puesto", e.target.value)}
-        className="border rounded p-2 placeholder:text-black"
-      />
+          {/* Puesto */}
+          <div className="flex flex-col">
+            <label className="text-sm font-semibold text-gray-700 mb-2">
+              Puesto
+            </label>
+            <input
+              type="text"
+              value={perfil.puesto}
+              onChange={(e) => handleChange("puesto", e.target.value)}
+              className="p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-sky-500 outline-none placeholder:text-gray-400 transition"
+              placeholder="Ej. Coordinador, Docente"
+            />
+          </div>
 
-      <select
-        value={perfil.academiasIngenieriasId}
-        required
-        onChange={(e) =>
-          handleChange("academiasIngenieriasId", Number(e.target.value))
-        }
-        className="border rounded p-2"
-      >
-        <option value={0}>Selecciona su academia actual</option>
-        {academias.map((a) => (
-          <option key={a.id_academias} value={a.id_academias}>
-            {a.ingenieria}
-          </option>
-        ))}
-      </select>
+          {/* Academia */}
+          <div className="flex flex-col md:col-span-2">
+            <label className="text-sm font-semibold text-gray-700 mb-2">
+              Academia actual <span className="text-red-500">*</span>
+            </label>
+            <select
+              value={perfil.academiasIngenieriasId}
+              required
+              onChange={(e) =>
+                handleChange("academiasIngenieriasId", Number(e.target.value))
+              }
+              className="p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-sky-500 outline-none transition bg-white"
+            >
+              <option value={0}>Selecciona su academia actual</option>
+              {academias.map((a) => (
+                <option key={a.id_academias} value={a.id_academias}>
+                  {a.ingenieria}
+                </option>
+              ))}
+            </select>
+          </div>
+        </form>
 
-      <div className="flex justify-between mt-4">
-        <button
-          onClick={handleSubmit}
-          disabled={loading}
-          className="px-4 py-2 bg-blue-600 text-white rounded"
-        >
-          {loading ? "Guardando..." : "Siguiente"}
-        </button>
+        {/* Botón */}
+        <div className="flex justify-end mt-12">
+          <button
+            onClick={handleSubmit}
+            disabled={loading}
+            className="px-8 py-3 bg-sky-600 text-white text-lg font-semibold rounded-xl shadow-md hover:bg-sky-700 transition disabled:opacity-50"
+          >
+            {loading ? "Guardando..." : "Siguiente"}
+          </button>
+        </div>
       </div>
     </div>
   );

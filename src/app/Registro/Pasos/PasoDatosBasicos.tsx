@@ -113,69 +113,100 @@ export default function PasoDatosBasicos({
   };
 
   return (
-    <div className="w-full h-full flex flex-col items-center justify-center px-6">
-      <div className="w-full max-w-2xl bg-white rounded-2xl shadow-lg p-8">
-        <h2 className="text-2xl font-bold text-center text-sky-700 mb-6">
+    <div className="min-h-screen w-full flex items-center justify-center bg-gradient-to-br from-sky-100 via-white to-sky-50 px-6 py-12">
+      <div className="w-full max-w-4xl bg-white rounded-3xl shadow-2xl border border-sky-100 p-12">
+        <h2 className="text-3xl font-bold text-center text-sky-700 mb-10">
           Datos básicos
         </h2>
 
-        <div className="grid grid-cols-1 gap-4 text-black">
-          <input
-            value={form.nombre}
-            onChange={(e) => handleChange("nombre", e.target.value)}
-            placeholder="Nombre"
-            className="p-3 border rounded-lg focus:ring-2 focus:ring-sky-500 outline-none placeholder:text-gray-400"
-          />
-          <input
-            value={form.apellido}
-            onChange={(e) => handleChange("apellido", e.target.value)}
-            placeholder="Apellido"
-            className="p-3 border rounded-lg focus:ring-2 focus:ring-sky-500 outline-none placeholder:text-gray-400"
-          />
-          <input
-            value={form.correo}
-            onChange={(e) => handleChange("correo", e.target.value)}
-            placeholder="Correo"
-            type="email"
-            className="p-3 border rounded-lg focus:ring-2 focus:ring-sky-500 outline-none placeholder:text-gray-400"
-          />
-          <input
-            type="password"
-            value={form.password}
-            onChange={(e) => handleChange("password", e.target.value)}
-            placeholder="Contraseña"
-            className="p-3 border rounded-lg focus:ring-2 focus:ring-sky-500 outline-none placeholder:text-gray-400"
-          />
-          <input
-            value={form.celular}
-            onChange={(e) => handleChange("celular", e.target.value)}
-            placeholder="Celular"
-            className="p-3 border rounded-lg focus:ring-2 focus:ring-sky-500 outline-none placeholder:text-gray-400"
-          />
-        </div>
+        <form className="grid grid-cols-1 md:grid-cols-2 gap-6 text-gray-800">
+          <div className="flex flex-col">
+            <label className="text-sm font-semibold text-gray-600 mb-1">
+              Nombre
+            </label>
+            <input
+              value={form.nombre}
+              onChange={(e) => handleChange("nombre", e.target.value)}
+              placeholder="Ingresa tu nombre"
+              className="p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none placeholder:text-gray-400 transition-all"
+            />
+          </div>
 
-        <div className="flex justify-between mt-6">
+          <div className="flex flex-col">
+            <label className="text-sm font-semibold text-gray-600 mb-1">
+              Apellido
+            </label>
+            <input
+              value={form.apellido}
+              onChange={(e) => handleChange("apellido", e.target.value)}
+              placeholder="Ingresa tu apellido"
+              className="p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none placeholder:text-gray-400 transition-all"
+            />
+          </div>
+
+          <div className="flex flex-col md:col-span-2">
+            <label className="text-sm font-semibold text-gray-600 mb-1">
+              Correo electrónico
+            </label>
+            <input
+              type="email"
+              value={form.correo}
+              onChange={(e) => handleChange("correo", e.target.value)}
+              placeholder="ejemplo@correo.com"
+              className="p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none placeholder:text-gray-400 transition-all"
+            />
+          </div>
+
+          <div className="flex flex-col">
+            <label className="text-sm font-semibold text-gray-600 mb-1">
+              Contraseña
+            </label>
+            <input
+              type="password"
+              value={form.password}
+              onChange={(e) => handleChange("password", e.target.value)}
+              placeholder="********"
+              className="p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none placeholder:text-gray-400 transition-all"
+            />
+          </div>
+
+          <div className="flex flex-col">
+            <label className="text-sm font-semibold text-gray-600 mb-1">
+              Celular
+            </label>
+            <input
+              value={form.celular}
+              onChange={(e) => handleChange("celular", e.target.value)}
+              placeholder="Número de celular"
+              className="p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none placeholder:text-gray-400 transition-all"
+            />
+          </div>
+        </form>
+
+        <div className="flex justify-between items-center mt-10">
           <button
             onClick={onBack}
-            className="px-6 py-2 border border-gray-300 rounded-lg text-gray-600 hover:bg-gray-100 transition"
+            className="px-8 py-3 border border-gray-300 rounded-lg text-gray-600 font-medium hover:bg-gray-100 hover:text-gray-800 transition"
           >
             Atrás
           </button>
+
           <button
             onClick={handleSubmit}
             disabled={loading}
-            className="px-6 py-2 bg-sky-600 text-white rounded-lg hover:bg-sky-700 transition disabled:opacity-50"
+            className="px-8 py-3 bg-sky-600 text-white rounded-lg font-semibold shadow-md hover:bg-sky-700 transition transform hover:scale-[1.03] disabled:opacity-50"
           >
             {loading ? "Guardando..." : "Continuar"}
           </button>
         </div>
-      </div>
-{/*       <div className="mt-6">
+        {/* Si luego quieres agregar Google */}
+        {/* <div className="mt-6 text-center">
         <BotonGoogle
           texto="Registrarse con Google"
           tipoCuenta={registro.tipoCuentaId?.toString()}
         />
       </div> */}
+      </div>
     </div>
   );
 }

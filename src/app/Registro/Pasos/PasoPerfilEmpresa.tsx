@@ -10,7 +10,12 @@ interface Props {
   onBack: () => void;
 }
 
-export default function PasoPerfilEmpresa({ registro, setRegistro, onNext, onBack }: Props) {
+export default function PasoPerfilEmpresa({
+  registro,
+  setRegistro,
+  onNext,
+  onBack,
+}: Props) {
   const perfil: PerfilEmpresa = registro.perfilEmpresa || {
     nombreComercial: "",
     razonSocial: "",
@@ -18,6 +23,8 @@ export default function PasoPerfilEmpresa({ registro, setRegistro, onNext, onBac
     direccion: "",
     correo: "",
     telefono: "",
+    titulo: "",
+    puesto: "",
   };
 
   const [loading, setLoading] = useState(false);
@@ -34,7 +41,9 @@ export default function PasoPerfilEmpresa({ registro, setRegistro, onNext, onBac
 
   const handleSubmit = async () => {
     if (!registro.usuarioId) {
-      toast.error("No se encontró el usuario. Completa primero los datos básicos.");
+      toast.error(
+        "No se encontró el usuario. Completa primero los datos básicos."
+      );
       return;
     }
 
@@ -52,6 +61,8 @@ export default function PasoPerfilEmpresa({ registro, setRegistro, onNext, onBac
       direccion: perfil.direccion,
       correo: perfil.correo,
       telefono: perfil.telefono,
+      titulo: perfil.titulo,
+      puesto: perfil.puesto,
     };
 
     setLoading(true);
@@ -71,65 +82,146 @@ export default function PasoPerfilEmpresa({ registro, setRegistro, onNext, onBac
   };
 
   return (
-    <div className="w-full max-w-md flex flex-col gap-4 text-black">
-      <h2 className="text-xl font-bold">Perfil de Empresa</h2>
+    <div className="w-full min-h-screen bg-gradient-to-br from-sky-50 via-white to-sky-100 flex flex-col items-center justify-center px-6 py-12">
+      <div className="w-full max-w-7xl">
+        <h2 className="text-4xl font-extrabold text-center text-sky-700 mb-14 drop-shadow-sm">
+          Perfil de Empresa
+        </h2>
 
-      <input
-        type="text"
-        placeholder="Nombre comercial"
-        value={perfil.nombreComercial}
-        onChange={(e) => handleChange("nombreComercial", e.target.value)}
-        className="border rounded p-2"
-      />
+        <form className="grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-8 text-gray-800">
+          {/* Título */}
+          <div className="flex flex-col">
+            <label className="text-sm font-semibold text-gray-700 mb-2">
+              Título{" "}
+              <span className="text-gray-400">(Ej. Lic., Ing., Mtro.)</span>
+            </label>
+            <input
+              type="text"
+              value={perfil.titulo}
+              onChange={(e) => handleChange("titulo", e.target.value)}
+              className="p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-sky-500 outline-none placeholder:text-gray-400 transition"
+              placeholder="Lic., Ing., Mtro."
+            />
+          </div>
 
-      <input
-        type="text"
-        placeholder="Razón social"
-        value={perfil.razonSocial}
-        onChange={(e) => handleChange("razonSocial", e.target.value)}
-        className="border rounded p-2"
-      />
+          {/* Puesto */}
+          <div className="flex flex-col">
+            <label className="text-sm font-semibold text-gray-700 mb-2">
+              Puesto{" "}
+              <span className="text-gray-400">
+                (Ej. Director General, Coordinador)
+              </span>
+            </label>
+            <input
+              type="text"
+              value={perfil.puesto}
+              onChange={(e) => handleChange("puesto", e.target.value)}
+              className="p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-sky-500 outline-none placeholder:text-gray-400 transition"
+              placeholder="Director General, Coordinador"
+            />
+          </div>
 
-      <input
-        type="text"
-        placeholder="RFC"
-        value={perfil.rfc}
-        onChange={(e) => handleChange("rfc", e.target.value)}
-        className="border rounded p-2"
-      />
+          {/* Nombre comercial */}
+          <div className="flex flex-col md:col-span-2">
+            <label className="text-sm font-semibold text-gray-700 mb-2">
+              Nombre comercial <span className="text-red-500">*</span>
+            </label>
+            <input
+              type="text"
+              value={perfil.nombreComercial}
+              onChange={(e) => handleChange("nombreComercial", e.target.value)}
+              className="p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-sky-500 outline-none placeholder:text-gray-400 transition"
+              placeholder="Nombre de la empresa"
+            />
+          </div>
 
-      <input
-        type="text"
-        placeholder="Dirección"
-        value={perfil.direccion}
-        onChange={(e) => handleChange("direccion", e.target.value)}
-        className="border rounded p-2"
-      />
+          {/* Razón social */}
+          <div className="flex flex-col md:col-span-2">
+            <label className="text-sm font-semibold text-gray-700 mb-2">
+              Razón social
+            </label>
+            <input
+              type="text"
+              value={perfil.razonSocial}
+              onChange={(e) => handleChange("razonSocial", e.target.value)}
+              className="p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-sky-500 outline-none placeholder:text-gray-400 transition"
+              placeholder="Razón social de la empresa"
+            />
+          </div>
 
-      <input
-        type="email"
-        placeholder="Correo"
-        value={perfil.correo}
-        onChange={(e) => handleChange("correo", e.target.value)}
-        className="border rounded p-2"
-      />
+          {/* RFC */}
+          <div className="flex flex-col">
+            <label className="text-sm font-semibold text-gray-700 mb-2">
+              RFC <span className="text-red-500">*</span>
+            </label>
+            <input
+              type="text"
+              value={perfil.rfc}
+              onChange={(e) => handleChange("rfc", e.target.value)}
+              className="p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-sky-500 outline-none placeholder:text-gray-400 uppercase transition"
+              placeholder="RFC de la empresa"
+            />
+          </div>
 
-      <input
-        type="text"
-        placeholder="Teléfono"
-        value={perfil.telefono}
-        onChange={(e) => handleChange("telefono", e.target.value)}
-        className="border rounded p-2"
-      />
+          {/* Teléfono */}
+          <div className="flex flex-col">
+            <label className="text-sm font-semibold text-gray-700 mb-2">
+              Teléfono
+            </label>
+            <input
+              type="text"
+              value={perfil.telefono}
+              onChange={(e) => handleChange("telefono", e.target.value)}
+              className="p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-sky-500 outline-none placeholder:text-gray-400 transition"
+              placeholder="Número de contacto"
+            />
+          </div>
 
-      <div className="flex justify-between mt-4">
-        <button
-          onClick={handleSubmit}
-          disabled={loading}
-          className="px-4 py-2 bg-blue-600 text-white rounded"
-        >
-          {loading ? "Guardando..." : "Siguiente"}
-        </button>
+          {/* Dirección */}
+          <div className="flex flex-col md:col-span-2">
+            <label className="text-sm font-semibold text-gray-700 mb-2">
+              Dirección
+            </label>
+            <input
+              type="text"
+              value={perfil.direccion}
+              onChange={(e) => handleChange("direccion", e.target.value)}
+              className="p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-sky-500 outline-none placeholder:text-gray-400 transition"
+              placeholder="Dirección completa"
+            />
+          </div>
+
+          {/* Correo electrónico */}
+          <div className="flex flex-col md:col-span-2">
+            <label className="text-sm font-semibold text-gray-700 mb-2">
+              Correo electrónico
+            </label>
+            <input
+              type="email"
+              value={perfil.correo}
+              onChange={(e) => handleChange("correo", e.target.value)}
+              className="p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-sky-500 outline-none placeholder:text-gray-400 transition"
+              placeholder="ejemplo@empresa.com"
+            />
+          </div>
+        </form>
+
+        {/* Botones */}
+        <div className="flex justify-between mt-12">
+          <button
+            onClick={onBack}
+            className="px-8 py-3 border border-gray-300 rounded-xl text-gray-600 hover:bg-gray-100 transition"
+          >
+            Atrás
+          </button>
+          <button
+            onClick={handleSubmit}
+            disabled={loading}
+            className="px-8 py-3 bg-sky-600 text-white text-lg font-semibold rounded-xl shadow-md hover:bg-sky-700 transition disabled:opacity-50"
+          >
+            {loading ? "Guardando..." : "Siguiente"}
+          </button>
+        </div>
       </div>
     </div>
   );

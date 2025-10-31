@@ -83,7 +83,7 @@ export const authOptions: NextAuthOptions = {
         } catch (error: unknown) {
           if (error instanceof Error) {
             console.error("Error en authorize:", error.message);
-            throw new Error("Error de autenticación");
+            throw error; // ← Aquí se conserva el mensaje original
           } else {
             console.error("Error desconocido en authorize:", error);
             throw new Error("Error inesperado");
@@ -121,8 +121,8 @@ export const authOptions: NextAuthOptions = {
         session.user.id = token.id;
         session.user.nombre = token.nombre;
         session.user.correo = token.correo;
-        session.user.tipoCuentaId = token.tipoCuentaId; 
-        session.user.roles_id = token.roles_id!;             // 👇 agrega rol en texto
+        session.user.tipoCuentaId = token.tipoCuentaId;
+        session.user.roles_id = token.roles_id!; // 👇 agrega rol en texto
         session.user.role = token.role as AppRole;
       }
       return session;
