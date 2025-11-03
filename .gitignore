@@ -45,3 +45,9 @@ next-env.d.ts
 # ignorar el contenido de la carpeta
 uploads/Subir_documentos/convenios_concretados/*
 !uploads/Subir_documentos/convenios_concretados/.gitkeep
+
+uploads/Subir_documentos/Egresados_Documentos/*
+!uploads/Subir_documentos/Egresados_Documentos/.gitkeep
+
+uploads/Subir_imagenes/Perfiles/*
+!uploads/Subir_imagenes/Perfiles/.gitkeep
