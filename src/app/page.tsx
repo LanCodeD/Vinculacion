@@ -32,7 +32,7 @@ export default function Home() {
             <a href="#" className="flex items-center space-x-3 relative">
               <div className="w-10 h-10 sm:w-12 sm:h-12 relative">
                 <Image
-                  src="/banner/tecnm.webp"
+                  src="/Banner/tecnm.webp"
                   alt="Logo"
                   priority
                   fill 
@@ -151,9 +151,9 @@ export default function Home() {
           >
             <Carousel
               images={[
-                "/banner/estrecho.webp",
-                "/banner/A.webp",
-                "/banner/OIP.webp",
+                "/Banner/estrecho.webp",
+                "/Banner/A.webp",
+                "/Banner/OIP.webp",
               ]}
               autoSlide={true}
               autoSlideInterval={4000}

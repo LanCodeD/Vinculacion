@@ -124,6 +124,7 @@ export default function Navbar() {
               setShowProfile(!showProfile);
               if (!showProfile) setShowNotifications(false);
             }}
+            unoptimized // 🚫 Evita error 400: la imagen proviene de /api/ y no puede ser optimizada por Next.js
             priority
           />
 

@@ -83,6 +83,7 @@ export default function Perfil() {
             width={96}
             height={96}
             className="rounded-full object-cover border"
+            unoptimized // 🚫 Evita error 400: la imagen proviene de /api/ y no puede ser optimizada por Next.js
           />
         ) : (
           <div className="w-24 h-24 rounded-full bg-gray-200 flex items-center justify-center text-gray-500 border">

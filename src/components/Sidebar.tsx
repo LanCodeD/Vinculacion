@@ -100,7 +100,7 @@ export default function Sidebar({ role }: { role: AppRole }) {
         {/* Logo */}
         <div className="flex gap-x-4 items-center">
           <Image
-            src="/dashboard/logoitsva.webp"
+            src="/Dashboard/logoitsva.webp"
             alt="Logo ITSVA"
             width={48}
             height={48}

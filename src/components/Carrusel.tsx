@@ -26,7 +26,7 @@ const Carousel: React.FC<CarouselProps> = ({
   }, [autoSlide, autoSlideInterval, images.length]);
 
   return (
-    <div className="relative w-full max-w-lg aspect-[4/3] overflow-hidden rounded-lg">
+    <div className="relative w-full max-w-lg aspect-4/3 overflow-hidden rounded-lg">
       {images.map((image, index) => (
         <div
           key={index}
