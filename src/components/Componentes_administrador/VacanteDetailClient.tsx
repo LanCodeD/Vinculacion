@@ -5,6 +5,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import toast from "react-hot-toast";
+import Image from "next/image";
 
 type VacanteDetail = {
   id_ofertas: number;
@@ -24,8 +25,6 @@ type VacanteDetail = {
   estado: { nombre_estado: string };
   ingenierias_ofertas: { academia: { ingenieria: string } }[];
 };
-
-
 
 interface Props {
   vacante: VacanteDetail;
@@ -50,14 +49,20 @@ export default function AdminVacanteDetailClient({ vacante }: Props) {
       const data = await res.json();
 
       if (res.ok && data.ok) {
-        alert(`Vacante ${accion === "aprobar" ? "publicada" : "rechazada"} correctamente.`);
+        toast.success(
+          `Vacante ${
+            accion === "aprobar" ? "publicada" : "rechazada"
+          } correctamente.`
+        );
         router.push("/Admin/BolsaTrabajoAD");
       } else {
-        alert("Error al actualizar la vacante: " + (data.error ?? "Desconocido"));
+        toast.error(
+          "Error al actualizar la vacante: " + (data.error ?? "Desconocido")
+        );
       }
     } catch (error) {
       console.error(error);
-      alert("Error en la conexión");
+      toast.error("Error en la conexión");
     } finally {
       setLoading(false);
     }
@@ -72,36 +77,81 @@ export default function AdminVacanteDetailClient({ vacante }: Props) {
         ← Regresar
       </button>
       {vacante.imagen && (
-        <img
+        <Image
           src={vacante.imagen}
           alt={vacante.titulo}
+          width={800}
+          height={400}
           className="w-full max-h-80 object-cover rounded-lg mb-4 shadow"
+          priority
         />
       )}
-      <p><strong>Titulo:</strong> {vacante.titulo}</p>
-      <p><strong>Empresa:</strong> {vacante.empresas.nombre_comercial}</p>
-      <p><strong>Estado:</strong> {vacante.estado.nombre_estado}</p>
-      <p><strong>Puesto:</strong> {vacante.puesto ?? "Sin puesto"}</p>
+      <p>
+        <strong>Titulo:</strong> {vacante.titulo}
+      </p>
+      <p>
+        <strong>Empresa:</strong> {vacante.empresas.nombre_comercial}
+      </p>
+      <p>
+        <strong>Estado:</strong> {vacante.estado.nombre_estado}
+      </p>
+      <p>
+        <strong>Puesto:</strong> {vacante.puesto ?? "Sin puesto"}
+      </p>
 
       <p>
         <strong>Ingenierías:</strong>{" "}
         {vacante.ingenierias_ofertas && vacante.ingenierias_ofertas.length > 0
-          ? vacante.ingenierias_ofertas.map(c => c.academia.ingenieria).join(", ")
+          ? vacante.ingenierias_ofertas
+              .map((c) => c.academia.ingenieria)
+              .join(", ")
           : "Sin ingenierías"}
       </p>
 
-      <p><strong>Ubicación:</strong> {vacante.ubicacion ?? "Sin ubicación"}</p>
-      <p><strong>Descripción:</strong> {vacante.descripcion_general ?? "Sin descripción"}</p>
-      <p><strong>Requisitos:</strong> {vacante.requisitos ?? "Sin requisitos"}</p>
-      <p><strong>Horario:</strong> {vacante.horario ?? "Sin horario"}</p>
-      <p><strong>Modalidad:</strong> {vacante.modalidad ?? "Sin modalidad"}</p>
-      <p><strong>ID de la Vacante:</strong> {vacante.id_ofertas}</p>
+      <p>
+        <strong>Ubicación:</strong> {vacante.ubicacion ?? "Sin ubicación"}
+      </p>
+      <p>
+        <strong>Descripción:</strong>{" "}
+        {vacante.descripcion_general ?? "Sin descripción"}
+      </p>
+      <p>
+        <strong>Requisitos:</strong> {vacante.requisitos ?? "Sin requisitos"}
+      </p>
+      <p>
+        <strong>Horario:</strong> {vacante.horario ?? "Sin horario"}
+      </p>
+      <p>
+        <strong>Modalidad:</strong> {vacante.modalidad ?? "Sin modalidad"}
+      </p>
+      <p>
+        <strong>ID de la Vacante:</strong> {vacante.id_ofertas}
+      </p>
 
-      <p><strong>Fecha de publicación:</strong> {vacante.fecha_publicacion ? new Date(vacante.fecha_publicacion).toLocaleDateString() : "No publicada"}</p>
-      <p><strong>Fecha de cierre:</strong> {vacante.fecha_cierre ? new Date(vacante.fecha_cierre).toLocaleDateString() : "No definida"}</p>
-      <p><strong>Creada el:</strong> {vacante.creado_en ? new Date(vacante.creado_en).toLocaleDateString() : "N/A"}</p>
-      <p><strong>Última actualización:</strong> {vacante.actualizado_en ? new Date(vacante.actualizado_en).toLocaleDateString() : "N/A"}</p>
-
+      <p>
+        <strong>Fecha de publicación:</strong>{" "}
+        {vacante.fecha_publicacion
+          ? new Date(vacante.fecha_publicacion).toLocaleDateString()
+          : "No publicada"}
+      </p>
+      <p>
+        <strong>Fecha de cierre:</strong>{" "}
+        {vacante.fecha_cierre
+          ? new Date(vacante.fecha_cierre).toLocaleDateString()
+          : "No definida"}
+      </p>
+      <p>
+        <strong>Creada el:</strong>{" "}
+        {vacante.creado_en
+          ? new Date(vacante.creado_en).toLocaleDateString()
+          : "N/A"}
+      </p>
+      <p>
+        <strong>Última actualización:</strong>{" "}
+        {vacante.actualizado_en
+          ? new Date(vacante.actualizado_en).toLocaleDateString()
+          : "N/A"}
+      </p>
 
       <div className="flex gap-4 mt-6">
         <button

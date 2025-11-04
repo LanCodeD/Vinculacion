@@ -7,7 +7,7 @@ interface Props {
   onBack: () => void;
 }
 
-export default function PasoFinal({ registro, onBack }: Props) {
+export default function PasoFinal({ registro }: Props) {
   const { tipoCuentaId } = registro;
   const router = useRouter();
 

@@ -50,10 +50,21 @@ export default function EventoPage() {
     const toastId = toast.loading("Guardando cambios...");
     setGuardando(true);
     try {
-      await axios.put(`/api/Convenios/Especificos/${id_solicitud}/Eventos`, form);
+      await axios.put(
+        `/api/Convenios/Especificos/${id_solicitud}/Eventos`,
+        form
+      );
       toast.success("Evento guardado correctamente ✅", { id: toastId });
-    } catch (err) {
-      toast.error("Error al guardar el evento ❌", { id: toastId });
+    } catch (err: unknown) {
+      if (axios.isAxiosError(err)) {
+        const mensaje =
+          err.response?.data?.error || "Error inesperado del servidor";
+        toast.error(mensaje);
+        console.error("❌ Axios error:", err);
+      } else {
+        toast.error("Error inesperado ❌");
+        console.error("❌ Error desconocido:", err);
+      }
     } finally {
       setGuardando(false);
     }

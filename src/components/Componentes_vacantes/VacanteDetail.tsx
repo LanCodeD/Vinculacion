@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
+import Image from "next/image";
 
 interface VacanteDetailProps {
   id: number;
@@ -35,10 +36,15 @@ export default function VacanteDetail({
   const [mensaje, setMensaje] = useState("");
   const [cvUrl, setCvUrl] = useState<string | null>(null);
   const [cvChecking, setCvChecking] = useState<boolean>(false);
-  const [activeTab, setActiveTab] = useState<"descripcion" | "requisitos" | "detalles">("descripcion");
+  const [activeTab, setActiveTab] = useState<
+    "descripcion" | "requisitos" | "detalles"
+  >("descripcion");
 
   // Util: comprueba si una URL responde (HEAD -> fallback GET)
-  async function urlExists(url: string, signal?: AbortSignal): Promise<boolean> {
+  async function urlExists(
+    url: string,
+    signal?: AbortSignal
+  ): Promise<boolean> {
     try {
       // Intentamos HEAD primero (más ligero)
       const headRes = await fetch(url, { method: "HEAD", signal });
@@ -47,7 +53,7 @@ export default function VacanteDetail({
       // Si HEAD no responde OK (algunos servidores no permiten HEAD), intentamos GET
       const getRes = await fetch(url, { method: "GET", signal });
       return getRes.ok;
-    } catch (err) {
+    } catch{
       // Puede fallar por CORS o network — lo tratamos como no existente
       return false;
     }
@@ -70,7 +76,10 @@ export default function VacanteDetail({
 
       try {
         // Bust cache: añadimos timestamp para asegurarnos datos frescos
-        const res = await fetch(`/api/Users/${session.user.id}?t=${Date.now()}`, { signal });
+        const res = await fetch(
+          `/api/Users/${session.user.id}?t=${Date.now()}`,
+          { signal }
+        );
         if (!res.ok) {
           console.error("Error API Users:", res.status);
           if (!mounted) return;
@@ -100,11 +109,13 @@ export default function VacanteDetail({
 
         if (exists) setCvUrl(possibleUrl);
         else {
-          console.warn("CV URL encontrada pero recurso no disponible (404 o CORS).");
+          console.warn(
+            "CV URL encontrada pero recurso no disponible (404 o CORS)."
+          );
           setCvUrl(null);
         }
-      } catch (err) {
-        if ((err as any)?.name === "AbortError") {
+      } catch (err: unknown) {
+        if (err instanceof DOMException && err.name === "AbortError") {
           // petición cancelada, no hacer nada
         } else {
           console.error("Error comprobando CV:", err);
@@ -155,17 +166,19 @@ export default function VacanteDetail({
       if (!data.ok) throw new Error(data.error || "Error al postular.");
 
       setMensaje("✅ Te has postulado correctamente.");
-    } catch (err: any) {
-      setMensaje(`❌ ${err.message}`);
+    } catch (err: unknown) {
+      const mensaje =
+        err instanceof Error ? err.message : "Error inesperado al postular.";
+      setMensaje(`❌ ${mensaje}`);
     } finally {
       setLoading(false);
     }
   }
+  type TabKey = "descripcion" | "requisitos" | "detalles";
 
   return (
     <section className="text-gray-700 body-font overflow-hidden relative">
       <div className="container px-5 py-16 mx-auto relative">
-
         {/* Botón regresar con ícono */}
         <button
           onClick={() => router.back()}
@@ -181,7 +194,11 @@ export default function VacanteDetail({
             stroke="currentColor"
             className="w-6 h-6"
           >
-            <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M15.75 19.5L8.25 12l7.5-7.5"
+            />
           </svg>
           <span className="hidden sm:inline font-medium">Regresar</span>
         </button>
@@ -189,7 +206,9 @@ export default function VacanteDetail({
         {/* Contenido principal */}
         <div className="lg:w-4/5 mx-auto flex flex-wrap items-start mt-2.5">
           <div className="lg:w-1/2 w-full lg:pr-10 lg:py-6 mb-8 lg:mb-0">
-            <h2 className="text-sm title-font text-gray-500 tracking-widest uppercase">{titulo}</h2>
+            <h2 className="text-sm title-font text-gray-500 tracking-widest uppercase">
+              {titulo}
+            </h2>
             <h1 className="text-gray-900 text-3xl title-font font-bold mb-4">
               {puesto ?? "Sin puesto especificado"}
             </h1>
@@ -199,17 +218,18 @@ export default function VacanteDetail({
               {["descripcion", "requisitos", "detalles"].map((tab) => (
                 <button
                   key={tab}
-                  onClick={() => setActiveTab(tab as any)}
-                  className={`flex-1 py-2 text-lg font-medium border-b-2 transition-colors duration-200 ${activeTab === tab
+                  onClick={() => setActiveTab(tab as TabKey)}
+                  className={`flex-1 py-2 text-lg font-medium border-b-2 transition-colors duration-200 ${
+                    activeTab === tab
                       ? "text-indigo-600 border-indigo-600"
                       : "text-gray-500 border-transparent hover:text-indigo-500"
-                    }`}
+                  }`}
                 >
                   {tab === "descripcion"
                     ? "Descripción"
                     : tab === "requisitos"
-                      ? "Requisitos"
-                      : "Detalles"}
+                    ? "Requisitos"
+                    : "Detalles"}
                 </button>
               ))}
             </div>
@@ -257,7 +277,9 @@ export default function VacanteDetail({
                 Currículum Vitae (CV)
               </h3>
               {cvChecking ? (
-                <p className="text-sm text-gray-600">Verificando CV en tu perfil...</p>
+                <p className="text-sm text-gray-600">
+                  Verificando CV en tu perfil...
+                </p>
               ) : cvUrl ? (
                 <a
                   href={cvUrl}
@@ -285,12 +307,13 @@ export default function VacanteDetail({
             <button
               onClick={handleAplicar}
               disabled={loading || !cvUrl}
-              className={`w-full text-white py-2 px-6 rounded transition-all ${loading
+              className={`w-full text-white py-2 px-6 rounded transition-all ${
+                loading
                   ? "bg-indigo-300"
                   : !cvUrl
-                    ? "bg-gray-400 cursor-not-allowed"
-                    : "bg-indigo-500 hover:bg-indigo-600"
-                }`}
+                  ? "bg-gray-400 cursor-not-allowed"
+                  : "bg-indigo-500 hover:bg-indigo-600"
+              }`}
             >
               {loading ? "Enviando..." : "Postularse"}
             </button>
@@ -299,14 +322,16 @@ export default function VacanteDetail({
           </div>
 
           {/* Imagen */}
-          <img
-            alt={titulo}
-            className="lg:w-1/2 w-full h-[400px] object-cover object-center rounded shadow mt-10"
+          <Image
             src={imagen ?? "https://dummyimage.com/400x400"}
+            alt={`Imagen de la vacante ${titulo}`}
+            width={800}
+            height={400}
+            className="lg:w-1/2 w-full h-[400px] object-cover object-center rounded shadow mt-10"
+            priority
           />
         </div>
       </div>
     </section>
   );
-
 }

@@ -1,31 +1,49 @@
-// src/app/Admin/BolsaTrabajoAD/[id]/page.tsx
+import React from "react";
 import { prisma } from "@/lib/prisma";
 import AdminVacanteDetailClient from "@/components/Componentes_administrador/VacanteDetailClient";
 
-type Props = { params: { id: string } };
+interface Props {
+  params: Promise<{ id: string }>;
+}
 
-export default async function AdminVacanteDetailPage({ params }: Props) {
-    const { id } = await params; // ✅ Esperamos la promesa
-    const vacanteId = Number(id);
+export default async function AdminVacantePage({ params }: Props) {
+  const { id } = await params; // ✅ se resuelve la promesa correctamente
+  const vacanteId = Number(id);
 
-    const vacante = await prisma.ofertas.findUnique({
-        where: { id_ofertas: vacanteId },
+  if (!id || isNaN(vacanteId)) {
+    console.error("❌ ID inválido:", id);
+    return <p className="text-center text-gray-500 mt-20">ID inválido</p>;
+  }
+
+  const vacante = await prisma.ofertas.findUnique({
+    where: { id_ofertas: vacanteId },
+    include: {
+      empresas: {
+        select: {
+          nombre_comercial: true,
+          usuarios_id: true,
+        },
+      },
+      estado: {
+        select: {
+          nombre_estado: true,
+        },
+      },
+      ingenierias_ofertas: {
         include: {
-            empresas: { select: { nombre_comercial: true, usuarios_id: true } },
-            estado: { select: { nombre_estado: true } },
-            ingenierias_ofertas: {
-                include: {
-                    academia: {
-                        select: { ingenieria: true }
-                    }
-                }
-            }
-        }
-    });
+          academia: {
+            select: {
+              ingenieria: true,
+            },
+          },
+        },
+      },
+    },
+  });
 
-    if (!vacante) {
-        return <p className="p-6 text-red-500">Vacante no encontrada</p>;
-    }
+  if (!vacante) {
+    return <p className="text-center text-gray-500 mt-20">Vacante no encontrada</p>;
+  }
 
-    return <AdminVacanteDetailClient vacante={vacante} />;
+  return <AdminVacanteDetailClient vacante={vacante} />;
 }

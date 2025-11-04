@@ -3,6 +3,7 @@ import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { useEstadoPaso } from "@/hook/EstadoPaso";
+import toast from "react-hot-toast";
 // 🔹 Tipos para mantener seguridad y claridad
 interface Responsable {
   actor: { nombre: "plantel" | "empresa" };
@@ -26,7 +27,10 @@ interface FormResponsabilidades {
 export default function PasoResponsabilidades() {
   const params = useParams();
   const id_solicitud = params.id_solicitud;
-  const { estadoPaso, bloqueado } = useEstadoPaso(id_solicitud as string, "Responsabilidades");
+  const { estadoPaso, bloqueado } = useEstadoPaso(
+    id_solicitud as string,
+    "Responsabilidades"
+  );
 
   // Estado principal tipado correctamente
   const [form, setForm] = useState<FormResponsabilidades>({
@@ -35,7 +39,7 @@ export default function PasoResponsabilidades() {
   });
 
   const [cargando, setCargando] = useState(true);
-  
+
   const [guardando, setGuardando] = useState(false);
 
   useEffect(() => {
@@ -73,23 +77,41 @@ export default function PasoResponsabilidades() {
 
   // 🔹 Función para guardar los datos
   const guardar = async () => {
+    const toastId = toast.loading("Guardando responsabilidades...");
     setGuardando(true);
     try {
-      await axios.put(`/api/Convenios/Generales/${id_solicitud}/Responsabilidades`, form);
-      alert("Responsabilidades guardadas ✅");
-    } catch (err) {
-      alert("Error al guardar");
+      await axios.put(
+        `/api/Convenios/Generales/${id_solicitud}/Responsabilidades`,
+        form
+      );
+      toast.success("Responsabilidades guardadas correctamente ✅", {
+        id: toastId,
+      });
+    } catch (err: unknown) {
+      if (axios.isAxiosError(err)) {
+        const mensaje =
+          err.response?.data?.error || "Error al guardar responsabilidades ❌";
+        toast.error(mensaje, { id: toastId });
+        console.error("❌ Axios error:", err);
+      } else {
+        toast.error("Error inesperado ❌", { id: toastId });
+        console.error("❌ Error desconocido:", err);
+      }
     } finally {
       setGuardando(false);
     }
   };
 
-  if (cargando) return <p className="text-center py-6 text-black">Cargando datos...</p>;
-   const bloqueadoPaso = bloqueado || estadoPaso === "EN REVISION" || estadoPaso === "APROBADO";
-    
+  if (cargando)
+    return <p className="text-center py-6 text-black">Cargando datos...</p>;
+  const bloqueadoPaso =
+    bloqueado || estadoPaso === "EN REVISION" || estadoPaso === "APROBADO";
 
   // 🔹 Componente interno para mostrar cada bloque (plantel / empresa)
-  const renderSeccion = (titulo: string, actor: keyof FormResponsabilidades) => (
+  const renderSeccion = (
+    titulo: string,
+    actor: keyof FormResponsabilidades
+  ) => (
     <div className="space-y-4 border p-4 rounded-xl bg-gray-50">
       <h3 className="text-lg font-semibold text-[#011848]">{titulo}</h3>
 
@@ -120,17 +142,20 @@ export default function PasoResponsabilidades() {
       <h2 className="text-2xl font-bold text-[#011848]">Responsabilidades</h2>
 
       {renderSeccion("Responsabilidades del PLANTEL", "plantel")}
-      {renderSeccion("Responsabilidades de la EMPRESA o DEPENDENCIA", "empresa")}
+      {renderSeccion(
+        "Responsabilidades de la EMPRESA o DEPENDENCIA",
+        "empresa"
+      )}
 
-    {!bloqueadoPaso && (
-      <button
-        onClick={guardar}
-        disabled={guardando}
-        className="px-6 py-2 bg-[#53b431] text-white rounded-lg hover:bg-[#459b28] transition"
-      >
-        {guardando ? "Guardando..." : "Guardar y continuar"}
-      </button>
-    )}
+      {!bloqueadoPaso && (
+        <button
+          onClick={guardar}
+          disabled={guardando}
+          className="px-6 py-2 bg-[#53b431] text-white rounded-lg hover:bg-[#459b28] transition"
+        >
+          {guardando ? "Guardando..." : "Guardar y continuar"}
+        </button>
+      )}
     </div>
   );
 }

@@ -1,6 +1,6 @@
 // src/app/api/auth/[...nextauth]/authOptions.ts
 import CredentialsProvider from "next-auth/providers/credentials";
-import type { NextAuthOptions, User } from "next-auth";
+import type { NextAuthOptions} from "next-auth";
 import { ROLE_MAP, AppRole } from "@/types/roles";
 import bcrypt from "bcrypt";
 import { prisma } from "@/lib/prisma"; // tu instancia de Prisma

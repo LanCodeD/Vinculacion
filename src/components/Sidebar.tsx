@@ -9,6 +9,15 @@ import {
   TbLayoutSidebarLeftExpand,
 } from "react-icons/tb";
 import { USER_MENUS, ADMIN_MENUS } from "@/constans/sidebarItems";
+import Image from "next/image";
+
+interface SidebarItem {
+  title: string;
+  path?: string;
+  key?: string;
+  icon?: React.ReactNode;
+  subMenu?: SidebarItem[];
+}
 
 export default function Sidebar({ role }: { role: AppRole }) {
   const [open, setOpen] = useState(true);
@@ -27,10 +36,13 @@ export default function Sidebar({ role }: { role: AppRole }) {
   };
 
   // Renderiza submenús de forma recursiva
-  const renderSubMenu = (items: any[]) => (
+  const renderSubMenu = (items: SidebarItem[]) => (
     <ul className="pl-3 pt-2 text-zinc-300 border-l border-zinc-700/40">
-      {items.map((item: any, index: number) => (
-        <li key={index} className="text-sm py-1 px-2 rounded-lg hover:bg-blue-800/40">
+      {items.map((item: SidebarItem, index: number) => (
+        <li
+          key={index}
+          className="text-sm py-1 px-2 rounded-lg hover:bg-blue-800/40"
+        >
           {item.subMenu ? (
             <>
               <div
@@ -38,14 +50,25 @@ export default function Sidebar({ role }: { role: AppRole }) {
                 onClick={() => toggleSubMenu(item.key ?? "")}
               >
                 <span>{item.title}</span>
-                {subMenus[item.key ?? ""] ? <FaChevronDown /> : <FaChevronRight />}
+                {subMenus[item.key ?? ""] ? (
+                  <FaChevronDown />
+                ) : (
+                  <FaChevronRight />
+                )}
               </div>
               {subMenus[item.key ?? ""] && renderSubMenu(item.subMenu)}
             </>
-          ) : (
-            <Link href={item.path} className="block px-2 py-1 hover:bg-blue-700/50 rounded-md">
+          ) : item.path ? (
+            <Link
+              href={item.path}
+              className="block px-2 py-1 hover:bg-blue-700/50 rounded-md"
+            >
               {item.title}
             </Link>
+          ) : (
+            <span className="block px-2 py-1 text-zinc-400 cursor-not-allowed">
+              {item.title}
+            </span>
           )}
         </li>
       ))}
@@ -76,13 +99,17 @@ export default function Sidebar({ role }: { role: AppRole }) {
 
         {/* Logo */}
         <div className="flex gap-x-4 items-center">
-          <img
-            src="/dashboard/logoitsva.webp"
-            alt="logo"
+          <Image
+            src="/Dashboard/logoitsva.webp"
+            alt="Logo ITSVA"
+            width={48}
+            height={48}
             className={`w-10 h-10 md:w-12 md:h-12 rounded-full object-cover object-center cursor-pointer transition-transform duration-300 ease-in-out hover:scale-110 ${
-              open && "rotate-[360deg]"
+              open && "rotate-360"
             }`}
+            priority
           />
+
           <h1
             className={`text-zinc-50 origin-left font-semibold text-xl duration-200 ease-in-out ${
               !open && "scale-0"
@@ -110,9 +137,13 @@ export default function Sidebar({ role }: { role: AppRole }) {
                   onClick={() => {
                     if (!open) {
                       setOpen(true);
-                      Menu.key && toggleSubMenu(Menu.key);
+                      if (Menu.key) {
+                        toggleSubMenu(Menu.key);
+                      }
                     } else {
-                      Menu.key && toggleSubMenu(Menu.key);
+                      if (Menu.key) {
+                        toggleSubMenu(Menu.key);
+                      }
                     }
                   }}
                 >
@@ -122,13 +153,20 @@ export default function Sidebar({ role }: { role: AppRole }) {
                   </div>
                   {Menu.subMenu && open && (
                     <span>
-                      {subMenus[Menu.key ?? ""] ? <FaChevronDown /> : <FaChevronRight />}
+                      {subMenus[Menu.key ?? ""] ? (
+                        <FaChevronDown />
+                      ) : (
+                        <FaChevronRight />
+                      )}
                     </span>
                   )}
                 </div>
               )}
 
-              {open && Menu.subMenu && subMenus[Menu.key ?? ""] && renderSubMenu(Menu.subMenu)}
+              {open &&
+                Menu.subMenu &&
+                subMenus[Menu.key ?? ""] &&
+                renderSubMenu(Menu.subMenu)}
             </li>
           ))}
         </ul>
@@ -184,7 +222,9 @@ export default function Sidebar({ role }: { role: AppRole }) {
                     </div>
                   )}
 
-                  {Menu.subMenu && subMenus[Menu.key ?? ""] && renderSubMenu(Menu.subMenu)}
+                  {Menu.subMenu &&
+                    subMenus[Menu.key ?? ""] &&
+                    renderSubMenu(Menu.subMenu)}
                 </li>
               ))}
             </ul>

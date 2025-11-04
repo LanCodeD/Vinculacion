@@ -52,7 +52,7 @@ export default function PasoVerificacion({
         codigoVerificacion,
       };
 
-      const res = await axios.post("/api/Registro/verificar-codigo", payload);
+      await axios.post("/api/Registro/verificar-codigo", payload);
 
       toast.success("Correo verificado con éxito");
       setRegistro((prev) => ({
@@ -109,7 +109,7 @@ export default function PasoVerificacion({
   }
 
   return (
-    <div className="w-full h-screen flex flex-col items-center justify-center bg-gradient-to-br from-emerald-50 via-white to-emerald-100">
+    <div className="w-full h-screen flex flex-col items-center justify-center bg-linear-to-br from-emerald-50 via-white to-emerald-100">
       <h2 className="text-2xl md:text-3xl font-bold text-gray-800 mb-6">
         Verificación de correo
       </h2>

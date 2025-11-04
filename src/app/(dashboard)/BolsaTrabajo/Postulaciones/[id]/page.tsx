@@ -50,24 +50,30 @@ export default function PostulacionesPage() {
     }
 
     const confirmar = confirm(
-      `¿Seguro que quieres ${accion === "aprobar" ? "aprobar ✅" : "rechazar ❌"} esta postulación?`
+      `¿Seguro que quieres ${
+        accion === "aprobar" ? "aprobar ✅" : "rechazar ❌"
+      } esta postulación?`
     );
     if (!confirmar) return;
 
     try {
       setLoading(true);
 
-      const res = await fetch(`/api/Postulaciones/${postulacionId}/estadoVacante`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          accion,
-          revisadoPorUsuarioId: session.user.id,
-        }),
-      });
+      const res = await fetch(
+        `/api/Postulaciones/${postulacionId}/estadoVacante`,
+        {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            accion,
+            revisadoPorUsuarioId: session.user.id,
+          }),
+        }
+      );
 
       const data = await res.json();
-      if (!data.ok) throw new Error(data.error || "Error al actualizar el estado");
+      if (!data.ok)
+        throw new Error(data.error || "Error al actualizar el estado");
 
       setPostulaciones((prev) =>
         prev.map((p) =>
@@ -78,9 +84,13 @@ export default function PostulacionesPage() {
       );
 
       alert("✅ Estado actualizado correctamente");
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error("❌ Error:", err);
-      alert(`❌ ${err.message}`);
+      if (err instanceof Error) {
+        alert(`❌ ${err.message}`);
+      } else {
+        alert("❌ Error inesperado");
+      }
     } finally {
       setLoading(false);
     }
@@ -130,13 +140,17 @@ export default function PostulacionesPage() {
                 <td className="px-4 py-2 border">{p.estado.nombre_estado}</td>
                 <td className="px-4 py-2 border text-center space-x-2">
                   <button
-                    onClick={() => handleCambioEstado(p.id_postulaciones, "aprobar")}
+                    onClick={() =>
+                      handleCambioEstado(p.id_postulaciones, "aprobar")
+                    }
                     className="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600"
                   >
                     Aprobar
                   </button>
                   <button
-                    onClick={() => handleCambioEstado(p.id_postulaciones, "rechazar")}
+                    onClick={() =>
+                      handleCambioEstado(p.id_postulaciones, "rechazar")
+                    }
                     className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"
                   >
                     Rechazar

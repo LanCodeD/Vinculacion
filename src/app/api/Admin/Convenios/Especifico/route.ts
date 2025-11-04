@@ -1,16 +1,13 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getSessionUser } from "@/lib/auth";
 
-export async function GET(req: NextRequest) {
+export async function GET() {
   try {
     const usuario = await getSessionUser();
 
     // Validar rol del usuario
-    if (
-      !usuario ||
-      (usuario.role !== "Administrador" && usuario.role !== "Root")
-    ) {
+    if (!usuario || usuario.role !== "Administrador") {
       return NextResponse.json({ error: "No autorizado" }, { status: 403 });
     }
 

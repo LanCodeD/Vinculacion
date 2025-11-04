@@ -9,12 +9,27 @@ import Link from "next/link";
 import Filtros from "@/components/Filtros";
 
 interface BolsaTrabajoPageProps {
-  searchParams: {
+  searchParams: Promise<{
     ingenieria?: string | string[];
     puesto?: string;
     ubicacion?: string;
-  };
+  }>;
 }
+interface Vacante {
+  id_ofertas: number;
+  titulo: string;
+  puesto: string | null;
+  ubicacion: string | null;
+  imagen: string | null;
+  ingenierias_ofertas: {
+    academia: {
+      id_academias: number;
+      ingenieria: string;
+    };
+  }[];
+}
+
+
 
 export default async function BolsaTrabajoPage({ searchParams }: BolsaTrabajoPageProps) {
   const resolvedParams = await searchParams;
@@ -69,7 +84,7 @@ export default async function BolsaTrabajoPage({ searchParams }: BolsaTrabajoPag
   const ubicacionFiltro = resolvedParams?.ubicacion ?? "";
 
   // --- CONSULTA DE VACANTES ---
-  let vacantes: any[] = [];
+  let vacantes: Vacante[] = [];
   if (puedeVerBolsa) {
     vacantes = await prisma.ofertas.findMany({
       where: {

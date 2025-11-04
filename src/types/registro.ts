@@ -29,12 +29,15 @@ export interface PerfilDocente {
 
 export interface PerfilEmpresa {
   nombreComercial: string;
-  razonSocial: string;
+  razonSocial?: string;
   rfc: string;
-  direccion: string;
-  correo: string;
-  telefono: string;
+  direccion?: string;
+  correo?: string;
+  telefono?: string;
+  puesto?: string;
+  titulo?: string;
 }
+
 
 /**
  * Objeto maestro que guarda todo el progreso del wizard.

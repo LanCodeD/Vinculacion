@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import axios from "axios";
 import toast from "react-hot-toast";
@@ -11,16 +11,26 @@ interface PasoHistorial {
   comentario: string | null;
 }
 
+interface SolicitudConvenio {
+  creador?: {
+    nombre: string;
+    correo: string;
+  };
+  estado?: {
+    nombre_estado: string;
+  };
+}
+
 export default function EstadoSolicitudAdmin() {
   const { id_solicitud } = useParams();
-  const [solicitud, setSolicitud] = useState<any>(null);
+  const [solicitud, setSolicitud] = useState<SolicitudConvenio | null>(null);
   const [historial, setHistorial] = useState<PasoHistorial[]>([]);
   const [comentario, setComentario] = useState("");
   const [cargando, setCargando] = useState(true);
   const [actualizando, setActualizando] = useState(false);
 
   // 🔹 Cargar solicitud y pasos
-  const cargar = async () => {
+  const cargar = useCallback(async () => {
     try {
       const { data } = await axios.get(`/api/Admin/Convenios/${id_solicitud}`);
       setSolicitud(data.solicitud);
@@ -31,11 +41,11 @@ export default function EstadoSolicitudAdmin() {
     } finally {
       setCargando(false);
     }
-  };
+  }, [id_solicitud]);
 
   useEffect(() => {
     if (id_solicitud) cargar();
-  }, [id_solicitud]);
+  }, [id_solicitud, cargar]);
 
   // 🔹 Actualizar paso (Aprobar / Rechazar)
   const actualizarPaso = async (paso: string, estado_id: number) => {

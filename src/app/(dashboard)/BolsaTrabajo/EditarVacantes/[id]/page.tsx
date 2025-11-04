@@ -16,7 +16,7 @@ interface Vacante {
   fecha_cierre: string;
   ingenierias_ofertas: {
     academia: { id_academias: number; ingenieria: string }[];
-  }
+  };
 }
 
 export default function EditarVacantePage() {
@@ -36,11 +36,11 @@ export default function EditarVacantePage() {
   useEffect(() => {
     // 🔹 Cargar ingenierías desde backend
     fetch("/api/Ingenierias")
-      .then(res => res.json())
-      .then(data => {
+      .then((res) => res.json())
+      .then((data) => {
         if (data.ok) setListaIngenierias(data.ingenierias);
       })
-      .catch(err => console.error(err));
+      .catch((err) => console.error(err));
 
     if (!id) return;
 
@@ -54,11 +54,11 @@ export default function EditarVacantePage() {
           if (data.vacante.ingenierias_ofertas) {
             setIngenierias(
               data.vacante.ingenierias_ofertas.map(
-                (c: any) => c.academia.id_academias
+                (c: { academia: { id_academias: number } }) =>
+                  c.academia.id_academias
               )
             );
           }
-
         }
       })
       .finally(() => setLoading(false));
@@ -119,9 +119,7 @@ export default function EditarVacantePage() {
 
   return (
     <section className="container mx-auto px-5 py-16">
-      <h1 className="text-2xl font-bold mb-6 text-gray-800">
-        Editar Vacante
-      </h1>
+      <h1 className="text-2xl font-bold mb-6 text-gray-800">Editar Vacante</h1>
 
       <form
         onSubmit={handleSubmit}
@@ -218,7 +216,6 @@ export default function EditarVacantePage() {
             className="mt-1 block w-full rounded-md border border-gray-300 p-2"
           />
         </div>
-
 
         <div>
           <label className="block text-sm font-medium text-gray-700">

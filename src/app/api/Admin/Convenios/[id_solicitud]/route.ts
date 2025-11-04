@@ -77,8 +77,10 @@ export async function DELETE(
       { success: true, mensaje: "Solicitud eliminada correctamente ✅" },
       { status: 200 }
     );
-  } catch (error: any) {
-    console.error("Error al eliminar solicitud admin:", error);
+  } catch (error: unknown) {
+    const mensaje =
+      error instanceof Error ? error.message : "Error desconocido";
+    console.error("Error al eliminar solicitud admin:", mensaje);
     return NextResponse.json(
       { error: "Error interno al eliminar la solicitud" },
       { status: 500 }
@@ -147,8 +149,10 @@ export async function PUT(
       },
       { status: 200 }
     );
-  } catch (error: any) {
-    console.error("Error al finalizar solicitud admin:", error);
+  } catch (error: unknown) {
+    const mensaje =
+      error instanceof Error ? error.message : "Error desconocido";
+    console.error("Error al finalizar solicitud admin:", mensaje);
     return NextResponse.json(
       { error: "Error interno al finalizar la solicitud" },
       { status: 500 }

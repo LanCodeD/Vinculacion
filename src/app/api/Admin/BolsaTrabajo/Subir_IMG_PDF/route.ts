@@ -8,7 +8,8 @@ import { getSessionUser } from "@/lib/auth";
 export async function POST(req: NextRequest) {
   try {
     const user = await getSessionUser();
-    if (!user) return NextResponse.json({ error: "No autorizado" }, { status: 403 });
+    if (!user)
+      return NextResponse.json({ error: "No autorizado" }, { status: 403 });
 
     const formData = await req.formData();
     const file = formData.get("file") as File | null;
@@ -17,11 +18,21 @@ export async function POST(req: NextRequest) {
     const idEgresado = Number(formData.get("idEgresado"));
 
     if (!file || !userId || !tipo) {
-      return NextResponse.json({ error: "Faltan datos requeridos" }, { status: 400 });
+      return NextResponse.json(
+        { error: "Faltan datos requeridos" },
+        { status: 400 }
+      );
     }
 
-    if (tipo === "cv" && user.role !== "Egresado" && user.role !== "Administrador") {
-      return NextResponse.json({ error: "Solo egresados pueden subir CVs" }, { status: 403 });
+    if (
+      tipo === "cv" &&
+      user.role !== "Egresado" &&
+      user.role !== "Administrador"
+    ) {
+      return NextResponse.json(
+        { error: "Solo egresados pueden subir CVs" },
+        { status: 403 }
+      );
     }
 
     const buffer = Buffer.from(await file.arrayBuffer());
@@ -30,10 +41,20 @@ export async function POST(req: NextRequest) {
     let rutaBaseAPI: string;
 
     if (tipo === "cv") {
-      carpetaDestino = path.join(basePath, "uploads", "Subir_documentos", "Egresados_Documentos");
+      carpetaDestino = path.join(
+        basePath,
+        "uploads",
+        "Subir_documentos",
+        "Egresados_Documentos"
+      );
       rutaBaseAPI = "/api/Usuarios/archivos/Egresados_Documentos";
     } else {
-      carpetaDestino = path.join(basePath, "uploads", "Subir_imagenes", "Perfiles");
+      carpetaDestino = path.join(
+        basePath,
+        "uploads",
+        "Subir_imagenes",
+        "Perfiles"
+      );
       rutaBaseAPI = "/api/Usuarios/archivos/Perfiles";
     }
 
@@ -41,9 +62,10 @@ export async function POST(req: NextRequest) {
 
     // Puedes dar un nombre específico al archivo, ejemplo: 'perfil_33.png' o 'cv_45.pdf'
     const extension = path.extname(file.name);
-    const nombreFinal = tipo === "foto_usuario"
-      ? `perfil_${userId}${extension}`
-      : `cv_${idEgresado || userId}${extension}`;
+    const nombreFinal =
+      tipo === "foto_usuario"
+        ? `perfil_${userId}${extension}`
+        : `cv_${idEgresado || userId}${extension}`;
 
     const rutaFinal = path.join(carpetaDestino, nombreFinal);
 
@@ -63,9 +85,20 @@ export async function POST(req: NextRequest) {
       });
     }
 
-    return NextResponse.json({ ok: true, url: urlArchivo, mensaje: "Archivo subido correctamente" });
-  } catch (error: any) {
-    console.error(error);
-    return NextResponse.json({ error: "Error interno del servidor" }, { status: 500 });
+    return NextResponse.json({
+      ok: true,
+      url: urlArchivo,
+      mensaje: "Archivo subido correctamente",
+    });
+  } catch (error: unknown) {
+    const mensaje =
+      error instanceof Error
+        ? error.message
+        : "Error desconocido al subir archivo";
+    console.error("❌ Error al subir archivo:", mensaje);
+    return NextResponse.json(
+      { error: "Error interno del servidor" },
+      { status: 500 }
+    );
   }
 }

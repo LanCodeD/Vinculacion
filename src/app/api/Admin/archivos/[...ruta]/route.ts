@@ -31,9 +31,10 @@ function mimeFromExt(ext: string) {
 
 export async function GET(
   req: Request,
-  context: { params: { ruta: string[] } }
+  context: { params: Promise<{ ruta: string[] }> }
 ) {
-  const rutaParts = context.params.ruta;
+  const { ruta: rutaParts } = await context.params;
+
   console.log("🔍 Ruta solicitada:", rutaParts);
   try {
     // dentro de GET, arriba
@@ -88,8 +89,12 @@ export async function GET(
         "Content-Type": mime,
       },
     });
-  } catch (err: any) {
-    console.error("Error al servir archivo:", err?.message || err);
+  } catch (err: unknown) {
+    const mensaje =
+      err instanceof Error
+        ? err.message
+        : "Error desconocido al servir archivo";
+    console.error("Error al servir archivo:", mensaje);
     return NextResponse.json(
       { error: "Archivo no encontrado" },
       { status: 404 }

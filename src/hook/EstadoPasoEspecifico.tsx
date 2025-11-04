@@ -9,6 +9,12 @@ export interface RegistroAuditoria {
   comentario: string;
 }
 
+type EstadoPaso = "PENDIENTE" | "EN REVISION" | "APROBADO" | "CORREGIR";
+
+function isEstadoPaso(value: string): value is EstadoPaso {
+  return ["PENDIENTE", "EN REVISION", "APROBADO", "CORREGIR"].includes(value);
+}
+
 export function useEstadoPaso(id_solicitud: string, nombrePaso: string) {
   const [estadoPaso, setEstadoPaso] = useState<
     "PENDIENTE" | "EN REVISION" | "APROBADO" | "CORREGIR"
@@ -31,7 +37,9 @@ export function useEstadoPaso(id_solicitud: string, nombrePaso: string) {
           (p: RegistroAuditoria) => p.paso === nombrePaso
         );
 
-        if (pasoActual) setEstadoPaso(pasoActual.estado as any);
+        if (pasoActual && isEstadoPaso(pasoActual.estado)) {
+          setEstadoPaso(pasoActual.estado);
+        }
       } catch (err) {
         console.error("Error al cargar estado del paso:", err);
       }

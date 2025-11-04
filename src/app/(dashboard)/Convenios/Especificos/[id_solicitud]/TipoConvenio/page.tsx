@@ -34,7 +34,9 @@ export default function PasoTipoConvenioEspecifico() {
   // 🔹 Cargar firmas disponibles
   useEffect(() => {
     const cargarFirmas = async () => {
-      const { data } = await axios.get("/api/Convenios/Especificos/firmas_especificos");
+      const { data } = await axios.get(
+        "/api/Convenios/Especificos/firmas_especificos"
+      );
       // Solo mostrar las 2 primeras
       setFirmas(data);
     };
@@ -75,8 +77,15 @@ export default function PasoTipoConvenioEspecifico() {
     try {
       await axios.put(`/api/Convenios/Especificos/${id_solicitud}`, form);
       toast.success("Guardado correctamente ✅", { id: toastId });
-    } catch (err) {
-      toast.error("Error al guardar ❌", { id: toastId });
+    } catch (err: unknown) {
+      if (axios.isAxiosError(err)) {
+        const mensaje = err.response?.data?.error || "Error al guardar ❌";
+        toast.error(mensaje, { id: toastId });
+        console.error("❌ Axios error:", err);
+      } else {
+        toast.error("Error inesperado ❌", { id: toastId });
+        console.error("❌ Error desconocido:", err);
+      }
     } finally {
       setGuardando(false);
     }

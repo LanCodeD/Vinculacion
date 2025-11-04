@@ -2,6 +2,7 @@
 "use client";
 import Link from "next/link";
 import React from "react";
+import Image from "next/image";
 
 interface VacanteCardProps {
   id: number;
@@ -40,9 +41,13 @@ const VacanteCard: React.FC<VacanteCardProps> = ({
     <div className="p-4">
       <div className="bg-white p-6 rounded-xl shadow-md border hover:shadow-lg hover:-translate-y-1 transition duration-300 flex flex-col justify-between h-full">
         {/* Imagen */}
-        <img
-          className="h-44 rounded-lg w-full object-cover object-center mb-4"
+        <Image
           src={imagen}
+          alt="Imagen de la vacante"
+          width={800}
+          height={176}
+          className="h-44 rounded-lg w-full object-cover object-center mb-4"
+          priority
         />
 
         {/* Contenido */}
@@ -86,7 +91,6 @@ const VacanteCard: React.FC<VacanteCardProps> = ({
             >
               Ver postulaciones
             </Link>
-
           </div>
         )}
       </div>

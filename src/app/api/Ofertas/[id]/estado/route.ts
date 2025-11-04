@@ -4,14 +4,19 @@ import { prisma } from "@/lib/prisma";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/app/api/auth/[...nextauth]/authOptions";
 
-export async function PATCH(req: Request, { params }: { params: { id: string } }) {
+export async function PATCH(
+  req: Request,
+  { params }: { params: Promise<{ id: string }> }
+) {
   try {
+    const { id } = await params;
     const session = await getServerSession(authOptions);
+
     if (!session?.user) {
       return NextResponse.json({ ok: false, error: "No autorizado" }, { status: 401 });
     }
 
-    const id = parseInt(params.id);
+    const idNum = parseInt(id);
     const { accion } = await req.json();
 
     const estadoMap: Record<string, number> = {
@@ -24,7 +29,7 @@ export async function PATCH(req: Request, { params }: { params: { id: string } }
     }
 
     const oferta = await prisma.ofertas.update({
-      where: { id_ofertas: id },
+      where: { id_ofertas: idNum },
       data: {
         oferta_estados_id: estadoMap[accion],
         verificado_por_usuarios_id: session.user.id,

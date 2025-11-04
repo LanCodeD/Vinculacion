@@ -28,9 +28,15 @@ export async function GET(
     });
 
     if (!solicitud)
-      return NextResponse.json({ error: "No existe la solicitud" }, { status: 404 });
+      return NextResponse.json(
+        { error: "No existe la solicitud" },
+        { status: 404 }
+      );
 
-    if (solicitud.creado_por_usuario_id !== usuario.id && usuario.role !== "Administrador")
+    if (
+      solicitud.creado_por_usuario_id !== usuario.id &&
+      usuario.role !== "Administrador"
+    )
       return NextResponse.json({ error: "No autorizado" }, { status: 403 });
 
     // 🔹 Obtener datos de docentes y estudiantes
@@ -47,8 +53,26 @@ export async function GET(
     return NextResponse.json({ docentes, estudiantes }, { status: 200 });
   } catch (error) {
     console.error("❌ GET /Participantes error:", error);
-    return NextResponse.json({ error: "Error interno del servidor" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Error interno del servidor" },
+      { status: 500 }
+    );
   }
+}
+
+interface DocenteInput {
+  nombre_completo: string;
+  grado_academico?: string;
+  programa_educativo: string;
+  rol_en_proyecto: string;
+}
+
+interface EstudianteInput {
+  nombre_completo: string;
+  genero?: string;
+  programa_educativo: string;
+  semestre: string;
+  grupo?: string;
 }
 
 // =========================================================
@@ -76,14 +100,23 @@ export async function PUT(
     });
 
     if (!solicitud)
-      return NextResponse.json({ error: "No existe la solicitud" }, { status: 404 });
+      return NextResponse.json(
+        { error: "No existe la solicitud" },
+        { status: 404 }
+      );
 
     if (solicitud.creado_por_usuario_id !== usuario.id)
       return NextResponse.json({ error: "No autorizado" }, { status: 403 });
 
     // 🔹 Leer body
     const body = await req.json();
-    const { docentes = [], estudiantes = [] } = body;
+    const {
+      docentes = [],
+      estudiantes = [],
+    }: {
+      docentes: DocenteInput[];
+      estudiantes: EstudianteInput[];
+    } = body;
 
     // 🔸 Validaciones básicas
     if (!Array.isArray(docentes) || !Array.isArray(estudiantes))
@@ -91,20 +124,33 @@ export async function PUT(
 
     // ✅ Validar que los campos requeridos estén completos
     const docenteIncompleto = docentes.some(
-      (d: any) => !d.nombre_completo?.trim() || !d.programa_educativo?.trim() || !d.rol_en_proyecto?.trim()
+      (d) =>
+        !d.nombre_completo?.trim() ||
+        !d.programa_educativo?.trim() ||
+        !d.rol_en_proyecto?.trim()
     );
+
     if (docenteIncompleto)
       return NextResponse.json(
-        { error: "Todos los docentes deben tener nombre, programa educativo y rol en el proyecto" },
+        {
+          error:
+            "Todos los docentes deben tener nombre, programa educativo y rol en el proyecto",
+        },
         { status: 400 }
       );
 
     const estudianteIncompleto = estudiantes.some(
-      (e: any) => !e.nombre_completo?.trim() || !e.programa_educativo?.trim() || !e.semestre?.trim()
+      (e) =>
+        !e.nombre_completo?.trim() ||
+        !e.programa_educativo?.trim() ||
+        !e.semestre?.trim()
     );
     if (estudianteIncompleto)
       return NextResponse.json(
-        { error: "Todos los estudiantes deben tener nombre, programa educativo y semestre" },
+        {
+          error:
+            "Todos los estudiantes deben tener nombre, programa educativo y semestre",
+        },
         { status: 400 }
       );
 
@@ -117,7 +163,7 @@ export async function PUT(
     // 🔹 Insertar nuevos docentes y estudiantes
     await prisma.$transaction([
       prisma.solicitud_docentes.createMany({
-        data: docentes.map((d: any, i: number) => ({
+        data: docentes.map((d, i) => ({
           id_solicitud: id,
           numero: i + 1,
           nombre_completo: d.nombre_completo,
@@ -127,7 +173,7 @@ export async function PUT(
         })),
       }),
       prisma.solicitud_estudiantes.createMany({
-        data: estudiantes.map((e: any, i: number) => ({
+        data: estudiantes.map((e, i) => ({
           id_solicitud: id,
           numero: i + 1,
           nombre_completo: e.nombre_completo,
@@ -145,6 +191,9 @@ export async function PUT(
     return NextResponse.json({ success: true }, { status: 200 });
   } catch (error) {
     console.error("❌ PUT /Participantes error:", error);
-    return NextResponse.json({ error: "Error interno del servidor" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Error interno del servidor" },
+      { status: 500 }
+    );
   }
 }

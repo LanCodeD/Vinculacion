@@ -19,7 +19,6 @@ export default function PasoPerfilEgresado({
   registro,
   setRegistro,
   onNext,
-  onBack,
 }: Props) {
   const perfil = registro.perfilEgresado || {
     matricula: "",
@@ -32,14 +31,13 @@ export default function PasoPerfilEgresado({
 
   const [academias, setAcademias] = useState<Academia[]>([]);
   const [loading, setLoading] = useState(false);
-  
+
   useEffect(() => {
     // Obtener academias para el select
     axios
       .get("/api/Registro/perfil-egresado")
       .then((res) => setAcademias(res.data))
       .catch((err) => console.error(err));
-      
   }, []);
 
   const handleChange = (
@@ -56,7 +54,7 @@ export default function PasoPerfilEgresado({
   };
 
   const handleSubmit = async () => {
-    console.log("Este es el usuarioid", registro.usuarioId)
+    console.log("Este es el usuarioid", registro.usuarioId);
     if (!registro.usuarioId) {
       toast.error(
         "No se encontró el usuario. Completa primero los datos básicos."
@@ -65,10 +63,7 @@ export default function PasoPerfilEgresado({
     }
 
     // Validaciones simples del frontend
-    if (
-      !perfil.matricula ||
-      !perfil.academiasIngenieriasId
-    ) {
+    if (!perfil.matricula || !perfil.academiasIngenieriasId) {
       toast.error("Completa los campos obligatorios.");
       return;
     }
@@ -100,76 +95,117 @@ export default function PasoPerfilEgresado({
   };
 
   return (
-    <div className="w-full max-w-md flex flex-col gap-4 text-black">
-      <h2 className="text-xl font-bold">Perfil de Egresado</h2>
+    <div className="w-full min-h-screen bg-linear-to-br from-blue-50 via-white to-blue-100 flex flex-col items-center justify-center px-6 py-12">
+      <div className="w-full max-w-7xl">
+        <h2 className="text-4xl font-extrabold text-center text-blue-700 mb-14 drop-shadow-sm">
+          Perfil de Egresado
+        </h2>
 
-      <input
-        type="text"
-        placeholder="Matrícula"
-        value={perfil.matricula}
-        onChange={(e) => handleChange("matricula", e.target.value)}
-        className="border rounded p-2"
-      />
+        <form className="grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-8 text-gray-800">
+          {/* Matrícula */}
+          <div className="flex flex-col">
+            <label className="text-sm font-semibold text-gray-700 mb-2">
+              Matrícula
+            </label>
+            <input
+              type="text"
+              value={perfil.matricula}
+              onChange={(e) => handleChange("matricula", e.target.value)}
+              className="p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none placeholder:text-gray-400 transition"
+              placeholder="Ej. 21070108"
+            />
+          </div>
 
-      <input
-        type="text"
-        placeholder="Título"
-        value={perfil.titulo}
-        onChange={(e) => handleChange("titulo", e.target.value)}
-        className="border rounded p-2"
-      />
+          {/* Título */}
+          <div className="flex flex-col">
+            <label className="text-sm font-semibold text-gray-700 mb-2">
+              Título
+            </label>
+            <input
+              type="text"
+              value={perfil.titulo}
+              onChange={(e) => handleChange("titulo", e.target.value)}
+              className="p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none placeholder:text-gray-400 transition"
+              placeholder="Lic., Ing., Mtro."
+            />
+          </div>
 
-      <input
-        type="text"
-        placeholder="Puesto"
-        value={perfil.puesto}
-        onChange={(e) => handleChange("puesto", e.target.value)}
-        className="border rounded p-2"
-      />
+          {/* Puesto */}
+          <div className="flex flex-col">
+            <label className="text-sm font-semibold text-gray-700 mb-2">
+              Puesto
+            </label>
+            <input
+              type="text"
+              value={perfil.puesto}
+              onChange={(e) => handleChange("puesto", e.target.value)}
+              className="p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none placeholder:text-gray-400 transition"
+              placeholder="Ej. Coordinador, Ingeniero"
+            />
+          </div>
 
-      <input
-        type="date"
-        placeholder="Año de Egresado"
-        value={perfil.fechaEgreso}
-        onChange={(e) => handleChange("fechaEgreso", e.target.value)}
-        className="border rounded p-2"
-      />
+          {/* Fecha de egreso */}
+          <div className="flex flex-col">
+            <label className="text-sm font-semibold text-gray-700 mb-2">
+              Fecha de egreso
+            </label>
+            <input
+              type="date"
+              value={perfil.fechaEgreso}
+              onChange={(e) => handleChange("fechaEgreso", e.target.value)}
+              className="p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition"
+            />
+          </div>
 
-      <input
-        type="email"
-        placeholder="Correo institucional"
-        value={perfil.correoInstitucional}
-        onChange={(e) => handleChange("correoInstitucional", e.target.value)}
-        className="border rounded p-2"
-      />
+          {/* Correo institucional */}
+          <div className="flex flex-col md:col-span-2">
+            <label className="text-sm font-semibold text-gray-700 mb-2">
+              Correo institucional
+            </label>
+            <input
+              type="email"
+              value={perfil.correoInstitucional}
+              onChange={(e) =>
+                handleChange("correoInstitucional", e.target.value)
+              }
+              className="p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none placeholder:text-gray-400 transition"
+              placeholder="ejemplo@alvaladolid.tecem.mx"
+            />
+          </div>
 
-      <select
-        value={perfil.academiasIngenieriasId}
-        required
-        onChange={(e) =>
-          handleChange("academiasIngenieriasId", Number(e.target.value))
-        }
-        className="border rounded p-2"
-      >
-        <option value={0}>Selecciona la academia cursada</option>
-        {academias.map((a) => (
-          <option key={a.id_academias} value={a.id_academias} className="text-black">
-            {a.ingenieria}
-          </option>
-        ))}
-      </select>
+          {/* Academia */}
+          <div className="flex flex-col md:col-span-2">
+            <label className="text-sm font-semibold text-gray-700 mb-2">
+              Academia cursada <span className="text-red-500">*</span>
+            </label>
+            <select
+              value={perfil.academiasIngenieriasId}
+              required
+              onChange={(e) =>
+                handleChange("academiasIngenieriasId", Number(e.target.value))
+              }
+              className="p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition bg-white"
+            >
+              <option value={0}>Selecciona la academia cursada</option>
+              {academias.map((a) => (
+                <option key={a.id_academias} value={a.id_academias}>
+                  {a.ingenieria}
+                </option>
+              ))}
+            </select>
+          </div>
+        </form>
 
-      <div className="flex justify-between mt-4">
-{/*         <button onClick={onBack} className="px-4 py-2 bg-gray-300 rounded">
-          Atrás
-        </button> */}
-        <button
-          onClick={handleSubmit}
-          disabled={loading}
-          className="px-4 py-2 bg-blue-600 text-white rounded"
-        >
-          {loading ? "Guardando..." : "Siguiente"}
-        </button>
+        {/* Botón */}
+        <div className="flex justify-end mt-12">
+          <button
+            onClick={handleSubmit}
+            disabled={loading}
+            className="px-10 py-4 bg-blue-600 text-white text-lg font-semibold rounded-xl shadow-md hover:bg-blue-700 transition disabled:opacity-50"
+          >
+            {loading ? "Guardando..." : "Siguiente"}
+          </button>
+        </div>
       </div>
     </div>
   );

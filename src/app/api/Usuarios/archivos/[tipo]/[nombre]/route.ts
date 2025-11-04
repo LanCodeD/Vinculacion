@@ -5,20 +5,30 @@ import { getSessionUser } from "@/lib/auth";
 
 function mimeFromExt(ext: string) {
   switch (ext.toLowerCase()) {
-    case ".pdf": return "application/pdf";
+    case ".pdf":
+      return "application/pdf";
     case ".jpg":
-    case ".jpeg": return "image/jpeg";
-    case ".png": return "image/png";
-    case ".doc": return "application/msword";
-    case ".docx": return "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
-    default: return "application/octet-stream";
+    case ".jpeg":
+      return "image/jpeg";
+    case ".png":
+      return "image/png";
+    case ".doc":
+      return "application/msword";
+    case ".docx":
+      return "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
+    default:
+      return "application/octet-stream";
   }
 }
 
-export async function GET(req: Request, context: any) {
+export async function GET(
+  req: Request,
+  context: { params: Promise<{ tipo: string; nombre: string }> }
+) {
   try {
     const user = await getSessionUser();
-    if (!user) return NextResponse.json({ error: "No autorizado" }, { status: 403 });
+    if (!user)
+      return NextResponse.json({ error: "No autorizado" }, { status: 403 });
 
     // Corregido: await context.params
     const { tipo, nombre } = await context.params;
@@ -36,9 +46,19 @@ export async function GET(req: Request, context: any) {
     const buffer = await fs.readFile(filePath);
     const mime = mimeFromExt(ext);
 
-    return new Response(new Uint8Array(buffer), { status: 200, headers: { "Content-Type": mime } });
-  } catch (err: any) {
-    console.error(err);
-    return NextResponse.json({ error: "Archivo no encontrado" }, { status: 404 });
+    return new Response(new Uint8Array(buffer), {
+      status: 200,
+      headers: { "Content-Type": mime },
+    });
+  } catch (err: unknown) {
+    const mensaje =
+      err instanceof Error
+        ? err.message
+        : "Error desconocido al acceder al archivo";
+    console.error("❌ Error al servir archivo:", mensaje);
+    return NextResponse.json(
+      { error: "Archivo no encontrado" },
+      { status: 404 }
+    );
   }
 }

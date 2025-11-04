@@ -46,15 +46,15 @@ export default function PasoTipoConvenio() {
       );
 
       // ✅ Nueva versión sin conversión de zona
-      const toInputDate = (value?: string | null) => {
+/*       const toInputDate = (value?: string | null) => {
         if (!value) return "";
         // Prisma devuelve el DATE como "2025-10-01T00:00:00.000Z", así que cortamos antes de la "T"
         return value.split("T")[0];
-      };
+      }; */
 
       setForm({
-       // fecha_inicio_proyecto: toInputDate(data.fecha_inicio_proyecto),
-       // fecha_conclusion_proyecto: toInputDate(data.fecha_conclusion_proyecto),
+        // fecha_inicio_proyecto: toInputDate(data.fecha_inicio_proyecto),
+        // fecha_conclusion_proyecto: toInputDate(data.fecha_conclusion_proyecto),
         firmas_origen: data.firmas_origen ?? [],
       });
 
@@ -71,18 +71,26 @@ export default function PasoTipoConvenio() {
     try {
       await axios.put(`/api/Convenios/Generales/${id_solicitud}`, form);
       toast.success("Guardado correctamente ✅", { id: toastId });
-    } catch (err) {
-      toast.error("Error al guardar ❌", { id: toastId });
+    } catch (err: unknown) {
+      if (axios.isAxiosError(err)) {
+        const mensaje = err.response?.data?.error || "Error al guardar ❌";
+        toast.error(mensaje, { id: toastId });
+        console.error("❌ Axios error:", err);
+      } else {
+        toast.error("Error inesperado ❌", { id: toastId });
+        console.error("❌ Error desconocido:", err);
+      }
     } finally {
       setGuardando(false);
     }
   };
 
-  if (cargando) return <p className="text-center py-6 text-black">Cargando datos...</p>;
-  
+  if (cargando)
+    return <p className="text-center py-6 text-black">Cargando datos...</p>;
+
   const bloqueadoPaso =
     bloqueado || estadoPaso === "EN REVISION" || estadoPaso === "APROBADO";
-    console.log("paso actual: ", estadoPaso)
+  console.log("paso actual: ", estadoPaso);
 
   // 🔹 Manejo del checkbox múltiple
   const toggleFirma = (id: number) => {
@@ -121,7 +129,7 @@ export default function PasoTipoConvenio() {
       </div>
 
       {/* Fechas */}
-{/*       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      {/*       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
           <label className="block text-sm font-medium mb-1">
             Fecha de inicio del proyecto

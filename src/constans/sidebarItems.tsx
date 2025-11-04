@@ -5,6 +5,7 @@ import { TiCalendar } from "react-icons/ti";
 import { FiTable } from "react-icons/fi";
 import { GoGraph } from "react-icons/go";
 import { FaGears } from "react-icons/fa6";
+import { IoIosContacts } from "react-icons/io";
 
 export const USER_MENUS = [
   {
@@ -39,7 +40,7 @@ export const USER_MENUS = [
   },
   { title: "Calendario", icon: <TiCalendar />, path: "/Calendar" },
   { title: "Tablas", icon: <FiTable />, path: "/BolsaTrabajo/Postulaciones" },
-  { title: "Estadísticas", icon: <GoGraph />, path: "/analytics" },
+  { title: "Historial", icon: <GoGraph />, path: "/Historial" },
   { title: "Soporte", icon: <MdOutlineHeadsetMic />, path: "/support" },
   {
     title: "Configuración",
@@ -95,8 +96,8 @@ export const ADMIN_MENUS = [
     ],
   },
   {
-    title: "Soporte",
-    icon: <MdOutlineHeadsetMic />,
-    path: "/Admin/PanelAdmin",
+    title: "Contactos",
+    icon: <IoIosContacts />,
+    path: "/Admin/Contactos",
   },
 ];

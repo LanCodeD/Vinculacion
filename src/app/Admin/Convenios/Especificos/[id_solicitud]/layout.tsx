@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useParams, usePathname } from "next/navigation";
+import { Toaster } from "react-hot-toast";
 
 // 🔹 Pasos actualizados con la nueva nomenclatura
 const pasos = [
@@ -24,6 +25,7 @@ export default function LayoutAdminConvenioEspecifico({
 
   return (
     <div className="min-h-screen bg-gray-50">
+      <Toaster position="top-right" />
       {/* 🔷 Encabezado */}
       <header className="bg-[#011848] text-white py-4 px-8 flex items-center justify-between">
         <h1 className="text-lg font-semibold">

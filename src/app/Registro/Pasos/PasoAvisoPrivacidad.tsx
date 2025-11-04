@@ -64,7 +64,7 @@ export default function PasoAvisoPrivacidad({ onNext, onBack }: PasoAvisoPrivaci
                 {onBack && (
                     <button
                         onClick={onBack}
-                        className="px-5 py-2 bg-gray-300 rounded-lg hover:bg-gray-400 transition"
+                        className="px-5 py-2 bg-gray-300 text-white rounded-lg hover:bg-gray-400 transition"
                         disabled={loading}
                     >
                         Atrás
