@@ -11,7 +11,6 @@ export default async function VacantePage({ params }: VacantePageProps) {
     const { id } = await params; // Esperamos la promesa
     const vacanteId = Number(id);
 
-
     const vacante = await prisma.ofertas.findUnique({
         where: { id_ofertas: vacanteId },
         select: {
