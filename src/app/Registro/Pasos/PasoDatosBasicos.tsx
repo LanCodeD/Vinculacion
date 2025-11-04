@@ -7,7 +7,7 @@ import type { DatosRegistro, DatosBasicos } from "@/types/registro";
 import type { Dispatch, SetStateAction } from "react";
 import toast from "react-hot-toast";
 import { z } from "zod";
-import BotonGoogle from "./BotonGoogle";
+//import BotonGoogle from "./BotonGoogle";
 
 interface Props {
   registro: DatosRegistro;
@@ -113,7 +113,7 @@ export default function PasoDatosBasicos({
   };
 
   return (
-    <div className="min-h-screen w-full flex items-center justify-center bg-gradient-to-br from-sky-100 via-white to-sky-50 px-6 py-12">
+    <div className="min-h-screen w-full flex items-center justify-center bg-linear-to-br from-sky-100 via-white to-sky-50 px-6 py-12">
       <div className="w-full max-w-4xl bg-white rounded-3xl shadow-2xl border border-sky-100 p-12">
         <h2 className="text-3xl font-bold text-center text-sky-700 mb-10">
           Datos básicos

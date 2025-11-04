@@ -2,6 +2,38 @@
 import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
 
+interface UsuarioExpandido {
+  id: number;
+  nombre: string;
+  apellido: string;
+  correo: string;
+  celular: string | null;
+  rol: string;
+  tipoCuenta: string;
+  last_login: Date | null;
+  paso_actual: number;
+  permisos: string[];
+  imagen_perfil: string | null;
+  egresados?: {
+    id_egresados: number;
+    titulo: string | null;
+    puesto: string | null;
+    matricula: string;
+    fecha_egreso: string | null;
+    correo_institucional: string | null;
+    cv_url: string | null;
+  }[];
+  empresas?: {
+    id_empresas: number;
+    nombre_comercial: string;
+    razon_social: string | null;
+    rfc: string;
+    direccion: string | null;
+    correo: string | null;
+    telefono: string | null;
+  }[];
+}
+
 export async function GET(
   req: Request,
   context: { params: Promise<{ id: string }> }
@@ -30,12 +62,15 @@ export async function GET(
     });
 
     if (!user)
-      return NextResponse.json({ error: "Usuario no encontrado" }, { status: 404 });
+      return NextResponse.json(
+        { error: "Usuario no encontrado" },
+        { status: 404 }
+      );
 
     const permisos =
       user.roles.roles_permisos?.map((rp) => rp.permisos.nombre) || [];
 
-    const data: any = {
+    const data: UsuarioExpandido = {
       id: user.id_usuarios,
       nombre: user.nombre,
       apellido: user.apellido,
@@ -55,7 +90,7 @@ export async function GET(
         titulo: e.titulo,
         puesto: e.puesto,
         matricula: e.matricula,
-        fecha_egreso: e.fecha_egreso,
+        fecha_egreso: e.fecha_egreso ? e.fecha_egreso.toISOString() : null,
         correo_institucional: e.correo_institucional,
         cv_url: e.cv_url,
       }));

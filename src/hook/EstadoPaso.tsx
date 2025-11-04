@@ -30,7 +30,14 @@ export function useEstadoPaso(id_solicitud: string, nombrePaso: string) {
           (p: RegistroAuditoria) => p.paso === nombrePaso
         );
 
-        if (pasoActual) setEstadoPaso(pasoActual.estado as any);
+        if (
+          pasoActual &&
+          ["PENDIENTE", "EN REVISION", "APROBADO", "CORREGIR"].includes(
+            pasoActual.estado
+          )
+        ) {
+          setEstadoPaso(pasoActual.estado as typeof estadoPaso);
+        }
       } catch (err) {
         console.error("Error al cargar estado del paso:", err);
       }

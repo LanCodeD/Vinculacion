@@ -5,6 +5,8 @@ import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import Image from "next/image";
 import Footer from "@/components/footer";
+import Link from "next/link";
+
 
 export default function Home() {
   const router = useRouter();
@@ -24,7 +26,7 @@ export default function Home() {
       {/* ================= Header ================= */}
       <header className="w-full">
         <nav className="border-gray-200 bg-blue-900 py-2.5">
-          <div className="mx-auto flex max-w-screen-xl flex-wrap items-center justify-between px-4">
+          <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between px-4">
 
             {/* Logo e imagen */}
             <a href="#" className="flex items-center space-x-3 relative">
@@ -40,22 +42,22 @@ export default function Home() {
             </a>
 
             <div className="flex items-center lg:order-2">
-              <a className="rounded-lg border-2 border-white px-4 py-2 text-sm font-medium text-white hover:bg-blue-800 sm:mr-2 lg:px-5 lg:py-2.5" href="/">
+              <Link className="rounded-lg border-2 border-white px-4 py-2 text-sm font-medium text-white hover:bg-blue-800 sm:mr-2 lg:px-5 lg:py-2.5" href="/">
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
                 </svg>
-              </a>
-              <a className="rounded-lg border-2 border-white px-4 py-2 text-sm font-medium text-white hover:bg-blue-800 sm:mr-2 lg:px-5 lg:py-2.5" href="/IniciarSesion">
+              </Link>
+              <Link className="rounded-lg border-2 border-white px-4 py-2 text-sm font-medium text-white hover:bg-blue-800 sm:mr-2 lg:px-5 lg:py-2.5" href="/IniciarSesion">
                 Iniciar sesión
-              </a>
-              <a className="rounded-lg border-2 border-white px-4 py-2 text-sm font-medium text-white hover:bg-blue-800 sm:mr-2 lg:px-5 lg:py-2.5" href="/Registro">
+              </Link>
+              <Link className="rounded-lg border-2 border-white px-4 py-2 text-sm font-medium text-white hover:bg-blue-800 sm:mr-2 lg:px-5 lg:py-2.5" href="/Registro">
                 Regístrate
-              </a>
+              </Link>
             </div>
 
             <div className="hidden w-full items-center justify-between lg:order-1 lg:flex lg:w-auto" id="mobile-menu-2">
               <ul className="mt-4 flex flex-col font-medium lg:mt-0 lg:flex-row lg:space-x-8">
-                <li><a className="block border-b py-2 pr-4 pl-3 text-gray-200 hover:text-white lg:border-0 lg:p-0" href="/">ITSVA</a></li>
+                <li><Link className="block border-b py-2 pr-4 pl-3 text-gray-200 hover:text-white lg:border-0 lg:p-0" href="/">ITSVA</Link></li>
               </ul>
             </div>
           </div>

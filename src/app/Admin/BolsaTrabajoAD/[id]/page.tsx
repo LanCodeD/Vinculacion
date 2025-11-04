@@ -2,7 +2,9 @@
 import { prisma } from "@/lib/prisma";
 import AdminVacanteDetailClient from "@/components/Componentes_administrador/VacanteDetailClient";
 
-type Props = { params: { id: string } };
+interface Props {
+  params: Promise<{ id: string }>;
+}
 
 export default async function AdminVacanteDetailPage({ params }: Props) {
     const { id } = await params; // ✅ Esperamos la promesa

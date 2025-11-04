@@ -23,9 +23,15 @@ export default function HistorialSolicitudes() {
         const { data } = await axios.get("/api/Convenios/Historial");
         setSolicitudes(data);
       } catch (err: unknown) {
-        const mensaje =
-          (err as any)?.response?.data?.error || "Error al cargar historial";
-        toast.error(mensaje);
+        if (axios.isAxiosError(err)) {
+          const mensaje =
+            err.response?.data?.error || "Error al cargar historial";
+          toast.error(mensaje);
+          console.error("❌ Axios error:", err);
+        } else {
+          toast.error("Error inesperado ❌");
+          console.error("❌ Error desconocido:", err);
+        }
       } finally {
         setLoading(false);
       }
@@ -70,7 +76,9 @@ export default function HistorialSolicitudes() {
                 </td>
                 <td className="px-4 py-2">
                   <button
-                    onClick={() => irASolicitud(s.id_solicitud, s.tipo_solicitud_id)}
+                    onClick={() =>
+                      irASolicitud(s.id_solicitud, s.tipo_solicitud_id)
+                    }
                     className="text-blue-600 hover:underline"
                   >
                     Ir a solicitud

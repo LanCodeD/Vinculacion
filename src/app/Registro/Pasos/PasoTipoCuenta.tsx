@@ -17,7 +17,6 @@ interface TipoCuenta {
 }
 
 export default function PasoTipoCuenta({
-  registro,
   setRegistro,
   onNext,
 }: Props) {
@@ -33,7 +32,7 @@ export default function PasoTipoCuenta({
   };
 
   return (
-    <div className="w-full h-screen flex flex-col items-center justify-center bg-gradient-to-br from-sky-100 via-white to-sky-200">
+    <div className="w-full h-screen flex flex-col items-center justify-center bg-linear-to-br from-sky-100 via-white to-sky-200">
       <h2 className="text-3xl md:text-4xl font-extrabold text-gray-800 mb-12 text-center drop-shadow-sm">
         ¿Qué tipo de cuenta desea crear?
       </h2>

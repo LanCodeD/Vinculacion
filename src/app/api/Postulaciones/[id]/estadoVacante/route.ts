@@ -1,15 +1,21 @@
-// src/app/api/Postulaciones/[id]/estadoVacante/router.ts
-import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { NextResponse } from "next/server";
 
-export async function PATCH(req: Request, { params }: { params: { id: string } }) {
+export async function PATCH(
+  req: Request,
+  { params }: { params: Promise<{ id: string }> }
+) {
   try {
-    const id = parseInt(params.id);
+    const { id } = await params;
+    const idNum = parseInt(id);
     const { accion, revisadoPorUsuarioId } = await req.json();
 
     if (!accion || !revisadoPorUsuarioId) {
       return NextResponse.json(
-        { ok: false, error: "Faltan datos requeridos (acción o usuario revisor)" },
+        {
+          ok: false,
+          error: "Faltan datos requeridos (acción o usuario revisor)",
+        },
         { status: 400 }
       );
     }
@@ -24,7 +30,7 @@ export async function PATCH(req: Request, { params }: { params: { id: string } }
 
     // ✅ Actualizamos la postulación
     const postulacion = await prisma.postulaciones.update({
-      where: { id_postulaciones: id },
+      where: { id_postulaciones: idNum },
       data: {
         postulacion_estados_id: nuevoEstadoId,
         revisado_por_usuarios_id: revisadoPorUsuarioId,
@@ -46,14 +52,17 @@ export async function PATCH(req: Request, { params }: { params: { id: string } }
           nuevoEstadoId === 3
             ? "Tu postulación fue aprobada"
             : nuevoEstadoId === 4
-              ? "Tu postulación fue rechazada"
-              : "Tu postulación está en revisión",
-        mensaje: `Tu postulación a la vacante "${postulacion.oferta.titulo}" fue ${nuevoEstadoId === 3
+            ? "Tu postulación fue rechazada"
+            : "Tu postulación está en revisión",
+        mensaje: `Tu postulación a la vacante "${
+          postulacion.oferta.titulo
+        }" fue ${
+          nuevoEstadoId === 3
             ? "aprobada ✅"
             : nuevoEstadoId === 4
-              ? "rechazada ❌"
-              : "marcada como en revisión 🔍"
-          }.`,
+            ? "rechazada ❌"
+            : "marcada como en revisión 🔍"
+        }.`,
       },
     });
 

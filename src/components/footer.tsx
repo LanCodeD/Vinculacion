@@ -1,10 +1,12 @@
 import React from "react";
 import { FaTwitter, FaFacebook, FaInstagram, FaYoutube } from "react-icons/fa";
+import Link from "next/link";
+
 
 const Footer: React.FC = () => {
   return (
     <footer className="bg-gray-100 pt-10">
-      <div className="max-w-screen-lg mx-auto px-4 sm:px-6 text-gray-800">
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 text-gray-800">
 
         {/* Secciones del footer */}
         <div className="grid sm:grid-cols-2 md:grid-cols-4 gap-6 pb-10">
@@ -18,17 +20,17 @@ const Footer: React.FC = () => {
           <div>
             <h4 className="text-blue-700 uppercase font-bold text-sm mb-2">Recursos</h4>
             <ul className="text-gray-700 text-sm space-y-1">
-              <li><a href="/#" className="hover:text-blue-700">Documentación</a></li>
-              <li><a href="/#" className="hover:text-blue-700">Tutoriales</a></li>
+              <li><Link href="/#" className="hover:text-blue-700">Documentación</Link></li>
+              <li><Link href="/#" className="hover:text-blue-700">Tutoriales</Link></li>
             </ul>
           </div>
 
           <div>
             <h4 className="text-blue-700 uppercase font-bold text-sm mb-2">Soporte</h4>
             <ul className="text-gray-700 text-sm space-y-1">
-              <li><a href="/#" className="hover:text-blue-700">Centro de ayuda</a></li>
-              <li><a href="/#" className="hover:text-blue-700">Política de privacidad</a></li>
-              <li><a href="/#" className="hover:text-blue-700">Términos y condiciones</a></li>
+              <li><Link href="/#" className="hover:text-blue-700">Centro de ayuda</Link></li>
+              <li><Link href="/#" className="hover:text-blue-700">Política de privacidad</Link></li>
+              <li><Link href="/#" className="hover:text-blue-700">Términos y condiciones</Link></li>
             </ul>
           </div>
 
@@ -46,7 +48,7 @@ const Footer: React.FC = () => {
         </div>
 
         {/* Decoración */}
-        <div className="w-full h-1 bg-gradient-to-r from-blue-400 via-purple-400 to-pink-300 rounded-full mb-6"></div>
+        <div className="w-full h-1 bg-linear-to-r from-blue-400 via-purple-400 to-pink-300 rounded-full mb-6"></div>
 
         {/* Redes sociales */}
         <div className="flex flex-row space-x-6 justify-center mb-6">

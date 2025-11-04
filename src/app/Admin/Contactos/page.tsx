@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import axios from "axios";
 
 interface Contacto {
@@ -26,18 +26,18 @@ export default function ContactoEstadosPage() {
   const [contactos, setContactos] = useState<Contacto[]>([]);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    cargarDatos();
-  }, []);
-
-  const cargarDatos = async () => {
+  const cargarDatos = useCallback(async () => {
     try {
       const data = await fetchContactos();
       setContactos(data);
     } catch (err) {
       setError((err as Error).message);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    cargarDatos();
+  }, [cargarDatos]);
 
   const fetchContactos = async (): Promise<Contacto[]> => {
     try {

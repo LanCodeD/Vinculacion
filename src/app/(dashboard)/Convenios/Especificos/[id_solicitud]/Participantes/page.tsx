@@ -8,13 +8,27 @@ import { useEstadoPaso } from "@/hook/EstadoPasoEspecifico";
 
 export default function PasoParticipantes() {
   const { id_solicitud } = useParams();
-  const { estadoPaso, bloqueado } = useEstadoPaso(id_solicitud as string, "Participantes");
+  const { estadoPaso, bloqueado } = useEstadoPaso(
+    id_solicitud as string,
+    "Participantes"
+  );
 
   const [docentes, setDocentes] = useState([
-    { nombre_completo: "", grado_academico: "", programa_educativo: "", rol_en_proyecto: "" },
+    {
+      nombre_completo: "",
+      grado_academico: "",
+      programa_educativo: "",
+      rol_en_proyecto: "",
+    },
   ]);
   const [estudiantes, setEstudiantes] = useState([
-    { nombre_completo: "", genero: "", programa_educativo: "", semestre: "", grupo: "" },
+    {
+      nombre_completo: "",
+      genero: "",
+      programa_educativo: "",
+      semestre: "",
+      grupo: "",
+    },
   ]);
   const [guardando, setGuardando] = useState(false);
   const [cargando, setCargando] = useState(true);
@@ -23,7 +37,9 @@ export default function PasoParticipantes() {
   useEffect(() => {
     const cargar = async () => {
       try {
-        const { data } = await axios.get(`/api/Convenios/Especificos/${id_solicitud}/Participantes`);
+        const { data } = await axios.get(
+          `/api/Convenios/Especificos/${id_solicitud}/Participantes`
+        );
         if (data.docentes?.length) setDocentes(data.docentes);
         if (data.estudiantes?.length) setEstudiantes(data.estudiantes);
       } catch {
@@ -39,7 +55,12 @@ export default function PasoParticipantes() {
     // 🔹 Validar docentes
     for (let i = 0; i < docentes.length; i++) {
       const d = docentes[i];
-      if (!d.nombre_completo.trim() || !d.grado_academico.trim() || !d.programa_educativo.trim() || !d.rol_en_proyecto.trim()) {
+      if (
+        !d.nombre_completo.trim() ||
+        !d.grado_academico.trim() ||
+        !d.programa_educativo.trim() ||
+        !d.rol_en_proyecto.trim()
+      ) {
         toast.error(`Faltan datos obligatorios en el docente ${i + 1}`);
         return false;
       }
@@ -48,7 +69,12 @@ export default function PasoParticipantes() {
     // 🔹 Validar estudiantes
     for (let i = 0; i < estudiantes.length; i++) {
       const e = estudiantes[i];
-      if (!e.nombre_completo.trim() || !e.programa_educativo.trim() || !e.semestre.trim() || !e.grupo.trim()) {
+      if (
+        !e.nombre_completo.trim() ||
+        !e.programa_educativo.trim() ||
+        !e.semestre.trim() ||
+        !e.grupo.trim()
+      ) {
         toast.error(`Faltan datos obligatorios en el estudiante ${i + 1}`);
         return false;
       }
@@ -59,7 +85,15 @@ export default function PasoParticipantes() {
 
   // 🔹 Funciones para manejar dinámicamente las filas
   const agregarDocente = () => {
-    setDocentes([...docentes, { nombre_completo: "", grado_academico: "", programa_educativo: "", rol_en_proyecto: "" }]);
+    setDocentes([
+      ...docentes,
+      {
+        nombre_completo: "",
+        grado_academico: "",
+        programa_educativo: "",
+        rol_en_proyecto: "",
+      },
+    ]);
   };
 
   const eliminarDocente = (index: number) => {
@@ -67,7 +101,16 @@ export default function PasoParticipantes() {
   };
 
   const agregarEstudiante = () => {
-    setEstudiantes([...estudiantes, { nombre_completo: "", genero: "", programa_educativo: "", semestre: "", grupo: "" }]);
+    setEstudiantes([
+      ...estudiantes,
+      {
+        nombre_completo: "",
+        genero: "",
+        programa_educativo: "",
+        semestre: "",
+        grupo: "",
+      },
+    ]);
   };
 
   const eliminarEstudiante = (index: number) => {
@@ -80,13 +123,26 @@ export default function PasoParticipantes() {
     const toastId = toast.loading("Guardando participantes...");
     setGuardando(true);
     try {
-      await axios.put(`/api/Convenios/Especificos/${id_solicitud}/Participantes`, {
-        docentes,
-        estudiantes,
+      await axios.put(
+        `/api/Convenios/Especificos/${id_solicitud}/Participantes`,
+        {
+          docentes,
+          estudiantes,
+        }
+      );
+      toast.success("Participantes guardados correctamente ✅", {
+        id: toastId,
       });
-      toast.success("Participantes guardados correctamente ✅", { id: toastId });
-    } catch (err) {
-      toast.error("Error al guardar los participantes ❌", { id: toastId });
+    } catch (err: unknown) {
+      if (axios.isAxiosError(err)) {
+        const mensaje =
+          err.response?.data?.error || "Error al guardar los participantes ❌";
+        toast.error(mensaje, { id: toastId });
+        console.error("❌ Axios error:", err);
+      } else {
+        toast.error("Error inesperado ❌", { id: toastId });
+        console.error("❌ Error desconocido:", err);
+      }
     } finally {
       setGuardando(false);
     }
@@ -94,15 +150,20 @@ export default function PasoParticipantes() {
 
   if (cargando) return <p className="text-center py-6">Cargando datos...</p>;
 
-  const bloqueadoPaso = bloqueado || estadoPaso === "EN REVISION" || estadoPaso === "APROBADO";
+  const bloqueadoPaso =
+    bloqueado || estadoPaso === "EN REVISION" || estadoPaso === "APROBADO";
 
   return (
     <div className="max-w-5xl mx-auto space-y-8 text-black">
-      <h2 className="text-xl font-semibold text-[#011848]">Participantes en el Proyecto</h2>
+      <h2 className="text-xl font-semibold text-[#011848]">
+        Participantes en el Proyecto
+      </h2>
 
       {/* ==== DOCENTES ==== */}
       <div>
-        <h3 className="text-lg font-medium text-[#011848] mb-3">Docentes participantes</h3>
+        <h3 className="text-lg font-medium text-[#011848] mb-3">
+          Docentes participantes
+        </h3>
         <table className="w-full border text-sm">
           <thead className="bg-[#011848] text-white">
             <tr>
@@ -124,22 +185,30 @@ export default function PasoParticipantes() {
                     className="w-full border rounded p-1"
                     value={docente.nombre_completo}
                     onChange={(e) =>
-                      setDocentes(docentes.map((d, j) =>
-                        j === i ? { ...d, nombre_completo: e.target.value } : d
-                      ))
+                      setDocentes(
+                        docentes.map((d, j) =>
+                          j === i
+                            ? { ...d, nombre_completo: e.target.value }
+                            : d
+                        )
+                      )
                     }
                     disabled={bloqueadoPaso}
                   />
                 </td>
-                                <td className="p-2">
+                <td className="p-2">
                   <input
                     type="text"
                     className="w-full border rounded p-1"
                     value={docente.grado_academico}
                     onChange={(e) =>
-                      setDocentes(docentes.map((d, j) =>
-                        j === i ? { ...d, grado_academico: e.target.value } : d
-                      ))
+                      setDocentes(
+                        docentes.map((d, j) =>
+                          j === i
+                            ? { ...d, grado_academico: e.target.value }
+                            : d
+                        )
+                      )
                     }
                     disabled={bloqueadoPaso}
                   />
@@ -150,9 +219,13 @@ export default function PasoParticipantes() {
                     className="w-full border rounded p-1"
                     value={docente.programa_educativo}
                     onChange={(e) =>
-                      setDocentes(docentes.map((d, j) =>
-                        j === i ? { ...d, programa_educativo: e.target.value } : d
-                      ))
+                      setDocentes(
+                        docentes.map((d, j) =>
+                          j === i
+                            ? { ...d, programa_educativo: e.target.value }
+                            : d
+                        )
+                      )
                     }
                     disabled={bloqueadoPaso}
                   />
@@ -163,9 +236,13 @@ export default function PasoParticipantes() {
                     className="w-full border rounded p-1"
                     value={docente.rol_en_proyecto}
                     onChange={(e) =>
-                      setDocentes(docentes.map((d, j) =>
-                        j === i ? { ...d, rol_en_proyecto: e.target.value } : d
-                      ))
+                      setDocentes(
+                        docentes.map((d, j) =>
+                          j === i
+                            ? { ...d, rol_en_proyecto: e.target.value }
+                            : d
+                        )
+                      )
                     }
                     disabled={bloqueadoPaso}
                   />
@@ -197,7 +274,9 @@ export default function PasoParticipantes() {
 
       {/* ==== ESTUDIANTES ==== */}
       <div>
-        <h3 className="text-lg font-medium text-[#011848] mb-3">Estudiantes participantes</h3>
+        <h3 className="text-lg font-medium text-[#011848] mb-3">
+          Estudiantes participantes
+        </h3>
         <table className="w-full border text-sm">
           <thead className="bg-[#011848] text-white">
             <tr>
@@ -220,9 +299,13 @@ export default function PasoParticipantes() {
                     className="w-full border rounded p-1"
                     value={est.nombre_completo}
                     onChange={(e) =>
-                      setEstudiantes(estudiantes.map((d, j) =>
-                        j === i ? { ...d, nombre_completo: e.target.value } : d
-                      ))
+                      setEstudiantes(
+                        estudiantes.map((d, j) =>
+                          j === i
+                            ? { ...d, nombre_completo: e.target.value }
+                            : d
+                        )
+                      )
                     }
                     disabled={bloqueadoPaso}
                   />
@@ -233,9 +316,11 @@ export default function PasoParticipantes() {
                     className="w-full border rounded p-1"
                     value={est.genero}
                     onChange={(e) =>
-                      setEstudiantes(estudiantes.map((d, j) =>
-                        j === i ? { ...d, genero: e.target.value } : d
-                      ))
+                      setEstudiantes(
+                        estudiantes.map((d, j) =>
+                          j === i ? { ...d, genero: e.target.value } : d
+                        )
+                      )
                     }
                     disabled={bloqueadoPaso}
                   />
@@ -246,9 +331,13 @@ export default function PasoParticipantes() {
                     className="w-full border rounded p-1"
                     value={est.programa_educativo}
                     onChange={(e) =>
-                      setEstudiantes(estudiantes.map((d, j) =>
-                        j === i ? { ...d, programa_educativo: e.target.value } : d
-                      ))
+                      setEstudiantes(
+                        estudiantes.map((d, j) =>
+                          j === i
+                            ? { ...d, programa_educativo: e.target.value }
+                            : d
+                        )
+                      )
                     }
                     disabled={bloqueadoPaso}
                   />
@@ -259,9 +348,11 @@ export default function PasoParticipantes() {
                     className="w-full border rounded p-1"
                     value={est.semestre}
                     onChange={(e) =>
-                      setEstudiantes(estudiantes.map((d, j) =>
-                        j === i ? { ...d, semestre: e.target.value } : d
-                      ))
+                      setEstudiantes(
+                        estudiantes.map((d, j) =>
+                          j === i ? { ...d, semestre: e.target.value } : d
+                        )
+                      )
                     }
                     disabled={bloqueadoPaso}
                   />
@@ -272,9 +363,11 @@ export default function PasoParticipantes() {
                     className="w-full border rounded p-1"
                     value={est.grupo}
                     onChange={(e) =>
-                      setEstudiantes(estudiantes.map((d, j) =>
-                        j === i ? { ...d, grupo: e.target.value } : d
-                      ))
+                      setEstudiantes(
+                        estudiantes.map((d, j) =>
+                          j === i ? { ...d, grupo: e.target.value } : d
+                        )
+                      )
                     }
                     disabled={bloqueadoPaso}
                   />

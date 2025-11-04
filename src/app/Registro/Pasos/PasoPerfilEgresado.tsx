@@ -19,7 +19,6 @@ export default function PasoPerfilEgresado({
   registro,
   setRegistro,
   onNext,
-  onBack,
 }: Props) {
   const perfil = registro.perfilEgresado || {
     matricula: "",
@@ -96,7 +95,7 @@ export default function PasoPerfilEgresado({
   };
 
   return (
-    <div className="w-full min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-100 flex flex-col items-center justify-center px-6 py-12">
+    <div className="w-full min-h-screen bg-linear-to-br from-blue-50 via-white to-blue-100 flex flex-col items-center justify-center px-6 py-12">
       <div className="w-full max-w-7xl">
         <h2 className="text-4xl font-extrabold text-center text-blue-700 mb-14 drop-shadow-sm">
           Perfil de Egresado

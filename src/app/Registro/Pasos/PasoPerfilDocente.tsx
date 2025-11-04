@@ -19,7 +19,6 @@ export default function PasoPerfilDocente({
   registro,
   setRegistro,
   onNext,
-  onBack,
 }: Props) {
   const perfil: PerfilDocente = registro.perfilDocente || {
     titulo: "",
@@ -80,7 +79,7 @@ export default function PasoPerfilDocente({
   };
 
   return (
-    <div className="w-full min-h-screen bg-gradient-to-br from-sky-50 via-white to-sky-100 flex flex-col items-center justify-center px-6 py-12">
+    <div className="w-full min-h-screen bg-linear-to-br from-sky-50 via-white to-sky-100 flex flex-col items-center justify-center px-6 py-12">
       <div className="w-full max-w-7xl">
         <h2 className="text-4xl font-extrabold text-center text-sky-700 mb-14 drop-shadow-sm">
           Perfil de Docente

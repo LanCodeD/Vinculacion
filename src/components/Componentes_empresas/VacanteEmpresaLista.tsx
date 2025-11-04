@@ -21,7 +21,7 @@ export default function VacantesEmpresaList() {
       .then((res) => res.json())
       .then((data) => {
         if (data.ok) {
-          const vacs = data.vacantes.map((v: any) => ({
+          const vacs = data.vacantes.map((v: Partial<Vacante>) => ({
             id_ofertas: v.id_ofertas,
             titulo: v.titulo ?? "",
             puesto: v.puesto ?? "Sin puesto especificado",

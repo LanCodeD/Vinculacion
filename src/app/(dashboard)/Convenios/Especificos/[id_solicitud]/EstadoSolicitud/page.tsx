@@ -5,6 +5,7 @@ import { useParams } from "next/navigation";
 import axios from "axios";
 import toast from "react-hot-toast";
 import { CheckCircle, XCircle, Clock, CircleDashed } from "lucide-react"; // 🔹 Agregamos ícono para pendiente
+import { useCallback } from "react";
 
 interface RegistroAuditoria {
   paso: string;
@@ -19,7 +20,7 @@ export default function AuditoriaConvenio() {
   const [bloqueado, setBloqueado] = useState(false);
 
   // 🔹 Cargar los datos desde el backend
-  const cargar = async () => {
+  const cargar = useCallback(async () => {
     try {
       const { data } = await axios.get(
         `/api/Convenios/Especificos/${id_solicitud}/Auditoria`
@@ -30,11 +31,11 @@ export default function AuditoriaConvenio() {
       toast.error("Error al cargar la auditoría ❌");
       console.error("Error al cargar auditoría:", err);
     }
-  };
+  }, [id_solicitud]);
 
   useEffect(() => {
     if (id_solicitud) cargar();
-  }, [id_solicitud]);
+  }, [id_solicitud, cargar]);
 
   // 🔹 Enviar la solicitud a revisión
   const enviarSolicitud = async () => {
@@ -45,7 +46,8 @@ export default function AuditoriaConvenio() {
             ¿Enviar solicitud para revisión?
           </p>
           <p className="text-xs text-gray-600">
-            No podrás editar los datos una vez enviada. Verifica que todo esté completo.
+            No podrás editar los datos una vez enviada. Verifica que todo esté
+            completo.
           </p>
           <div className="flex gap-2 mt-2">
             <button
@@ -53,13 +55,18 @@ export default function AuditoriaConvenio() {
                 toast.dismiss(t.id);
                 const toastId = toast.loading("Enviando solicitud...");
                 try {
-                  await axios.put(`/api/Convenios/Especificos/${id_solicitud}/Enviar`);
-                  toast.success("Solicitud enviada correctamente ✅", { id: toastId,
-                    duration: 3000
-                   });
+                  await axios.put(
+                    `/api/Convenios/Especificos/${id_solicitud}/Enviar`
+                  );
+                  toast.success("Solicitud enviada correctamente ✅", {
+                    id: toastId,
+                    duration: 3000,
+                  });
                   await cargar();
                 } catch {
-                  toast.error("Error al enviar la solicitud ❌", { id: toastId });
+                  toast.error("Error al enviar la solicitud ❌", {
+                    id: toastId,
+                  });
                 }
               }}
               className="bg-green-600 hover:bg-green-700 text-white text-xs px-3 py-1 rounded-md"
@@ -127,7 +134,10 @@ export default function AuditoriaConvenio() {
           <tbody>
             {historial.length === 0 ? (
               <tr>
-                <td colSpan={3} className="text-center py-6 text-gray-500 italic">
+                <td
+                  colSpan={3}
+                  className="text-center py-6 text-gray-500 italic"
+                >
                   Aún no hay información del progreso de esta solicitud.
                 </td>
               </tr>

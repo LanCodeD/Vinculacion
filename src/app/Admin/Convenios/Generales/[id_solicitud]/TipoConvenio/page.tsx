@@ -4,9 +4,13 @@ import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import axios from "axios";
 
+interface FormTipoConvenio {
+  firmas_origen: number[];
+}
+
 export default function TipoConvenioAdmin() {
   const { id_solicitud } = useParams();
-  const [form, setForm] = useState<any>(null);
+  const [form, setForm] = useState<FormTipoConvenio | null>(null);
   const [firmas, setFirmas] = useState<{ id_firma: number; nombre: string }[]>(
     []
   );

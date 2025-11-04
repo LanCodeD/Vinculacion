@@ -1,16 +1,16 @@
-// app/api/Convenios/Historial/[id]/route.ts
 import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
 
 export async function GET(
   _req: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id_solicitud: string }> }
 ) {
   try {
-    const id = parseInt(params.id);
+    const { id_solicitud } = await params;
+    const idNum = parseInt(id_solicitud);
 
     const solicitud = await prisma.solicitud_convenios.findMany({
-      where: { id_solicitud: id },
+      where: { id_solicitud: idNum },
       orderBy: { id_solicitud: "asc" },
       include: {
         detalle: true,
@@ -25,7 +25,7 @@ export async function GET(
       },
     });
 
-    if (!solicitud) {
+    if (!solicitud || solicitud.length === 0) {
       return NextResponse.json(
         { error: "Solicitud no encontrada" },
         { status: 404 }

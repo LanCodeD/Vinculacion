@@ -3,6 +3,10 @@ import { prisma } from "@/lib/prisma";
 import bcrypt from "bcrypt";
 import crypto from "crypto";
 import { enviarCorreo } from "@/lib/mailer";
+import { Prisma } from "@prisma/client";
+
+
+
 
 // Regex institucional (solo docentes)
 const regexInstitucional =
@@ -17,14 +21,13 @@ const rolPorTipoCuenta: Record<number, number> = {
 
 export async function PATCH(
   request: Request,
-  { params }: { params: { usuarioID: string } }
+  { params }: { params: Promise<{ usuarioID: string }> }
 ) {
-  console.log("🪵 params:", params); // 👈 para ver qué trae
-  const id = Number(params.usuarioID);
-  console.log("🪵 usuarioID recibido:", params.usuarioID, "->", id);
+  const { usuarioID } = await params;
+  const id = parseInt(usuarioID, 10);
+  console.log("🪵 usuarioID recibido:", usuarioID, "->", id);
+
   try {
-    const { usuarioID } = params;
-    const id = parseInt(usuarioID, 10);
     if (isNaN(id)) {
       return NextResponse.json({ error: "ID inválido" }, { status: 400 });
     }
@@ -37,23 +40,22 @@ export async function PATCH(
       );
     }
 
-    // 🔍 Verificar usuario actual
     const usuario = await prisma.usuarios.findUnique({
       where: { id_usuarios: id },
     });
     if (!usuario) {
-      return NextResponse.json({ error: "Usuario no encontrado" }, { status: 404 });
+      return NextResponse.json(
+        { error: "Usuario no encontrado" },
+        { status: 404 }
+      );
     }
 
-    const updates: any = {};
+    const updates: Prisma.usuariosUpdateInput = {};
 
-    // 📌 Validar nombre / apellido si vienen
     if (body.nombre) updates.nombre = body.nombre;
     if (body.apellido) updates.apellido = body.apellido;
 
-    // 📌 Validar correo
     if (body.correo && body.correo !== usuario.correo) {
-      // Unicidad
       const existente = await prisma.usuarios.findUnique({
         where: { correo: body.correo },
       });
@@ -64,20 +66,27 @@ export async function PATCH(
         );
       }
 
-      // Validación institucional (solo docentes)
-      if (usuario.tipos_cuenta_id === 1 && !regexInstitucional.test(body.correo)) {
+      if (
+        usuario.tipos_cuenta_id === 1 &&
+        !regexInstitucional.test(body.correo)
+      ) {
         return NextResponse.json(
-          { error: "El correo debe ser institucional Docente (Dominio del plantel)" },
+          {
+            error:
+              "El correo debe ser institucional Docente (Dominio del plantel)",
+          },
           { status: 400 }
         );
       }
 
       updates.correo = body.correo;
 
-      // 🚨 Generar token de verificación
       const codigo = Math.floor(100000 + Math.random() * 900000).toString();
-      const tokenHash = crypto.createHash("sha256").update(codigo).digest("hex");
-      const expiracion = new Date(Date.now() + 10 * 60 * 1000); // 10 minutos
+      const tokenHash = crypto
+        .createHash("sha256")
+        .update(codigo)
+        .digest("hex");
+      const expiracion = new Date(Date.now() + 10 * 60 * 1000);
 
       await prisma.tokens_usuarios.create({
         data: {
@@ -88,7 +97,6 @@ export async function PATCH(
         },
       });
 
-      // Enviar correo
       await enviarCorreo({
         to: body.correo,
         subject: "Código de verificación",
@@ -103,39 +111,38 @@ export async function PATCH(
       });
     }
 
-    // 📌 Validar password si viene
-if (body.password) {
-  if (body.password.length < 8) {
-    return NextResponse.json(
-      { error: "La contraseña debe tener al menos 8 caracteres" },
-      { status: 400 }
-    );
-  }
+    if (body.password) {
+      if (body.password.length < 8) {
+        return NextResponse.json(
+          { error: "La contraseña debe tener al menos 8 caracteres" },
+          { status: 400 }
+        );
+      }
 
-  // 🔹 Solo hashear si la contraseña actual existe y es diferente
-  if (!usuario.password_hash) {
-    // No hay hash previo → se crea uno nuevo
-    updates.password_hash = await bcrypt.hash(body.password, 10);
-  } else {
-    // Comparamos con el hash actual
-    const esIgual = await bcrypt.compare(body.password, usuario.password_hash);
-    if (!esIgual) {
-      updates.password_hash = await bcrypt.hash(body.password, 10);
+      if (!usuario.password_hash) {
+        updates.password_hash = await bcrypt.hash(body.password, 10);
+      } else {
+        const esIgual = await bcrypt.compare(
+          body.password,
+          usuario.password_hash
+        );
+        if (!esIgual) {
+          updates.password_hash = await bcrypt.hash(body.password, 10);
+        }
+      }
     }
-  }
-}
 
-    // 📌 Validar celular si viene
     if (body.celular) updates.celular = body.celular;
 
-    // 📌 Validar rol por tipoCuentaId (no debería cambiar, pero blindamos)
     const rolId = rolPorTipoCuenta[usuario.tipos_cuenta_id];
     if (!rolId) {
-      return NextResponse.json({ error: "Tipo de cuenta no válido" }, { status: 400 });
+      return NextResponse.json(
+        { error: "Tipo de cuenta no válido" },
+        { status: 400 }
+      );
     }
-    updates.roles_id = rolId;
+    updates.roles = { connect: { id_roles: rolId } };
 
-    // Actualizar usuario
     const usuarioActualizado = await prisma.usuarios.update({
       where: { id_usuarios: id },
       data: updates,
