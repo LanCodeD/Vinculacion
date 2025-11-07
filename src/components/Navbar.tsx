@@ -114,19 +114,23 @@ export default function Navbar() {
 
         {/* Perfil */}
         <div className="relative">
-          <Image
-            src={profileImage}
-            alt="Imagen de perfil"
-            width={44}
-            height={44}
-            className="rounded-full object-cover object-center cursor-pointer"
+          {/* Imagen de perfil clickable */}
+          <div
+            className="w-11 h-11 rounded-full overflow-hidden border border-gray-300 cursor-pointer"
             onClick={() => {
               setShowProfile(!showProfile);
               if (!showProfile) setShowNotifications(false);
             }}
-            unoptimized // 🚫 Evita error 400: la imagen proviene de /api/ y no puede ser optimizada por Next.js
-            priority
-          />
+          >
+            <Image
+              src={profileImage}
+              alt="Imagen de perfil"
+              fill
+              className="object-cover object-center"
+              unoptimized
+              priority
+            />
+          </div>
 
           {showProfile && (
             <div className="absolute right-0 mt-2 w-48 bg-white shadow-lg rounded-lg overflow-hidden z-50">

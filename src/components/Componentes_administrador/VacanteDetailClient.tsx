@@ -50,8 +50,7 @@ export default function AdminVacanteDetailClient({ vacante }: Props) {
 
       if (res.ok && data.ok) {
         toast.success(
-          `Vacante ${
-            accion === "aprobar" ? "publicada" : "rechazada"
+          `Vacante ${accion === "aprobar" ? "publicada" : "rechazada"
           } correctamente.`
         );
         router.push("/Admin/BolsaTrabajoAD");
@@ -78,6 +77,7 @@ export default function AdminVacanteDetailClient({ vacante }: Props) {
       </button>
       {vacante.imagen && (
         <Image
+          unoptimized
           src={vacante.imagen}
           alt={vacante.titulo}
           width={800}
@@ -103,8 +103,8 @@ export default function AdminVacanteDetailClient({ vacante }: Props) {
         <strong>Ingenierías:</strong>{" "}
         {vacante.ingenierias_ofertas && vacante.ingenierias_ofertas.length > 0
           ? vacante.ingenierias_ofertas
-              .map((c) => c.academia.ingenieria)
-              .join(", ")
+            .map((c) => c.academia.ingenieria)
+            .join(", ")
           : "Sin ingenierías"}
       </p>
 

@@ -24,6 +24,7 @@ const VacanteCard: React.FC<VacanteCardProps> = ({
     <div className="xl:w-1/4 md:w-1/2 p-4">
       <div className="bg-gray-100 p-6 rounded-lg border-2 border-gray-200 border-opacity-60 hover:shadow-lg transition duration-300">
         <Image
+          unoptimized
           src={imagen}
           alt={`Imagen de la vacante ${titulo}`}
           width={720}

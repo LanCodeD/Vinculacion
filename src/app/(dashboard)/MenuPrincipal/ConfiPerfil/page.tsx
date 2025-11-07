@@ -77,14 +77,16 @@ export default function Perfil() {
       {/* Cabecera con foto de perfil */}
       <div className="flex items-center gap-4 mb-6">
         {user.imagen_perfil ? (
-          <Image
-            src={user.imagen_perfil}
-            alt="Foto de perfil"
-            width={96}
-            height={96}
-            className="rounded-full object-cover border"
-            unoptimized // 🚫 Evita error 400: la imagen proviene de /api/ y no puede ser optimizada por Next.js
-          />
+          <div className="relative w-24 h-24 rounded-full overflow-hidden border border-gray-300">
+            <Image
+              src={user.imagen_perfil}
+              alt="Foto de perfil"
+              fill // ocupa todo el contenedor
+              className="object-cover object-center"
+              unoptimized
+              priority
+            />
+          </div>
         ) : (
           <div className="w-24 h-24 rounded-full bg-gray-200 flex items-center justify-center text-gray-500 border">
             Sin imagen
@@ -201,13 +203,13 @@ export default function Perfil() {
                   setUser((prev) =>
                     prev
                       ? {
-                          ...prev,
-                          egresados: prev.egresados?.map((e) =>
-                            e.id_egresados === eg.id_egresados
-                              ? { ...e, cv_url: url }
-                              : e
-                          ),
-                        }
+                        ...prev,
+                        egresados: prev.egresados?.map((e) =>
+                          e.id_egresados === eg.id_egresados
+                            ? { ...e, cv_url: url }
+                            : e
+                        ),
+                      }
                       : prev
                   )
                 }

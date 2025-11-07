@@ -14,7 +14,7 @@ export async function POST(req: NextRequest) {
     const formData = await req.formData();
     const file = formData.get("file") as File | null;
     const userId = Number(formData.get("userId"));
-    const tipo = formData.get("tipo") as "cv" | "foto_usuario";
+    const tipo = formData.get("tipo") as "cv" | "foto_usuario" | "imagen_oferta";
     const idEgresado = Number(formData.get("idEgresado"));
 
     if (!file || !userId || !tipo) {
@@ -48,6 +48,14 @@ export async function POST(req: NextRequest) {
         "Egresados_Documentos"
       );
       rutaBaseAPI = "/api/Usuarios/archivos/Egresados_Documentos";
+    } else if (tipo === "imagen_oferta") {
+      carpetaDestino = path.join(
+        basePath,
+        "uploads",
+        "Subir_imagenes",
+        "Ofertas"
+      );
+      rutaBaseAPI = "/api/Usuarios/archivos/Ofertas";
     } else {
       carpetaDestino = path.join(
         basePath,
@@ -62,10 +70,16 @@ export async function POST(req: NextRequest) {
 
     // Puedes dar un nombre específico al archivo, ejemplo: 'perfil_33.png' o 'cv_45.pdf'
     const extension = path.extname(file.name);
-    const nombreFinal =
-      tipo === "foto_usuario"
-        ? `perfil_${userId}${extension}`
-        : `cv_${idEgresado || userId}${extension}`;
+
+    let nombreFinal: string;
+
+    if (tipo === "foto_usuario") {
+      nombreFinal = `perfil_${userId}${extension}`;
+    } else if (tipo === "imagen_oferta") {
+      nombreFinal = `oferta_${userId}_${Date.now()}${extension}`;
+    } else {
+      nombreFinal = `cv_${idEgresado || userId}${extension}`;
+    }
 
     const rutaFinal = path.join(carpetaDestino, nombreFinal);
 
@@ -78,7 +92,7 @@ export async function POST(req: NextRequest) {
         where: { id_egresados: idEgresado },
         data: { cv_url: urlArchivo },
       });
-    } else {
+    } else if (tipo === "foto_usuario") {
       await prisma.usuarios.update({
         where: { id_usuarios: userId },
         data: { foto_perfil: urlArchivo },
@@ -88,6 +102,8 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({
       ok: true,
       url: urlArchivo,
+      nombre: nombreFinal, // 👈 se agrega para usarlo en el front
+      tipo,
       mensaje: "Archivo subido correctamente",
     });
   } catch (error: unknown) {
