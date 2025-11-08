@@ -34,6 +34,101 @@ interface UsuarioExpandido {
   }[];
 }
 
+export async function PATCH(
+  req: Request,
+  context: { params: Promise<{ id: string }> }
+) {
+  const { id } = await context.params;
+  const userId = parseInt(id);
+  const body = await req.json();
+
+  try {
+    // Actualiza datos del usuario
+    await prisma.usuarios.update({
+      where: { id_usuarios: userId },
+      data: {
+        nombre: body.nombre,
+        apellido: body.apellido,
+        celular: body.celular,
+        correo: body.correo,
+      },
+    });
+
+    // Si el usuario es egresado, actualiza todos los perfiles de egresado asociados
+    if (body.egresados && Array.isArray(body.egresados)) {
+      for (const eg of body.egresados) {
+        await prisma.egresados.update({
+          where: { id_egresados: eg.id_egresados },
+          data: {
+            titulo: eg.titulo,
+            puesto: eg.puesto,
+            correo_institucional: eg.correo_institucional,
+          },
+        });
+      }
+    }
+
+
+    // Si es empresa, actualiza su perfil empresarial
+    if (body.empresas && Array.isArray(body.empresas)) {
+      for (const emp of body.empresas) {
+        await prisma.empresas.update({
+          where: { id_empresas: emp.id_empresas },
+          data: {
+            nombre_comercial: emp.nombre_comercial,
+            razon_social: emp.razon_social,
+            rfc: emp.rfc,
+            direccion: emp.direccion,
+            correo: emp.correo,
+            telefono: emp.telefono,
+          },
+        });
+      }
+    }
+
+    // 🔄 Obtener el usuario actualizado
+    const updatedUser = await prisma.usuarios.findUnique({
+      where: { id_usuarios: userId },
+      include: {
+        tipos_cuenta: true,
+        roles: {
+          include: {
+            roles_permisos: {
+              include: { permisos: true },
+            },
+          },
+        },
+        egresados_perfil: true,
+        empresas_perfil: true,
+      },
+    });
+
+    // Estructurar igual que en el GET
+    const permisos = updatedUser?.roles.roles_permisos?.map((rp) => rp.permisos.nombre) || [];
+    const userData = {
+      id: updatedUser?.id_usuarios,
+      nombre: updatedUser?.nombre,
+      apellido: updatedUser?.apellido,
+      correo: updatedUser?.correo,
+      celular: updatedUser?.celular,
+      rol: updatedUser?.roles.nombre,
+      tipoCuenta: updatedUser?.tipos_cuenta.nombre,
+      last_login: updatedUser?.last_login,
+      paso_actual: updatedUser?.paso_actual,
+      permisos,
+      imagen_perfil: updatedUser?.foto_perfil || null,
+      egresados: updatedUser?.egresados_perfil || [],
+      empresas: updatedUser?.empresas_perfil || [],
+    };
+
+    return NextResponse.json({ ok: true, mensaje: "Perfil actualizado correctamente", user: userData });
+  } catch (error) {
+    console.error("❌ Error al actualizar usuario:", error);
+    return NextResponse.json({ error: "Error interno al actualizar" }, { status: 500 });
+  }
+}
+
+
 export async function GET(
   req: Request,
   context: { params: Promise<{ id: string }> }

@@ -17,7 +17,7 @@ export async function GET(
         { status: 401 }
       );
 
-    const { id } = await context.params; // ✅ resolver la promesa
+    const { id } = await context.params; 
     const idNumber = parseInt(id);
 
     if (isNaN(idNumber))

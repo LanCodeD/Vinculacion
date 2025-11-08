@@ -1,5 +1,6 @@
 // src/components/Componentes_empresas/VacanteCardEmpresa.tsx
 "use client";
+import { Pencil, Trash2, Users } from "lucide-react";
 import Link from "next/link";
 import React from "react";
 import Image from "next/image";
@@ -73,24 +74,27 @@ const VacanteCard: React.FC<VacanteCardProps> = ({
 
         {/* Acciones */}
         {showActions && (
-          <div className="mt-4 flex gap-2">
+          <div className="mt-4 flex justify-center gap-3">
             <Link
               href={`/BolsaTrabajo/EditarVacantes/${id}`}
-              className="flex-1 bg-blue-700 hover:bg-blue-600 text-white text-sm font-semibold py-2 px-3 rounded-lg text-center transition"
+              className="p-2 bg-blue-600 hover:bg-blue-500 text-white rounded-full transition-all duration-200 shadow-sm hover:shadow-md"
+              title="Editar vacante"
             >
-              Editar
+              <Pencil size={18} />
             </Link>
             <button
               onClick={() => onDelete?.(id)}
-              className="flex-1 bg-red-500 hover:bg-red-600 text-white text-sm font-semibold py-2 px-3 rounded-lg transition"
+              className="p-2 bg-red-500 hover:bg-red-600 text-white rounded-full transition-all duration-200 shadow-sm hover:shadow-md"
+              title="Eliminar vacante"
             >
-              Eliminar
+              <Trash2 size={18} />
             </button>
             <Link
               href={`/BolsaTrabajo/Postulaciones/${id}`}
-              className="flex-1 bg-green-600 hover:bg-green-700 text-white text-sm font-semibold py-2 px-3 rounded-lg text-center transition"
+              className="p-2 bg-green-600 hover:bg-green-700 text-white rounded-full transition-all duration-200 shadow-sm hover:shadow-md"
+              title="Ver postulaciones"
             >
-              Ver postulaciones
+              <Users size={18} />
             </Link>
           </div>
         )}

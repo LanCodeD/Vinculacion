@@ -126,7 +126,7 @@ export default function Navbar() {
               src={profileImage}
               alt="Imagen de perfil"
               fill
-              className="object-cover object-center"
+              className=" rounded-full object-cover object-center"
               unoptimized
               priority
             />

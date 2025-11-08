@@ -1,4 +1,3 @@
-// api/Usuarios/archivos/[tipo]/[nombre]/route.ts
 import { NextResponse } from "next/server";
 import fs from "fs/promises";
 import path from "path";
@@ -63,7 +62,10 @@ export async function GET(
       headers: {
         "Content-Type": mime,
         "Content-Length": fileStats.size.toString(),
-        "Cache-Control": "public, max-age=31536000, immutable",
+        // 🚫 Evita cache en navegador y proxy/CDN
+        "Cache-Control": "no-store, no-cache, must-revalidate, proxy-revalidate",
+        "Pragma": "no-cache",
+        "Expires": "0",
       },
     });
   } catch (err: unknown) {
