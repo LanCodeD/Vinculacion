@@ -1,10 +1,14 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
   images: {
-    domains: ['pagedone.io'],
-  }
+    domains: [
+      "cdn.pixabay.com",
+      "lh3.googleusercontent.com",
+      "avatars.githubusercontent.com",
+      "localhost", // 👈 para desarrollo local
+    ],
+  },
 };
 
 export default nextConfig;

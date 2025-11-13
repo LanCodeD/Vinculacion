@@ -12,6 +12,9 @@ import PasoPerfilDocente from "./Pasos/PasoPerfilDocente";
 import PasoPerfilEmpresa from "./Pasos/PasoPerfilEmpresa";
 import PasoFinal from "./Pasos/PasoFinal";
 import PasoAvisoPrivacidad from "./Pasos/PasoAvisoPrivacidad";
+import { useSession } from "next-auth/react";
+import axios from "axios";
+import toast from "react-hot-toast";
 
 const initialRegistro: DatosRegistro = { tipoCuentaId: 0 };
 
@@ -19,6 +22,8 @@ export default function RegistroWizard() {
   const searchParams = useSearchParams(); // 👈 leer query params
   const [registro, setRegistro] = useState<DatosRegistro>(initialRegistro);
   const [paso, setPaso] = useState<number>(1);
+
+  const { data: session } = useSession();
 
   const avanzar = () => setPaso((p) => p + 1);
   const retroceder = () => setPaso((p) => Math.max(1, p - 1));
@@ -58,6 +63,7 @@ export default function RegistroWizard() {
       localStorage.removeItem("registroPaso");
       localStorage.removeItem("registroUsuarioId");
       localStorage.removeItem("registroTipoCuenta");
+      localStorage.removeItem("registroModo"); // 👈 añade esta línea
       console.log("LOCALSTORAGE LIMPIADO");
       return;
     }
@@ -77,6 +83,57 @@ export default function RegistroWizard() {
       console.log("localstorage de tipo de cuenta:", registro.tipoCuentaId);
     }
   }, [paso, registro.usuarioId, registro.tipoCuentaId]);
+
+  // 🔹 NUEVO useEffect: completar registro con Google
+  useEffect(() => {
+    if (!session?.user?.email) return; // Si no hay sesión, salir
+    if (registro.usuarioId) return; // Ya registrado
+
+    const completarRegistroGoogle = async () => {
+      const tipo =
+        Number(localStorage.getItem("registroTipoCuenta")) ||
+        registro.tipoCuentaId;
+
+      if (!tipo) {
+        toast.error("No se encontró el tipo de cuenta seleccionado.");
+        return;
+      }
+
+      try {
+        const res = await axios.post("/api/Usuarios/google-complete", {
+          tipoCuentaId: tipo,
+          correo: session.user.email,
+          providerAccountId: session.user.idGoogle ?? null,
+        });
+
+        const id = res.data.id_usuarios ?? res.data.id;
+        if (id) {
+          setRegistro((prev) => ({
+            ...prev,
+            usuarioId: id,
+            tipoCuentaId: tipo,
+          }));
+          toast.success(
+            "Registro completado con Google. Avanzando al perfil..."
+          );
+          setPaso(4); // Avanzamos al paso de perfil
+        } else {
+          toast.error("No se obtuvo id de usuario desde el servidor.");
+        }
+      } catch (err) {
+        if (axios.isAxiosError(err)) {
+          toast.error(
+            err.response?.data?.error ??
+              "Error en servidor al completar registro."
+          );
+        } else {
+          toast.error("Error inesperado al completar registro.");
+        }
+      }
+    };
+
+    completarRegistroGoogle();
+  }, [session]);
 
   return (
     <div className="w-full h-full flex flex-col items-center justify-center">
@@ -135,7 +192,7 @@ export default function RegistroWizard() {
 
       {paso === 5 && (
         <PasoAvisoPrivacidad
-          onNext={avanzar}   // Avaza al paso final
+          onNext={avanzar} // Avaza al paso final
           onBack={retroceder} // Puede volver al paso anterior si quiere
         />
       )}

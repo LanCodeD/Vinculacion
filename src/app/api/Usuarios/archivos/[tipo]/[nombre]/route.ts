@@ -26,13 +26,18 @@ export async function GET(
   context: { params: Promise<{ tipo: string; nombre: string }> }
 ) {
   try {
-    const user = await getSessionUser();
-    if (!user)
-      return NextResponse.json({ error: "No autorizado" }, { status: 403 });
-
-    // Corregido: await context.params
     const { tipo, nombre } = await context.params;
 
+    // ✅ Si es imagen de perfil, no pedimos sesión
+    let user = null;
+    if (tipo !== "Perfiles") {
+      user = await getSessionUser();
+      if (!user || user.role !== "Administrador") {
+        return NextResponse.json({ error: "No autorizado" }, { status: 403 });
+      }
+    }
+
+    // ✅ Solo permitir tipos conocidos
     if (!["Perfiles", "Egresados_Documentos"].includes(tipo)) {
       return NextResponse.json({ error: "Tipo no permitido" }, { status: 400 });
     }

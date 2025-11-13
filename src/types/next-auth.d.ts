@@ -10,6 +10,7 @@ declare module "next-auth" {
       tipoCuentaId: number;
       roles_id: number;
       role: AppRole;
+      idGoogle?: string | null; // ✅ <-- nuevo
     } & DefaultSession["user"];
   }
 
@@ -19,6 +20,7 @@ declare module "next-auth" {
     correo: string;
     tipoCuentaId: number;
     roles_id: number;
+    idGoogle?: string | null; // ✅ <-- nuevo
   }
 }
 
@@ -30,5 +32,6 @@ declare module "next-auth/jwt" {
     tipoCuentaId: number;
     roles_id: number;
     role: AppRole;
+    idGoogle?: string | null; // ✅ <-- nuevo
   }
 }
