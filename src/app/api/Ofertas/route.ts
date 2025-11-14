@@ -5,6 +5,7 @@ import { authOptions } from "@/app/api/auth/[...nextauth]/authOptions";
 import { prisma } from "@/lib/prisma";
 import { ROLE_MAP, AppRole } from "@/types/roles";
 import { enviarCorreo } from "@/lib/mailer";
+import { plantillaNuevaVacante } from "@/lib/nuevaVacante";
 
 export async function GET() {
   try {
@@ -165,10 +166,18 @@ export async function POST(req: Request) {
             await enviarCorreo({
               to: admin.correo,
               subject: "Nueva vacante pendiente de aprobación",
-              html: `<p>Hola ${admin.nombre},</p>
-               <p>La empresa "<strong>${empresa.nombre_comercial}</strong>" ha creado la vacante "<strong>${titulo}</strong>".</p>
-               <p>Por favor, revisa y aprueba o rechaza la vacante en el panel de administración.</p>
-               <p>Saludos,<br/>Equipo de Vinculación</p>`,
+              html: plantillaNuevaVacante({
+                adminNombre: admin.nombre,
+                empresaNombre: empresa.nombre_comercial,
+                tituloVacante: titulo,
+                puesto,
+                ubicacion,
+                horario,
+                modalidad,
+                fecha_cierre,
+                descripcion: descripcion_general,
+                botonUrl: "https://tusitio.com/Admin/BolsaTrabajoAD", // cambia según tu ruta real
+              }),
             });
             console.log("📧 Correo enviado a admin:", admin.correo);
           } catch (err) {

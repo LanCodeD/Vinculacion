@@ -53,7 +53,7 @@ export default function VacanteDetail({
       // Si HEAD no responde OK (algunos servidores no permiten HEAD), intentamos GET
       const getRes = await fetch(url, { method: "GET", signal });
       return getRes.ok;
-    } catch{
+    } catch {
       // Puede fallar por CORS o network — lo tratamos como no existente
       return false;
     }
@@ -219,17 +219,16 @@ export default function VacanteDetail({
                 <button
                   key={tab}
                   onClick={() => setActiveTab(tab as TabKey)}
-                  className={`flex-1 py-2 text-lg font-medium border-b-2 transition-colors duration-200 ${
-                    activeTab === tab
+                  className={`flex-1 py-2 text-lg font-medium border-b-2 transition-colors duration-200 ${activeTab === tab
                       ? "text-indigo-600 border-indigo-600"
                       : "text-gray-500 border-transparent hover:text-indigo-500"
-                  }`}
+                    }`}
                 >
                   {tab === "descripcion"
                     ? "Descripción"
                     : tab === "requisitos"
-                    ? "Requisitos"
-                    : "Detalles"}
+                      ? "Requisitos"
+                      : "Detalles"}
                 </button>
               ))}
             </div>
@@ -307,13 +306,12 @@ export default function VacanteDetail({
             <button
               onClick={handleAplicar}
               disabled={loading || !cvUrl}
-              className={`w-full text-white py-2 px-6 rounded transition-all ${
-                loading
+              className={`w-full text-white py-2 px-6 rounded transition-all ${loading
                   ? "bg-indigo-300"
                   : !cvUrl
-                  ? "bg-gray-400 cursor-not-allowed"
-                  : "bg-indigo-500 hover:bg-indigo-600"
-              }`}
+                    ? "bg-gray-400 cursor-not-allowed"
+                    : "bg-indigo-500 hover:bg-indigo-600"
+                }`}
             >
               {loading ? "Enviando..." : "Postularse"}
             </button>
@@ -323,6 +321,7 @@ export default function VacanteDetail({
 
           {/* Imagen */}
           <Image
+            unoptimized
             src={imagen ?? "https://dummyimage.com/400x400"}
             alt={`Imagen de la vacante ${titulo}`}
             width={800}

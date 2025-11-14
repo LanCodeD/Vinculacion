@@ -91,10 +91,7 @@ export const ADMIN_MENUS = [
         key: "admin-bolsa",
         subMenu: [
           { title: "Vacantes", path: "/Admin/BolsaTrabajoAD" },
-          {
-            title: "Postulaciones",
-            path: "/Admin/BolsaTrabajoAD/Postulaciones",
-          },
+          { title: "Postulaciones", path: "/Admin/BolsaTrabajoAD/VacantesInfo" },
         ],
       },
     ],
@@ -106,7 +103,7 @@ export const ADMIN_MENUS = [
     subMenu: [
       { title: "Perfil", path: "/Registro" },
       { title: "Tema", path: "/MenuPrincipal/ConfiTema" },
-      { title: "Gestión", path: "/MenuPrincipal/ConfiGestion" },
+      { title: "Gestión", path: "/Admin/VerificarUsuarios" },
     ],
   },
   {

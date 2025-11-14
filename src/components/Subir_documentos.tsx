@@ -4,7 +4,7 @@ import { useState } from 'react';
 
 interface UploadProps {
   userId: number;
-  tipo: 'cv' | 'foto_usuario'; // Cambiado para foto de perfil global
+  tipo: 'cv' | 'foto_usuario' | 'imagen_oferta'; // Cambiado para foto de perfil global
   idEgresado?: number;
   onUploaded?: (url: string) => void;
 }

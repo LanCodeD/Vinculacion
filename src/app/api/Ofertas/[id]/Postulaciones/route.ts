@@ -46,7 +46,7 @@ export async function GET(
         usuario: {
           id_usuarios: p.usuarios_id,
           nombre: p.usuario.nombre,
-          correo: egresado?.correo_institucional || p.usuario.correo,
+          correo: p.usuario.correo,
           celular: p.usuario.celular,
           titulo: egresado?.titulo || "No especificado",
           matricula: egresado?.matricula || "No registrada",

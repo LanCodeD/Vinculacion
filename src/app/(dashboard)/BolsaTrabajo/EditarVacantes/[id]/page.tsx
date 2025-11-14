@@ -2,6 +2,8 @@
 "use client";
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
+import CampoImagen from "@/components/CampoImagen";
+import toast from "react-hot-toast";
 
 interface Vacante {
   id_ofertas: number;
@@ -30,6 +32,7 @@ export default function EditarVacantePage() {
   const [listaIngenierias, setListaIngenierias] = useState<
     { id_academias: number; ingenieria: string }[]
   >([]);
+  const [imagenFile] = useState<File | null>(null);
 
   const id = params.id;
 
@@ -91,10 +94,34 @@ export default function EditarVacantePage() {
 
     setSaving(true);
 
-    // 🔹 Enviamos la vacante con las categorías seleccionadas
+    let nuevaImagenUrl = vacante.imagen;
+
+    // 🔹 Si el usuario subió una nueva imagen
+    if (imagenFile) {
+      const formData = new FormData();
+      formData.append("archivo", imagenFile);
+      formData.append("tipo", "imagen_oferta");
+
+      const uploadRes = await fetch("/api/Usuarios/upload", {
+        method: "POST",
+        body: formData,
+      });
+
+      const uploadData = await uploadRes.json();
+      if (uploadData.ok && uploadData.filename) {
+        nuevaImagenUrl = `/api/Usuarios/archivos/Ofertas/${uploadData.filename}`;
+      } else {
+        alert("Error al subir la imagen.");
+        setSaving(false);
+        return;
+      }
+    }
+
+    // 🔹 Enviamos la vacante con la nueva imagen (si se cambió)
     const body = {
       ...vacante,
-      ingenierias, // <- incluimos las categorías
+      imagen: nuevaImagenUrl,
+      ingenierias,
     };
 
     const res = await fetch(`/api/Ofertas/${vacante.id_ofertas}`, {
@@ -107,10 +134,10 @@ export default function EditarVacantePage() {
     setSaving(false);
 
     if (data.ok) {
-      alert("Vacante actualizada. Se enviará a revisión.");
-      router.push("/BolsaTrabajo/VacantesEmpresa");
-    } else {
-      alert("Error al actualizar la vacante");
+      toast("Vacante actualizada. Se enviará a revisión.");
+      router.push("/BolsaTrabajo"); // 🔹 te envía a la página donde está el botón "Crear Vacante"
+      router.refresh(); // 🔹 fuerza la recarga de la lista y el botón
+      // 🔹 redirect completo del navegador
     }
   };
 
@@ -218,15 +245,10 @@ export default function EditarVacantePage() {
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700">
-            URL de Imagen
-          </label>
-          <input
-            type="text"
-            name="imagen"
-            value={vacante.imagen}
-            onChange={handleChange}
-            className="mt-1 block w-full rounded-md border border-gray-300 p-2"
+          <CampoImagen
+            user={{ id: vacante.id_ofertas }}
+            imagen={vacante.imagen}
+            setImagen={(url) => setVacante({ ...vacante, imagen: url })}
           />
         </div>
 
@@ -263,15 +285,17 @@ export default function EditarVacantePage() {
             ))}
           </div>
         </div>
-
         <div className="flex justify-end gap-3 pt-4">
           <button
             type="button"
-            onClick={() => router.push("/BolsaTrabajo/VacantesEmpresa")}
+            onClick={() => {
+              window.location.href = "/BolsaTrabajo";
+            }}
             className="bg-gray-300 hover:bg-gray-400 text-gray-800 px-4 py-2 rounded-lg"
           >
             Cancelar
           </button>
+
           <button
             type="submit"
             disabled={saving}

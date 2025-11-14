@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import toast, { Toaster } from "react-hot-toast";
-import Image from "next/image";
+import CampoImagen from "@/components/CampoImagen";
 
 export default function CrearOferta() {
   const { data: session } = useSession();
@@ -264,29 +264,9 @@ export default function CrearOferta() {
           />
         </div>
 
-        <div>
-          <label className="block font-medium mb-1">Imagen (URL) *</label>
-          <input
-            type="url"
-            value={imagen}
-            onChange={(e) => setImagen(e.target.value)}
-            className="w-full border p-2 rounded-lg focus:ring focus:ring-blue-200"
-            placeholder="https://ejemplo.com/imagen.jpg"
-          />
-          {imagen && (
-            <div className="mt-3">
-              <p className="text-sm text-gray-600 mb-1">Previsualización:</p>
-              <Image
-                src={imagen}
-                alt="Previsualización"
-                width={800}
-                height={320}
-                className="w-full rounded-lg border h-40 object-cover"
-                unoptimized
-              />
-            </div>
-          )}
-        </div>
+        {session?.user && (
+          <CampoImagen user={session.user} imagen={imagen} setImagen={setImagen} />
+        )}
 
         <div>
           <label className="block font-medium mb-1">

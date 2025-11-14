@@ -43,17 +43,36 @@ export async function GET(
     }
 
     const basePath = process.cwd();
-    const carpeta = tipo === "Perfiles" ? "Subir_imagenes" : "Subir_documentos";
+    const carpeta =
+      tipo === "Perfiles" || tipo === "Ofertas"
+        ? "Subir_imagenes"
+        : "Subir_documentos";
+
     const filePath = path.join(basePath, "uploads", carpeta, tipo, nombre);
 
     await fs.access(filePath);
-    const ext = path.extname(filePath).toLowerCase();
-    const buffer = await fs.readFile(filePath);
-    const mime = mimeFromExt(ext);
 
-    return new Response(new Uint8Array(buffer), {
+    const fileBuffer = await fs.readFile(filePath);
+    const fileStats = await fs.stat(filePath);
+
+    const mime = mimeFromExt(path.extname(filePath).toLowerCase());
+
+    // ✅ Conversión segura a ArrayBuffer
+    const arrayBuffer = fileBuffer.buffer.slice(
+      fileBuffer.byteOffset,
+      fileBuffer.byteOffset + fileBuffer.byteLength
+    ) as ArrayBuffer;
+
+    return new Response(arrayBuffer, {
       status: 200,
-      headers: { "Content-Type": mime },
+      headers: {
+        "Content-Type": mime,
+        "Content-Length": fileStats.size.toString(),
+        // 🚫 Evita cache en navegador y proxy/CDN
+        "Cache-Control": "no-store, no-cache, must-revalidate, proxy-revalidate",
+        "Pragma": "no-cache",
+        "Expires": "0",
+      },
     });
   } catch (err: unknown) {
     const mensaje =

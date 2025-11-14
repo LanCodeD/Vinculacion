@@ -63,13 +63,13 @@ model empresas {
   titulo                     String?     @db.VarChar(60)
   rfc                        String      @unique(map: "uq_empresas_rfc") @db.VarChar(12)
   direccion                  String?     @db.VarChar(255)
-  correo                     String?     @db.VarChar(150)
+  correo_empresas            String?     @db.VarChar(150)
   telefono                   String?     @db.VarChar(25)
   verificado                 Int         @default(0) @db.TinyInt
   verificado_por_usuarios_id Int?
   verificado_en              DateTime?   @db.DateTime(0)
   creado_en                  DateTime    @default(now()) @db.DateTime(0)
-  actualizado_en             DateTime    @default(now()) @db.DateTime(0)
+  actualizado_en             DateTime    @default(now()) @updatedAt @db.DateTime(0)
   puesto                     String?     @db.VarChar(100)
   usuarios_id                Int
   contactos                  contactos[]
@@ -225,7 +225,7 @@ model egresados {
   empresas_id                Int?
   academias_ingenierias_id   Int
   creado_en                  DateTime              @default(now()) @db.DateTime(0)
-  actualizado_en             DateTime              @default(now()) @db.DateTime(0)
+  actualizado_en             DateTime              @default(now()) @updatedAt @db.DateTime(0)
   verificado_en              DateTime?             @db.DateTime(0)
   verificado_por_usuarios_id Int?
   cv_url                     String?               @db.VarChar(500)
@@ -280,13 +280,11 @@ model ofertas {
   creado_por_usuarios_id     Int?
   titulo                     String                @db.VarChar(250)
   ubicacion                  String?               @db.VarChar(255)
-  es_flyer                   Int                   @default(0) @db.TinyInt
-  flyer_url                  String?               @db.VarChar(500)
   fecha_publicacion          DateTime?             @db.DateTime(0)
   fecha_cierre               DateTime?             @db.DateTime(0)
   oferta_estados_id          Int                   @default(1)
   creado_en                  DateTime              @default(now()) @db.DateTime(0)
-  actualizado_en             DateTime              @default(now()) @db.DateTime(0)
+  actualizado_en             DateTime              @default(now()) @updatedAt @db.DateTime(0)
   imagen                     String?               @db.VarChar(500)
   puesto                     String?               @db.VarChar(150)
   verificado_en              DateTime?
@@ -325,7 +323,7 @@ model postulaciones {
   revisado_por_usuarios_id Int?
   revisado_en              DateTime?           @db.DateTime(0)
   creado_en                DateTime            @default(now()) @db.DateTime(0)
-  actualizado_en           DateTime            @default(now()) @db.DateTime(0)
+  actualizado_en           DateTime            @default(now()) @updatedAt @db.DateTime(0)
   estado                   postulacion_estados @relation(fields: [postulacion_estados_id], references: [id_postulacion_estados], map: "fk_postu_estado")
   oferta                   ofertas             @relation(fields: [ofertas_id], references: [id_ofertas], map: "fk_postu_oferta")
   revisado_por             usuarios?           @relation("PostulacionRevisada", fields: [revisado_por_usuarios_id], references: [id_usuarios], map: "fk_postu_revisado")

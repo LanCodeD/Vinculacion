@@ -1,4 +1,4 @@
-// src/app/api/Admin/BolsaTrabajo/Subir_IMG_PDF/route.ts
+// api/Admin/BolsaTrabajo/Subir_IMG_PDF/route.ts
 import { NextRequest, NextResponse } from "next/server";
 import fs from "fs/promises";
 import path from "path";
@@ -14,7 +14,7 @@ export async function POST(req: NextRequest) {
     const formData = await req.formData();
     const file = formData.get("file") as File | null;
     const userId = Number(formData.get("userId"));
-    const tipo = formData.get("tipo") as "cv" | "foto_usuario";
+    const tipo = formData.get("tipo") as "cv" | "foto_usuario" | "imagen_oferta";
     const idEgresado = Number(formData.get("idEgresado"));
 
     if (!file || !userId || !tipo) {
@@ -24,6 +24,16 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    // 🚫 Límite de tamaño: 5 MB
+    const fileSizeMB = file.size / (1024 * 1024);
+    if (fileSizeMB > 3) {
+      return NextResponse.json(
+        { error: `El archivo supera el límite de 5 MB (${fileSizeMB.toFixed(2)} MB)` },
+        { status: 400 }
+      );
+    }
+
+    // 🚫 Verificación de permisos
     if (
       tipo === "cv" &&
       user.role !== "Egresado" &&
@@ -41,44 +51,50 @@ export async function POST(req: NextRequest) {
     let rutaBaseAPI: string;
 
     if (tipo === "cv") {
-      carpetaDestino = path.join(
-        basePath,
-        "uploads",
-        "Subir_documentos",
-        "Egresados_Documentos"
-      );
+      carpetaDestino = path.join(basePath, "uploads", "Subir_documentos", "Egresados_Documentos");
       rutaBaseAPI = "/api/Usuarios/archivos/Egresados_Documentos";
+    } else if (tipo === "imagen_oferta") {
+      carpetaDestino = path.join(basePath, "uploads", "Subir_imagenes", "Ofertas");
+      rutaBaseAPI = "/api/Usuarios/archivos/Ofertas";
     } else {
-      carpetaDestino = path.join(
-        basePath,
-        "uploads",
-        "Subir_imagenes",
-        "Perfiles"
-      );
+      carpetaDestino = path.join(basePath, "uploads", "Subir_imagenes", "Perfiles");
       rutaBaseAPI = "/api/Usuarios/archivos/Perfiles";
     }
 
     await fs.mkdir(carpetaDestino, { recursive: true });
 
-    // Puedes dar un nombre específico al archivo, ejemplo: 'perfil_33.png' o 'cv_45.pdf'
     const extension = path.extname(file.name);
-    const nombreFinal =
-      tipo === "foto_usuario"
-        ? `perfil_${userId}${extension}`
-        : `cv_${idEgresado || userId}${extension}`;
+    let nombreFinal: string;
+
+    if (tipo === "foto_usuario") {
+      nombreFinal = `perfil_${userId}${extension}`;
+    } else if (tipo === "imagen_oferta") {
+      nombreFinal = `oferta_${userId}_${Date.now()}${extension}`;
+    } else {
+      nombreFinal = `cv_${idEgresado || userId}${extension}`;
+    }
 
     const rutaFinal = path.join(carpetaDestino, nombreFinal);
+
+    // 🧹 Eliminar archivo anterior si existe
+    try {
+      await fs.access(rutaFinal);
+      await fs.unlink(rutaFinal);
+      console.log(`🗑️ Archivo anterior eliminado: ${rutaFinal}`);
+    } catch {
+      // No existía antes, no pasa nada
+    }
 
     await fs.writeFile(rutaFinal, buffer);
     const urlArchivo = `${rutaBaseAPI}/${encodeURIComponent(nombreFinal)}`;
 
-    // Guardar en BD
+    // 💾 Guardar en BD
     if (tipo === "cv") {
       await prisma.egresados.update({
         where: { id_egresados: idEgresado },
         data: { cv_url: urlArchivo },
       });
-    } else {
+    } else if (tipo === "foto_usuario") {
       await prisma.usuarios.update({
         where: { id_usuarios: userId },
         data: { foto_perfil: urlArchivo },
@@ -88,17 +104,14 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({
       ok: true,
       url: urlArchivo,
+      nombre: nombreFinal,
+      tipo,
       mensaje: "Archivo subido correctamente",
     });
   } catch (error: unknown) {
     const mensaje =
-      error instanceof Error
-        ? error.message
-        : "Error desconocido al subir archivo";
+      error instanceof Error ? error.message : "Error desconocido al subir archivo";
     console.error("❌ Error al subir archivo:", mensaje);
-    return NextResponse.json(
-      { error: "Error interno del servidor" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Error interno del servidor" }, { status: 500 });
   }
 }
