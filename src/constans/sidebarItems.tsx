@@ -33,7 +33,10 @@ export const USER_MENUS = [
         subMenu: [
           { title: "Información", path: "/BolsaTrabajo/InformacionBolsa" },
           { title: "Vacantes", path: "/BolsaTrabajo" },
-          { title: "Mis Postulaciones", path: "/BolsaTrabajo/MisPostulacionesFront" },
+          {
+            title: "Mis Postulaciones",
+            path: "/BolsaTrabajo/MisPostulacionesFront",
+          },
         ],
       },
     ],
@@ -56,9 +59,14 @@ export const USER_MENUS = [
 
 export const ADMIN_MENUS = [
   {
-    title: "Panel Admin",
+    title: "Dashboard",
     icon: <MdSpaceDashboard />,
     path: "/Admin/ConfiguracionAdmin",
+  },
+  {
+    title: "Gestión Usuarios",
+    icon: <MdSpaceDashboard />,
+    path: "/Admin/GestionUsuario",
   },
   {
     title: "Gestión",
@@ -71,7 +79,10 @@ export const ADMIN_MENUS = [
         key: "admin-convenios",
         subMenu: [
           { title: "Convenio General", path: "/Admin/Convenios/Generales" },
-          { title: "Convenio Específico", path: "/Admin/Convenios/Especificos" },
+          {
+            title: "Convenio Específico",
+            path: "/Admin/Convenios/Especificos",
+          },
           { title: "Convenio Firmado", path: "/Admin/Convenios/Concretados" },
         ],
       },
@@ -80,7 +91,10 @@ export const ADMIN_MENUS = [
         key: "admin-bolsa",
         subMenu: [
           { title: "Vacantes", path: "/Admin/BolsaTrabajoAD" },
-          { title: "Postulaciones", path: "/Admin/BolsaTrabajoAD/Postulaciones" },
+          {
+            title: "Postulaciones",
+            path: "/Admin/BolsaTrabajoAD/Postulaciones",
+          },
         ],
       },
     ],

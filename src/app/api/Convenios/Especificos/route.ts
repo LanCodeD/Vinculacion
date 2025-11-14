@@ -19,6 +19,7 @@ export async function POST(req: Request) {
       where: {
         creado_por_usuario_id: usuario.id,
         estado_id: 1, // ✅ Solo bloquea si está pendiente
+        tipo_solicitud_id: 2,
       },
     });
 
