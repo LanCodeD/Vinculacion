@@ -20,7 +20,7 @@ interface UserProfile {
     razon_social?: string;
     rfc: string;
     direccion?: string;
-    correo?: string;
+    correo_empresas?: string;
     telefono?: string;
   }[];
   egresados?: {
@@ -32,6 +32,11 @@ interface UserProfile {
     correo_institucional?: string;
     cv_url?: string;
     foto_perfil?: string;
+  }[];
+    docentes?: {
+    id_docentes: number;
+    titulo?: string;
+    puesto?: string;
   }[];
   imagen_perfil?: string;
 }
@@ -199,6 +204,65 @@ export default function Perfil() {
         )}
       </div>
 
+            {/* INFORMACIÓN DE DOCENTE */}
+      {user.rol === "Docente" && formData?.docentes && (
+        <div>
+          <h2 className="text-xl font-semibold mb-2">Información de Docente</h2>
+          {formData.docentes.map((doc, i) => (
+            <div key={doc.id_docentes} className="mb-4 p-4 border rounded">
+              <p>
+                <strong>Título:</strong>{" "}
+                {editMode ? (
+                  <input
+                    type="text"
+                    value={doc.titulo || ""}
+                    onChange={(e) =>
+                      setFormData((prev) =>
+                        prev
+                          ? {
+                              ...prev,
+                              docentes: prev.docentes?.map((d, idx) =>
+                                idx === i ? { ...d, titulo: e.target.value } : d
+                              ),
+                            }
+                          : prev
+                      )
+                    }
+                    className="border rounded p-1 ml-2"
+                  />
+                ) : (
+                  doc.titulo || "-"
+                )}
+              </p>
+              <p>
+                <strong>Puesto:</strong>{" "}
+                {editMode ? (
+                  <input
+                    type="text"
+                    value={doc.puesto || ""}
+                    onChange={(e) =>
+                      setFormData((prev) =>
+                        prev
+                          ? {
+                              ...prev,
+                              docentes: prev.docentes?.map((d, idx) =>
+                                idx === i ? { ...d, puesto: e.target.value } : d
+                              ),
+                            }
+                          : prev
+                      )
+                    }
+                    className="border rounded p-1 ml-2"
+                  />
+                ) : (
+                  doc.puesto || "-"
+                )}
+              </p>
+            </div>
+          ))}
+        </div>
+      )}
+
       {/* INFORMACIÓN DE EMPRESA */}
       {user.rol === "Empresa" && formData?.empresas && (
         <div>
@@ -287,6 +351,34 @@ export default function Perfil() {
                     />
                   ) : (
                     emp.direccion
+                  )}
+                </p>
+              )}
+              {emp.correo_empresas && (
+                <p>
+                  <strong>Correo Empresa:</strong>{" "}
+                  {editMode ? (
+                    <input
+                      type="text"
+                      value={emp.correo_empresas}
+                      onChange={(e) =>
+                        setFormData((prev) =>
+                          prev
+                            ? {
+                              ...prev,
+                              empresas: prev.empresas?.map((empresa, idx) =>
+                                idx === i
+                                  ? { ...empresa, correo_empresas: e.target.value }
+                                  : empresa
+                              ),
+                            }
+                            : prev
+                        )
+                      }
+                      className="border rounded p-1 ml-2 w-full"
+                    />
+                  ) : (
+                    emp.correo_empresas 
                   )}
                 </p>
               )}

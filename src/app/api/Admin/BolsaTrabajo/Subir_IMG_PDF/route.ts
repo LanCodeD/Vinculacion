@@ -1,3 +1,4 @@
+// api/Admin/BolsaTrabajo/Subir_IMG_PDF/route.ts
 import { NextRequest, NextResponse } from "next/server";
 import fs from "fs/promises";
 import path from "path";

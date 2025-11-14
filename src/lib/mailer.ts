@@ -23,7 +23,7 @@ export async function enviarCorreo({
 }) {
   try {
     await transporter.sendMail({
-      from: `"Soporte Plataforma" <${process.env.EMAIL_USER}>`,
+      from: `"Equipo de Vinculación y Bolsa de Trabajo" <${process.env.EMAIL_USER}>`,
       to,
       subject,
       html,

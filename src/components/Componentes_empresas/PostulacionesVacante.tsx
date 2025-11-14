@@ -130,7 +130,6 @@ export default function PostulacionesVacante({
               <div>
                 <p className="font-medium text-gray-900">{p.usuario.nombre}</p>
                 <p className="text-sm text-gray-600">{p.usuario.correo}</p>
-                <p className="text-sm mt-1">{p.mensaje}</p>
                 <p className="text-sm mt-1 text-blue-600">
                   Estado:{" "}
                   <span className="font-semibold">

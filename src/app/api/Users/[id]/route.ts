@@ -29,8 +29,13 @@ interface UsuarioExpandido {
     razon_social: string | null;
     rfc: string;
     direccion: string | null;
-    correo: string | null;
+    correo_empresas: string | null;
     telefono: string | null;
+  }[];
+  docentes?: {
+    id_docentes: number;
+    titulo: string | null;
+    puesto: string | null;
   }[];
 }
 
@@ -79,8 +84,21 @@ export async function PATCH(
             razon_social: emp.razon_social,
             rfc: emp.rfc,
             direccion: emp.direccion,
-            correo: emp.correo,
+            correo_empresas: emp.correo_empresas,
             telefono: emp.telefono,
+          },
+        });
+      }
+    }
+
+    // 🔹 Si el usuario tiene perfil de docente
+    if (body.docentes && Array.isArray(body.docentes)) {
+      for (const doc of body.docentes) {
+        await prisma.docentes.update({
+          where: { id_docentes: doc.id_docentes },
+          data: {
+            titulo: doc.titulo,
+            puesto: doc.puesto,
           },
         });
       }
@@ -100,6 +118,7 @@ export async function PATCH(
         },
         egresados_perfil: true,
         empresas_perfil: true,
+        docentes: true,
       },
     });
 
@@ -119,6 +138,7 @@ export async function PATCH(
       imagen_perfil: updatedUser?.foto_perfil || null,
       egresados: updatedUser?.egresados_perfil || [],
       empresas: updatedUser?.empresas_perfil || [],
+      docentes: updatedUser?.docentes || [],
     };
 
     return NextResponse.json({ ok: true, mensaje: "Perfil actualizado correctamente", user: userData });
@@ -153,6 +173,7 @@ export async function GET(
         },
         egresados_perfil: true,
         empresas_perfil: true,
+        docentes: true,
       },
     });
 
@@ -198,8 +219,16 @@ export async function GET(
         razon_social: emp.razon_social,
         rfc: emp.rfc,
         direccion: emp.direccion,
-        correo: emp.correo,
+        correo_empresas: emp.correo_empresas,
         telefono: emp.telefono,
+      }));
+    }
+
+    if (user.docentes.length > 0) {
+      data.docentes = user.docentes.map((doc) => ({
+        id_docentes: doc.id_docentes,
+        titulo: doc.titulo,
+        puesto: doc.puesto,
       }));
     }
 

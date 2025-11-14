@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import CampoImagen from "@/components/CampoImagen";
+import toast from "react-hot-toast";
 
 interface Vacante {
   id_ofertas: number;
@@ -133,10 +134,10 @@ export default function EditarVacantePage() {
     setSaving(false);
 
     if (data.ok) {
-      alert("Vacante actualizada. Se enviará a revisión.");
-      router.push("/BolsaTrabajo/VacantesEmpresa");
-    } else {
-      alert("Error al actualizar la vacante");
+      toast("Vacante actualizada. Se enviará a revisión.");
+      router.push("/BolsaTrabajo"); // 🔹 te envía a la página donde está el botón "Crear Vacante"
+      router.refresh(); // 🔹 fuerza la recarga de la lista y el botón
+      // 🔹 redirect completo del navegador
     }
   };
 
@@ -284,15 +285,17 @@ export default function EditarVacantePage() {
             ))}
           </div>
         </div>
-
         <div className="flex justify-end gap-3 pt-4">
           <button
             type="button"
-            onClick={() => router.push("/BolsaTrabajo/VacantesEmpresa")}
+            onClick={() => {
+              window.location.href = "/BolsaTrabajo";
+            }}
             className="bg-gray-300 hover:bg-gray-400 text-gray-800 px-4 py-2 rounded-lg"
           >
             Cancelar
           </button>
+
           <button
             type="submit"
             disabled={saving}

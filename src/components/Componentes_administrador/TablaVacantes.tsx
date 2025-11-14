@@ -7,11 +7,13 @@ type Vacante = {
   id_ofertas: number;
   titulo: string;
   puesto: string | null;
-  empresas: { nombre_comercial: string;
-    correo: string | null;
+  empresas: {
+    nombre_comercial: string;
+    correo_empresas: string | null;
     telefono: string | null;
-   } | null;
-  estado: { nombre_estado: string } | null;
+  } | null;
+  oferta_estados_id: number;
+  estado: { id_oferta_estados: number; nombre_estado: string } | null;
 };
 
 type Props = {
@@ -32,19 +34,18 @@ export default function TablaVacantes({ vacantes }: Props) {
       .sort((a, b) => a.id_ofertas - b.id_ofertas); // Orden ascendente por ID
   }, [search, vacantes]);
 
-  const estadoBadge = (estado: string | undefined) => {
-    switch (estado?.toLowerCase()) {
-      case 'PUBLICADA':
-        return <span className="px-3 py-1 rounded-full bg-green-100 text-green-800 text-xs font-semibold">{estado}</span>;
-      case 'RECHAZADA':
-        return <span className="px-3 py-1 rounded-full bg-red-100 text-red-800 text-xs font-semibold">{estado}</span>;
-      case 'PENDIENTE_REVISION':
-        return <span className="px-3 py-1 rounded-full bg-orange-100 text-orange-800 text-xs font-semibold">{estado}</span>;
-      default:
-        return <span className="px-3 py-1 rounded-full bg-gray-100 text-gray-800 text-xs font-semibold">{estado}</span>;
-    }
-  };
+  const estadoBadge = (idEstado: number, nombre: string) => {
+    let style = "bg-gray-100 text-gray-800 border border-gray-300";
+    if (idEstado === 2) style = "bg-blue-100 text-blue-800 border border-blue-300"; // Pendiente
+    if (idEstado === 3) style = "bg-green-100 text-green-800 border border-green-300"; // Publicada
+    if (idEstado === 4) style = "bg-red-100 text-red-800 border border-red-300"; // Rechazada
 
+    return (
+      <span className={`px-3 py-1 rounded-full text-xs font-semibold ${style}`}>
+        {nombre}
+      </span>
+    );
+  };
   return (
     <div className="py-4 overflow-x-auto sm:px-6 lg:px-0">
       {/* Buscador */}
@@ -76,9 +77,9 @@ export default function TablaVacantes({ vacantes }: Props) {
               <tr key={v.id_ofertas} className="hover:bg-gray-50 transition-colors">
                 <td className="px-6 py-4 whitespace-nowrap text-blue-900">{v.titulo}</td>
                 <td className="px-6 py-4 whitespace-nowrap text-blue-900">{v.empresas?.nombre_comercial ?? 'Sin empresa'}</td>
-                <td className="px-6 py-4 whitespace-nowrap">{v.empresas?.correo ?? 'N/A'}</td>
+                <td className="px-6 py-4 whitespace-nowrap">{v.empresas?.correo_empresas ?? 'N/A'}</td>
                 <td className="px-6 py-4 whitespace-nowrap">{v.empresas?.telefono ?? 'N/A'}</td>
-                <td className="px-6 py-4 whitespace-nowrap">{estadoBadge(v.estado?.nombre_estado)}</td>
+                <td className="px-6 py-4 whitespace-nowrap">{estadoBadge(v.oferta_estados_id, v.estado?.nombre_estado ?? "Sin estado")}</td>
                 <td className="px-6 py-4 whitespace-nowrap text-right">
                   <Link
                     href={`/Admin/BolsaTrabajoAD/${v.id_ofertas}`}

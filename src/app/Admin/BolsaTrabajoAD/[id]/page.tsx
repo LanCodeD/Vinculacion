@@ -26,7 +26,7 @@ export default async function AdminVacantePage({ params }: Props) {
       },
       estado: {
         select: {
-          nombre_estado: true,
+          id_oferta_estados: true, nombre_estado: true
         },
       },
       ingenierias_ofertas: {
