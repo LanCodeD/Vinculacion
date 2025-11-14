@@ -44,7 +44,7 @@ export interface EmpresaPerfil {
   rfc: string;
   direccion: string;
   telefono: string;
-  correo: string;
+  correo_empresas: string;
   puesto: string | null;
   verificado: boolean;
   verificado_por_usuarios_id: number | null;

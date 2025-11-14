@@ -64,7 +64,7 @@ export async function GET() {
             rfc: true,
             direccion: true,
             telefono: true,
-            correo: true,
+            correo_empresas: true,
             puesto: true,
             verificado_en: true,
             verificado: true,

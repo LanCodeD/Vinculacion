@@ -359,7 +359,7 @@ export default function ModalUsuario({
               <strong>Teléfono:</strong> {perfil?.telefono ?? "—"}
             </p>
             <p>
-              <strong>Correo:</strong> {perfil?.correo ?? "—"}
+              <strong>Correo:</strong> {perfil?.correo_empresas ?? "—"}
             </p>
             <p>
               <strong>Puesto:</strong> {perfil?.puesto ?? "—"}
