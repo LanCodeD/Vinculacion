@@ -84,10 +84,10 @@ export default function RegistroWizard() {
     }
   }, [paso, registro.usuarioId, registro.tipoCuentaId]);
 
-  // 🔹 NUEVO useEffect: completar registro con Google
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
-    if (!session?.user?.email) return; // Si no hay sesión, salir
-    if (registro.usuarioId) return; // Ya registrado
+    if (!session?.user?.email) return;
+    if (registro.usuarioId) return;
 
     const completarRegistroGoogle = async () => {
       const tipo =
@@ -107,28 +107,21 @@ export default function RegistroWizard() {
         });
 
         const id = res.data.id_usuarios ?? res.data.id;
+
         if (id) {
           setRegistro((prev) => ({
             ...prev,
             usuarioId: id,
             tipoCuentaId: tipo,
           }));
+
           toast.success(
             "Registro completado con Google. Avanzando al perfil..."
           );
-          setPaso(4); // Avanzamos al paso de perfil
-        } else {
-          toast.error("No se obtuvo id de usuario desde el servidor.");
+          setPaso(4);
         }
       } catch (err) {
-        if (axios.isAxiosError(err)) {
-          toast.error(
-            err.response?.data?.error ??
-              "Error en servidor al completar registro."
-          );
-        } else {
-          toast.error("Error inesperado al completar registro.");
-        }
+        toast.error("Error al completar registro.");
       }
     };
 

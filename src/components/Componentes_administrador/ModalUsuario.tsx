@@ -96,10 +96,10 @@ export default function ModalUsuario({
     }
   };
 
-  const baseURL =
+/*   const baseURL =
     process.env.NODE_ENV === "development"
       ? "http://localhost:3000" // 👈 tu backend local
-      : ""; // 👈 producción usa dominio actual
+      : ""; // 👈 producción usa dominio actual */
 
   const fotoPerfil =
     usuario?.foto_perfil && usuario.foto_perfil.startsWith("http")
