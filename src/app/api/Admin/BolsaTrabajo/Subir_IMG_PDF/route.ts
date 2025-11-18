@@ -71,7 +71,7 @@ export async function POST(req: NextRequest) {
     } else if (tipo === "imagen_oferta") {
       nombreFinal = `oferta_${userId}_${Date.now()}${extension}`;
     } else {
-      nombreFinal = `cv_${idEgresado || userId}${extension}`;
+      nombreFinal = `cv_${userId}${extension}`;
     }
 
     const rutaFinal = path.join(carpetaDestino, nombreFinal);
