@@ -15,7 +15,7 @@ export default function BotonGoogle({
   modo = "registro",
 }: Props) {
   const handleGoogle = async () => {
-    // Guardar datos para el RegistroWizard
+    // Guardar datos para RegistroWizard (opcional, pero útil)
     if (modo === "registro") {
       localStorage.setItem("registroModo", modo);
       localStorage.setItem("registroTipoCuenta", String(tipoCuenta ?? ""));
@@ -29,10 +29,16 @@ export default function BotonGoogle({
     });
 
     try {
+      const callbackUrl =
+        modo === "registro"
+          ? `/Registro?from=google&tipoCuenta=${tipoCuenta ?? ""}`
+          : `/MenuPrincipal`; // o "/" si prefieres
+
+      // redirige directamente a la URL adecuada
       await signIn("google", {
-        callbackUrl: "/Registro?from=google",
+        callbackUrl,
         redirect: true,
-        prompt: "select_account", // 👈 muestra selector + mensaje de permisos
+        prompt: "select_account",
       });
     } catch (err) {
       console.error("Error signIn google:", err);

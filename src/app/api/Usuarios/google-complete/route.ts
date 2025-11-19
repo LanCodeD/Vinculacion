@@ -1,38 +1,78 @@
 // app/api/Usuarios/google-complete/route.ts
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
-import { authOptions } from "@/app/api/auth/[...nextauth]/authOptions"; // ajusta si lo moviste
+import type { Session } from "next-auth";
+import { authOptions } from "@/app/api/auth/[...nextauth]/authOptions";
 import { prisma } from "@/lib/prisma";
 import { v4 as uuidv4 } from "uuid";
 
-// Regex institucional (docente)
+/**
+ * Regex para correos institucionales
+ */
 const regexInstitucional =
   /^(?=(?:[A-Za-z0-9.#+-][A-Za-z]){2,})(?!.*[.#+-]{2,})(?!^[.#+-])(?!.*[.#+-]$)[A-Za-z0-9._#+-]+@valladolid\.tecnm\.mx$/;
 
-// Mapeo tipoCuenta → rol
+/**
+ * Mapeo tipoCuenta -> rol
+ */
 const rolPorTipoCuenta: Record<number, number> = {
-  1: 1, // Docente
-  2: 2, // Egresado
-  3: 3, // Empresa
+  1: 1,
+  2: 2,
+  3: 3,
 };
+
+/**
+ * Tipado del body esperado
+ */
+interface BodyTipoCuenta {
+  tipoCuentaId?: number;
+  tipoCuenta?: number;
+}
 
 export async function POST(req: Request) {
   try {
-    // 1) validar sesión (NextAuth)
-    const session = await getServerSession(authOptions);
-    if (!session?.user?.email) {
+    // 1) validar sesión
+    const session: Session | null = await getServerSession(authOptions);
+    if (!session || !session.user) {
       return NextResponse.json({ error: "No autenticado" }, { status: 401 });
     }
-    const correo = session.user.email;
 
-    // 2) leer body: tipoCuenta (preferible enviar en body JSON desde el cliente)
-    const body = await req.json();
-    const tipoCuentaId = Number(body?.tipoCuentaId ?? body?.tipoCuenta ?? 0);
-    if (!tipoCuentaId) {
-      return NextResponse.json({ error: "Falta tipoCuentaId" }, { status: 400 });
+    /**
+     * Tipamos userObj correctamente para evitar ANY
+     */
+    const userObj = session.user as Session["user"] & {
+      correo?: string | null;
+      idGoogle?: string | null;
+      id?: string | number | null;
+      image?: string | null;
+    };
+
+    // correo preferimos "correo", si no existe usamos "email"
+    const correo = (userObj.correo ?? userObj.email)?.toString() ?? "";
+    if (!correo) {
+      return NextResponse.json(
+        { error: "No se encontró correo en la sesión" },
+        { status: 400 }
+      );
     }
 
-    // 3) validación de dominio si es docente (1)
+    // 2) leer body
+    let body: BodyTipoCuenta;
+    try {
+      body = (await req.json()) as BodyTipoCuenta;
+    } catch {
+      return NextResponse.json({ error: "Body inválido" }, { status: 400 });
+    }
+
+    const tipoCuentaId = Number(body.tipoCuentaId ?? body.tipoCuenta ?? 0);
+    if (!tipoCuentaId) {
+      return NextResponse.json(
+        { error: "Falta tipoCuentaId" },
+        { status: 400 }
+      );
+    }
+
+    // 3) validar dominio institucional
     if (tipoCuentaId === 1 && !regexInstitucional.test(correo)) {
       return NextResponse.json(
         { error: "El correo no cumple el dominio institucional" },
@@ -42,25 +82,40 @@ export async function POST(req: Request) {
 
     const rolId = rolPorTipoCuenta[tipoCuentaId];
     if (!rolId) {
-      return NextResponse.json({ error: "Tipo de cuenta inválido" }, { status: 400 });
+      return NextResponse.json(
+        { error: "Tipo de cuenta inválido" },
+        { status: 400 }
+      );
     }
 
-    // 4) buscar usuario existente por correo
-    let usuario = await prisma.usuarios.findUnique({ where: { correo } });
+    // 4) buscar usuario
+    let usuario = await prisma.usuarios.findUnique({
+      where: { correo },
+    });
 
-    // Extraer nombre/apellido desde session.user.name si existe
-    const fullName = session.user.name ?? "";
-    const nameParts = fullName.trim().split(/\s+/);
-    const nombre = nameParts.shift() ?? session.user.name ?? "SinNombre";
-    const apellido = nameParts.join(" ") ?? "";
+    // nombre y apellido
+    const fullName = userObj.name?.toString() ?? "";
+    const parts = fullName.trim().split(/\s+/).filter(Boolean);
 
-    // 5) Si no existe: crearlo con mínimos datos (sin password)
-    // Si existe: actualizar tipos_cuenta_id / roles_id si hace falta
+    const nombre =
+      parts.length > 0 ? parts.shift()! : userObj.name ?? "SinNombre";
+    const apellido = parts.join(" ");
+
+    // providerId idGoogle -> id -> email -> uuid
+    const providerId =
+      (userObj.idGoogle && String(userObj.idGoogle)) ||
+      (userObj.id ? String(userObj.id) : null) ||
+      userObj.email ||
+      uuidv4();
+
+    console.log("DEBUG userObj.idGoogle BEFORE SAVE:", userObj.idGoogle);
+    console.log("DEBUG typeof idGoogle:", typeof userObj.idGoogle);
+
+    // 5) crear o actualizar usuario
     if (!usuario) {
-      // crear dentro de transacción para también crear accounts
       const idAccount = uuidv4();
 
-      const created = await prisma.$transaction(async (tx) => {
+      usuario = await prisma.$transaction(async (tx) => {
         const nuevo = await tx.usuarios.create({
           data: {
             nombre,
@@ -68,11 +123,10 @@ export async function POST(req: Request) {
             correo,
             tipos_cuenta_id: tipoCuentaId,
             roles_id: rolId,
-            paso_actual: 4, // ya salta a perfil
+            paso_actual: 4,
             correo_verificado: 1,
             correo_verificado_en: new Date(),
-            // foto_perfil: session.user.image ?? undefined
-            foto_perfil: session.user.image ?? undefined,
+            foto_perfil: userObj.image ?? undefined,
           },
         });
 
@@ -81,18 +135,15 @@ export async function POST(req: Request) {
             id_accounts: idAccount,
             usuarios_id: nuevo.id_usuarios,
             provider: "google",
-            providerAccountId: session.user?.email ?? idAccount, // puedes usar profile id si lo pasas
+            providerAccountId: providerId,
           },
         });
 
         return nuevo;
       });
-
-      usuario = created;
     } else {
-      // usuario ya existe → actualizar role/tipo y crear account si no existe para Google
+      // actualizar
       await prisma.$transaction(async (tx) => {
-        // actualizar tipo/rol si difieren
         await tx.usuarios.update({
           where: { id_usuarios: usuario!.id_usuarios },
           data: {
@@ -100,38 +151,57 @@ export async function POST(req: Request) {
             roles_id: rolId,
             paso_actual: Math.max(usuario!.paso_actual ?? 1, 4),
             actualizado_en: new Date(),
-            // actualizar foto si no existe
-            ...(session.user.image && !usuario!.foto_perfil
-              ? { foto_perfil: session.user.image }
+            ...(userObj.image && !usuario!.foto_perfil
+              ? { foto_perfil: userObj.image }
               : {}),
           },
         });
 
-        // crear account si no existe
+        // buscar account con mismo providerId
         const existingAccount = await tx.accounts.findFirst({
           where: {
             usuarios_id: usuario!.id_usuarios,
             provider: "google",
+            providerAccountId: providerId,
           },
         });
 
         if (!existingAccount) {
-          await tx.accounts.create({
-            data: {
-              id_accounts: uuidv4(),
+          // buscar legacy
+          const legacy = await tx.accounts.findFirst({
+            where: {
               usuarios_id: usuario!.id_usuarios,
               provider: "google",
-              providerAccountId: session.user?.email ?? uuidv4(),
+              providerAccountId: { contains: "@" },
             },
           });
+
+          if (legacy) {
+            await tx.accounts.updateMany({
+              where: {
+                usuarios_id: usuario!.id_usuarios,
+                provider: "google",
+                providerAccountId: { contains: "@" },
+              },
+              data: { providerAccountId: providerId },
+            });
+          } else {
+            await tx.accounts.create({
+              data: {
+                id_accounts: uuidv4(),
+                usuarios_id: usuario!.id_usuarios,
+                provider: "google",
+                providerAccountId: providerId,
+              },
+            });
+          }
         }
       });
 
-      // recarga usuario para devolver datos actualizados
       usuario = await prisma.usuarios.findUnique({ where: { correo } });
     }
 
-    // 6) responder con id de usuario y mensaje
+    // 6) responder
     return NextResponse.json(
       {
         message: "Usuario creado/actualizado con Google",
