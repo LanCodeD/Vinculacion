@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import Image from "next/image";
+import toast from "react-hot-toast";
 
 interface VacanteDetailProps {
   id: number;
@@ -137,7 +138,7 @@ export default function VacanteDetail({
   // Función para postularse
   async function handleAplicar() {
     if (!session?.user) {
-      alert("Debes iniciar sesión para postularte.");
+      toast("Debes iniciar sesión para postularte.");
       router.push("/IniciarSesion");
       return;
     }
@@ -165,11 +166,11 @@ export default function VacanteDetail({
 
       if (!data.ok) throw new Error(data.error || "Error al postular.");
 
-      setMensaje("✅ Te has postulado correctamente.");
+      toast.success("✅ Te has postulado correctamente.");
     } catch (err: unknown) {
       const mensaje =
         err instanceof Error ? err.message : "Error inesperado al postular.";
-      setMensaje(`❌ ${mensaje}`);
+      toast.success(`${mensaje}`);
     } finally {
       setLoading(false);
     }

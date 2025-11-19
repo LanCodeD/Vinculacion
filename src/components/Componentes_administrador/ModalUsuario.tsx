@@ -8,6 +8,7 @@ import utc from "dayjs/plugin/utc";
 dayjs.extend(utc);
 import Image from "next/image";
 import type { UsuarioGestion } from "@/types/GestionUsuario";
+import toast from "react-hot-toast";
 
 interface Rol {
   id_roles: number;
@@ -82,15 +83,15 @@ export default function ModalUsuario({
       );
 
       if (res.data.success) {
-        alert("Usuario actualizado correctamente ✅");
+        toast("Usuario actualizado correctamente ✅");
         setModoEdicion(false);
         onActualizado?.();
       } else {
-        alert(res.data.error || "No se pudo actualizar el usuario");
+        toast(res.data.error || "No se pudo actualizar el usuario");
       }
     } catch (error) {
       console.error("Error al guardar usuario:", error);
-      alert("Error al actualizar el usuario");
+      toast("Error al actualizar el usuario");
     } finally {
       setGuardando(false);
     }

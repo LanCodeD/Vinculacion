@@ -3,6 +3,7 @@
 
 import { motion } from "framer-motion";
 import { useState } from "react";
+import toast from "react-hot-toast";
 
 interface PasoAvisoPrivacidadProps {
     onNext: () => void;
@@ -36,7 +37,7 @@ export default function PasoAvisoPrivacidad({ onNext, onBack }: PasoAvisoPrivaci
             onNext();
         } catch (err) {
             console.error(err);
-            alert("Hubo un error al registrar tu consentimiento.");
+            toast("Hubo un error al registrar tu consentimiento.");
         } finally {
             setLoading(false);
         }

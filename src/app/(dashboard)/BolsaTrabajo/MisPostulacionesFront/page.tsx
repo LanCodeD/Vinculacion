@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import toast from "react-hot-toast";
 
 interface PostulacionUsuario {
   id_postulaciones: number;
@@ -25,12 +26,24 @@ export default function MisPostulaciones() {
   }, []);
 
   const handleEliminar = async (id: number) => {
-    if (!confirm("¿Deseas eliminar esta postulación?")) return;
-    const res = await fetch(`/api/Postulaciones/${id}/EliminarMiPostulacion`, { method: "DELETE" });
-    const data = await res.json();
-    if (!data.ok) return alert(data.error);
-    setPostulaciones(prev => prev.filter(p => p.id_postulaciones !== id));
-    alert("Postulación eliminada ✅");
+    try {
+      const res = await fetch(`/api/Postulaciones/${id}/EliminarMiPostulacion`, {
+        method: "DELETE",
+      });
+
+      const data = await res.json();
+      if (!data.ok) {
+        toast.error(data.error || "No se pudo eliminar la postulación");
+        return;
+      }
+      // Actualizar la lista en el front
+      setPostulaciones(prev =>
+        prev.filter(p => p.id_postulaciones !== id)
+      );
+      toast.success("Postulación eliminada");
+    } catch (error) {
+      toast.error("Error al eliminar la postulación");
+    }
   };
 
   const formatearFecha = (fecha?: string, conHora = false) => {
@@ -123,108 +136,132 @@ export default function MisPostulaciones() {
                 {/* Darse de baja (icono de papelera) */}
                 <button
                   onClick={() => {
-                    if (window.confirm("¿Estás seguro de que quieres darte de baja?")) {
-                      handleEliminar(p.id_postulaciones);
-                    }
+                    toast((t) => (
+                      <div className="flex flex-col gap-2">
+                        <p className="font-semibold text-sm text-gray-800">
+                          ¿Quieres darte de baja?
+                        </p>
+                        <p className="text-xs text-gray-600">
+                          Esta acción no se puede deshacer.
+                        </p>
+                        <div className="flex gap-2 mt-2">
+                          <button
+                            onClick={async () => {
+                              toast.dismiss(t.id); // cierra el toast
+                              await handleEliminar(p.id_postulaciones); // llama a tu función
+                            }}
+                            className="bg-red-600 hover:bg-red-700 text-white text-xs px-3 py-1 rounded-md"
+                          >
+                            Sí, eliminar
+                          </button>
+                          <button
+                            onClick={() => toast.dismiss(t.id)}
+                            className="bg-gray-300 hover:bg-gray-400 text-xs px-3 py-1 rounded-md"
+                          >
+                            Cancelar
+                          </button>
+                        </div>
+                      </div>
+                    ));
                   }}
                   className="text-gray-400 hover:text-red-600 transition"
                   title="Darse de baja"
                 >
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6M1 7h22M9 3h6a1 1 0 011 1v1H8V4a1 1 0 011-1z"
-                    />
-                  </svg>
-                </button>
-              </div>
-
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6M1 7h22M9 3h6a1 1 0 011 1v1H8V4a1 1 0 011-1z"
+                  />
+                </svg>
+              </button>
             </div>
 
           </div>
+
+          </div>
         ))}
-      </div>
+    </div>
 
-      {/* Modal con fondo difuminado */}
-      <AnimatePresence>
-        {selectedOferta && (
-          <motion.div
-            className="fixed inset-0 flex items-center justify-center z-50 backdrop-blur-md"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-          >
-            <motion.div
-              className="bg-white/90 p-6 rounded-2xl shadow-xl max-w-lg w-full border border-gray-200"
-              initial={{ scale: 0.8, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.8, opacity: 0 }}
-              transition={{ duration: 0.25 }}
-            >
-              <h2 className="text-2xl font-bold mb-2 text-gray-800">
-                {selectedOferta.oferta.titulo ?? "Sin título"}
-              </h2>
+      {/* Modal con fondo difuminado */ }
+  <AnimatePresence>
+    {selectedOferta && (
+      <motion.div
+        className="fixed inset-0 flex items-center justify-center z-50 backdrop-blur-md"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+      >
+        <motion.div
+          className="bg-white/90 p-6 rounded-2xl shadow-xl max-w-lg w-full border border-gray-200"
+          initial={{ scale: 0.8, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          exit={{ scale: 0.8, opacity: 0 }}
+          transition={{ duration: 0.25 }}
+        >
+          <h2 className="text-2xl font-bold mb-2 text-gray-800">
+            {selectedOferta.oferta.titulo ?? "Sin título"}
+          </h2>
 
-              <p className="mb-1 text-gray-700">
-                <strong>Empresa:</strong> {selectedOferta.oferta.titulo ?? "No especificada"}
+          <p className="mb-1 text-gray-700">
+            <strong>Empresa:</strong> {selectedOferta.oferta.titulo ?? "No especificada"}
+          </p>
+          <p className="mb-1 text-gray-700">
+            <strong>Estado:</strong> {selectedOferta.estado.nombre_estado ?? "Desconocido"}
+          </p>
+          <p className="mb-1 text-gray-700">
+            <strong>Postulado el:</strong> {formatearFecha(selectedOferta.creado_en, true)}
+          </p>
+
+          {/* Descripción segura con "Leer más" */}
+          {selectedOferta.oferta.descripcion_general ? (
+            <>
+              <p className="mt-3 text-gray-800">
+                <strong>Descripción:</strong>{" "}
+                {showFullDesc
+                  ? selectedOferta.oferta.descripcion_general
+                  : selectedOferta.oferta.descripcion_general.length > 100
+                    ? selectedOferta.oferta.descripcion_general.slice(0, 100) + "..."
+                    : selectedOferta.oferta.descripcion_general}
               </p>
-              <p className="mb-1 text-gray-700">
-                <strong>Estado:</strong> {selectedOferta.estado.nombre_estado ?? "Desconocido"}
-              </p>
-              <p className="mb-1 text-gray-700">
-                <strong>Postulado el:</strong> {formatearFecha(selectedOferta.creado_en, true)}
-              </p>
-
-              {/* Descripción segura con "Leer más" */}
-              {selectedOferta.oferta.descripcion_general ? (
-                <>
-                  <p className="mt-3 text-gray-800">
-                    <strong>Descripción:</strong>{" "}
-                    {showFullDesc
-                      ? selectedOferta.oferta.descripcion_general
-                      : selectedOferta.oferta.descripcion_general.length > 100
-                        ? selectedOferta.oferta.descripcion_general.slice(0, 100) + "..."
-                        : selectedOferta.oferta.descripcion_general}
-                  </p>
-                  {selectedOferta.oferta.descripcion_general.length > 100 && (
-                    <button
-                      onClick={() => setShowFullDesc(!showFullDesc)}
-                      className="inline-flex items-center gap-1 text-blue-600 hover:text-blue-800 font-medium text-sm mt-2 transition-colors duration-200"
-                    >
-                      {showFullDesc ? "Mostrar menos" : "Leer más"}
-                      <svg
-                        className={`w-4 h-4 transition-transform duration-200 ${showFullDesc ? "rotate-180" : ""}`}
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                      </svg>
-                    </button>
-                  )}
-                </>
-              ) : (
-                <p className="mt-3 text-gray-800">
-                  <strong>Descripción:</strong> Sin descripción disponible.
-                </p>
-              )}
-
-              <div className="mt-5 flex justify-end">
+              {selectedOferta.oferta.descripcion_general.length > 100 && (
                 <button
-                  onClick={() => setSelectedOferta(null)}
-                  className="bg-gray-600 text-white px-4 py-2 rounded hover:bg-gray-700 transition"
+                  onClick={() => setShowFullDesc(!showFullDesc)}
+                  className="inline-flex items-center gap-1 text-blue-600 hover:text-blue-800 font-medium text-sm mt-2 transition-colors duration-200"
                 >
-                  Cerrar
+                  {showFullDesc ? "Mostrar menos" : "Leer más"}
+                  <svg
+                    className={`w-4 h-4 transition-transform duration-200 ${showFullDesc ? "rotate-180" : ""}`}
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
                 </button>
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+              )}
+            </>
+          ) : (
+            <p className="mt-3 text-gray-800">
+              <strong>Descripción:</strong> Sin descripción disponible.
+            </p>
+          )}
 
-    </section>
+          <div className="mt-5 flex justify-end">
+            <button
+              onClick={() => setSelectedOferta(null)}
+              className="bg-gray-600 text-white px-4 py-2 rounded hover:bg-gray-700 transition"
+            >
+              Cerrar
+            </button>
+          </div>
+        </motion.div>
+      </motion.div>
+    )}
+  </AnimatePresence>
+
+    </section >
   );
 }

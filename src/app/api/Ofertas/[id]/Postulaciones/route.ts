@@ -39,13 +39,16 @@ export async function GET(
       return {
         id_postulaciones: p.id_postulaciones,
         mensaje: p.mensaje,
+        creado_en : p.creado_en,
         estado: {
           id_postulacion_estados: p.postulacion_estados_id,
           nombre_estado: p.estado?.nombre_estado || "Desconocido",
         },
         usuario: {
           id_usuarios: p.usuarios_id,
+          foto_perfil: p.usuario.foto_perfil,
           nombre: p.usuario.nombre,
+          apellido: p.usuario.apellido,
           correo: p.usuario.correo,
           celular: p.usuario.celular,
           titulo: egresado?.titulo || "No especificado",

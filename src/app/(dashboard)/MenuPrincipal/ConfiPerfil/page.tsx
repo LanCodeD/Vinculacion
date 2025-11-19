@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import UploadFile from "@/components/Subir_documentos";
 import Image from "next/image";
+import toast from "react-hot-toast";
 
 interface UserProfile {
   id: number;
@@ -85,12 +86,12 @@ export default function Perfil() {
 
     const data = await res.json();
     if (data.ok) {
-      alert("Perfil actualizado correctamente");
+      toast("Perfil actualizado correctamente");
       setEditMode(false);
       setUser(data.user);
       setFormData(data.user);
     } else {
-      alert("Error al actualizar: " + data.error);
+      toast("Error al actualizar: " + data.error);
     }
   };
 

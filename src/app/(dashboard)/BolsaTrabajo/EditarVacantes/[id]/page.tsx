@@ -88,7 +88,7 @@ export default function EditarVacantePage() {
     if (!vacante) return;
 
     if (ingenierias.length === 0) {
-      alert("Selecciona al menos una ingeniería.");
+      toast("Selecciona al menos una ingeniería.");
       return;
     }
 
@@ -111,7 +111,7 @@ export default function EditarVacantePage() {
       if (uploadData.ok && uploadData.filename) {
         nuevaImagenUrl = `/api/Usuarios/archivos/Ofertas/${uploadData.filename}`;
       } else {
-        alert("Error al subir la imagen.");
+        toast("Error al subir la imagen.");
         setSaving(false);
         return;
       }

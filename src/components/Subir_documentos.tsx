@@ -1,6 +1,7 @@
 // src/components/Subir_documentos.tsx
 'use client';
 import { useState } from 'react';
+import toast from 'react-hot-toast';
 
 interface UploadProps {
   userId: number;
@@ -32,11 +33,11 @@ export default function UploadFile({ userId, tipo, idEgresado, onUploaded }: Upl
       if (data.ok && data.url && onUploaded) {
         onUploaded(data.url);
       } else {
-        alert("Error al subir archivo: " + data.error);
+        toast("Error al subir archivo: " + data.error);
       }
     } catch (err) {
       console.error(err);
-      alert("Error al subir archivo");
+      toast("Error al subir archivo");
     } finally {
       setLoading(false);
     }

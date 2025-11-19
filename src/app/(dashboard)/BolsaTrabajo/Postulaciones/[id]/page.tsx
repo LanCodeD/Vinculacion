@@ -4,17 +4,22 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { useSession } from "next-auth/react";
+import { toast } from "react-hot-toast";
+import { motion, AnimatePresence } from "framer-motion";
 
 interface Postulacion {
   id_postulaciones: number;
   mensaje: string;
+  creado_en: string;
   estado: {
     id_postulacion_estados: number;
     nombre_estado: string;
   };
   usuario: {
     id_usuarios: number;
+    foto_perfil: string;
     nombre: string;
+    apellido: string;
     correo: string;
     celular?: string;
     titulo?: string;
@@ -29,6 +34,9 @@ export default function PostulacionesPage() {
   const { data: session } = useSession();
   const [postulaciones, setPostulaciones] = useState<Postulacion[]>([]);
   const [loading, setLoading] = useState(true);
+  const [expandedId, setExpandedId] = useState<number | null>(null);
+  const [selectedPostulante, setSelectedPostulante] = useState<Postulacion | null>(null);
+
 
   useEffect(() => {
     if (!id) return;
@@ -40,60 +48,77 @@ export default function PostulacionesPage() {
       .finally(() => setLoading(false));
   }, [id]);
 
-  const handleCambioEstado = async (
-    postulacionId: number,
-    accion: "aprobar" | "rechazar"
-  ) => {
+  const toggleExpand = (id: number) => {
+    setExpandedId(expandedId === id ? null : id);
+  };
+
+  // -----------------------------
+  // FUNCION DE CONFIRMACIÓN CON TOAST
+  // -----------------------------
+  const confirmarCambioEstado = (postulacionId: number, accion: "aprobar" | "rechazar") => {
     if (!session?.user) {
-      alert("Debes iniciar sesión");
+      toast("Debes iniciar sesión");
       return;
     }
 
-    const confirmar = confirm(
-      `¿Seguro que quieres ${
-        accion === "aprobar" ? "aprobar ✅" : "rechazar ❌"
-      } esta postulación?`
-    );
-    if (!confirmar) return;
+    const accionTexto = accion === "aprobar" ? "aprobar" : "rechazar";
 
-    try {
-      setLoading(true);
+    toast((t) => (
+      <div className="flex flex-col gap-2">
+        <p className="font-semibold text-sm text-gray-800">
+          ¿Seguro que quieres {accionTexto} esta postulación?
+        </p>
+        <div className="flex gap-2 mt-2">
+          <button
+            onClick={async () => {
+              toast.dismiss(t.id); // Cierra el toast
+              const toastId = toast.loading("Procesando...");
 
-      const res = await fetch(
-        `/api/Postulaciones/${postulacionId}/estadoVacante`,
-        {
-          method: "PATCH",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            accion,
-            revisadoPorUsuarioId: session.user.id,
-          }),
-        }
-      );
+              try {
+                const res = await fetch(`/api/Postulaciones/${postulacionId}/estadoVacante`, {
+                  method: "PATCH",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({
+                    accion,
+                    revisadoPorUsuarioId: session.user.id,
+                  }),
+                });
 
-      const data = await res.json();
-      if (!data.ok)
-        throw new Error(data.error || "Error al actualizar el estado");
+                const data = await res.json();
+                if (!data.ok) throw new Error(data.error || "Error al actualizar el estado");
 
-      setPostulaciones((prev) =>
-        prev.map((p) =>
-          p.id_postulaciones === postulacionId
-            ? { ...p, estado: data.postulacion.estado }
-            : p
-        )
-      );
+                setPostulaciones((prev) =>
+                  prev.map((p) =>
+                    p.id_postulaciones === postulacionId
+                      ? { ...p, estado: data.postulacion.estado }
+                      : p
+                  )
+                );
 
-      alert("✅ Estado actualizado correctamente");
-    } catch (err: unknown) {
-      console.error("❌ Error:", err);
-      if (err instanceof Error) {
-        alert(`❌ ${err.message}`);
-      } else {
-        alert("❌ Error inesperado");
-      }
-    } finally {
-      setLoading(false);
-    }
+                toast.success(`Postulación ${accion === "aprobar" ? "aprobada" : "rechazada"}`, {
+                  id: toastId,
+                });
+              } catch (err) {
+                console.error(err);
+                toast.error("❌ Error al actualizar la postulación", { id: toastId });
+              }
+            }}
+            className={`px-3 py-1 text-white rounded ${accion === "aprobar"
+              ? "bg-green-500 hover:bg-green-600"
+              : "bg-red-500 hover:bg-red-600"
+              }`}
+          >
+            Sí
+          </button>
+          <button
+            onClick={() => toast.dismiss(t.id)}
+            className="bg-gray-300 hover:bg-gray-400 text-xs px-3 py-1 rounded"
+          >
+            Cancelar
+          </button>
+        </div>
+      </div>
+    ));
   };
 
   if (loading) return <p className="p-6">Cargando postulaciones...</p>;
@@ -104,63 +129,124 @@ export default function PostulacionesPage() {
     <section className="p-6">
       <h1 className="text-2xl font-bold mb-4">📋 Postulaciones</h1>
 
-      <div className="overflow-x-auto shadow rounded-lg">
-        <table className="min-w-full border border-gray-200 bg-white">
-          <thead className="bg-gray-100">
-            <tr className="text-left text-gray-700">
-              <th className="px-4 py-2 border">Nombre</th>
-              <th className="px-4 py-2 border">Correo</th>
-              <th className="px-4 py-2 border">Título</th>
-              <th className="px-4 py-2 border">Matrícula</th>
-              <th className="px-4 py-2 border">CV</th>
-              <th className="px-4 py-2 border">Estado</th>
-              <th className="px-4 py-2 border">Acciones</th>
-            </tr>
-          </thead>
-          <tbody>
-            {postulaciones.map((p) => (
-              <tr key={p.id_postulaciones} className="hover:bg-gray-50">
-                <td className="px-4 py-2 border">{p.usuario.nombre}</td>
-                <td className="px-4 py-2 border">{p.usuario.correo}</td>
-                <td className="px-4 py-2 border">{p.usuario.titulo}</td>
-                <td className="px-4 py-2 border">{p.usuario.matricula}</td>
-                <td className="px-4 py-2 border text-center">
-                  {p.usuario.cv_url ? (
-                    <a
-                      href={p.usuario.cv_url}
-                      target="_blank"
-                      className="text-indigo-600 underline"
+      <div className="space-y-4">
+        {postulaciones.map((p) => (
+          <motion.div
+            key={p.id_postulaciones}
+            layout
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="bg-white rounded-xl shadow p-4 cursor-pointer hover:shadow-lg transition"
+          >
+            {/* Resumen */}
+            <div className="flex justify-between items-center">
+              <div className="flex items-center gap-4">
+                {/* Foto de perfil en la card */}
+                {p.usuario.foto_perfil ? (
+                  <img
+                    src={p.usuario.foto_perfil}
+                    alt={p.usuario.nombre + " foto"}
+                    className="w-12 h-12 rounded-full object-cover"
+                  />
+                ) : (
+                  <div className="w-12 h-12 rounded-full bg-gray-200 flex items-center justify-center text-gray-500">
+                    ?
+                  </div>
+                )}
+
+                <div>
+                  <p className="text-gray-500 text-sm">{new Date(p.creado_en).toLocaleDateString()}</p>
+                  <h2 className="text-lg font-semibold">{p.usuario.nombre + " " + (p.usuario.apellido ?? "")}</h2>
+                  <p className="text-gray-600">{p.usuario.correo}</p>
+                </div>
+              </div>
+
+              <button
+                onClick={() => setSelectedPostulante(p)}
+                className="text-blue-600 font-medium hover:underline"
+              >
+                Ver detalles
+              </button>
+            </div>
+
+            {/* Modal de detalles */}
+            <AnimatePresence>
+              {selectedPostulante && selectedPostulante.id_postulaciones === p.id_postulaciones && (
+                <motion.div
+                  className="fixed inset-0 flex items-center justify-center z-50 backdrop-blur-md"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                >
+                  <motion.div
+                    className="bg-white p-6 rounded-2xl shadow-xl max-w-lg w-full border border-gray-200"
+                    initial={{ scale: 0.8, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    exit={{ scale: 0.8, opacity: 0 }}
+                    transition={{ duration: 0.25 }}
+                  >
+                    {/* Foto de perfil en el modal */}
+                    <div className="flex justify-center mb-4">
+                      {selectedPostulante.usuario.foto_perfil ? (
+                        <img
+                          src={selectedPostulante.usuario.foto_perfil}
+                          alt={selectedPostulante.usuario.nombre + " foto"}
+                          className="w-24 h-24 rounded-full object-cover border-2 border-gray-300"
+                        />
+                      ) : (
+                        <div className="w-24 h-24 rounded-full bg-gray-200 flex items-center justify-center text-gray-500 border-2 border-gray-300">
+                          ?
+                        </div>
+                      )}
+                    </div>
+
+                    <h2 className="text-2xl font-bold mb-2 text-center">
+                      {selectedPostulante.usuario.nombre + " " + (selectedPostulante.usuario.apellido ?? "")}
+                    </h2>
+                    <p><strong>Correo:</strong> {selectedPostulante.usuario.correo}</p>
+                    <p><strong>Título:</strong> {selectedPostulante.usuario.titulo}</p>
+                    <p><strong>Matrícula:</strong> {selectedPostulante.usuario.matricula}</p>
+                    <p>
+                      <strong>CV:</strong>{" "}
+                      {selectedPostulante.usuario.cv_url ? (
+                        <a href={selectedPostulante.usuario.cv_url} target="_blank" className="text-indigo-600 underline">
+                          Ver CV
+                        </a>
+                      ) : (
+                        <span className="text-gray-400">No disponible</span>
+                      )}
+                    </p>
+                    <p><strong>Estado:</strong> {selectedPostulante.estado.nombre_estado}</p>
+
+                    <div className="flex gap-2 mt-4">
+                      <button
+                        onClick={() => confirmarCambioEstado(selectedPostulante.id_postulaciones, "aprobar")}
+                        className="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600"
+                      >
+                        Aprobar
+                      </button>
+                      <button
+                        onClick={() => confirmarCambioEstado(selectedPostulante.id_postulaciones, "rechazar")}
+                        className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"
+                      >
+                        Rechazar
+                      </button>
+                    </div>
+
+                    <button
+                      onClick={() => setSelectedPostulante(null)}
+                      className="mt-4 bg-gray-600 text-white px-4 py-2 rounded hover:bg-gray-700 w-full"
                     >
-                      Ver CV
-                    </a>
-                  ) : (
-                    <span className="text-gray-400">No disponible</span>
-                  )}
-                </td>
-                <td className="px-4 py-2 border">{p.estado.nombre_estado}</td>
-                <td className="px-4 py-2 border text-center space-x-2">
-                  <button
-                    onClick={() =>
-                      handleCambioEstado(p.id_postulaciones, "aprobar")
-                    }
-                    className="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600"
-                  >
-                    Aprobar
-                  </button>
-                  <button
-                    onClick={() =>
-                      handleCambioEstado(p.id_postulaciones, "rechazar")
-                    }
-                    className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"
-                  >
-                    Rechazar
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+                      Cerrar
+                    </button>
+                  </motion.div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </motion.div>
+        ))}
+    </div>
     </section>
   );
 }
