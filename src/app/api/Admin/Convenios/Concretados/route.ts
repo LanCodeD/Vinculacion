@@ -7,7 +7,6 @@ import fs from "fs/promises";
 import path from "path";
 
 // 📌 Obtener todos los convenios concretados
-// 📌 Obtener todos los convenios concretados
 export async function GET() {
   try {
     const convenios = await prisma.convenio_concretado.findMany({
@@ -19,9 +18,16 @@ export async function GET() {
         vigencia: true,
         fecha_expira: true,
         unidad_vigencia: true,
-        estado_dinamico: true, // 👈 ya lo traemos directamente desde la BD
+        estado_dinamico: true,
         created_at: true,
         updated_at: true,
+        eficiencia: true,
+        meta: {
+          select: {
+            id_metas_convenios: true,
+            nombre: true,
+          },
+        },
         solicitud: {
           select: {
             id_solicitud: true,
@@ -31,6 +37,17 @@ export async function GET() {
             solicitud_firmas_origen: {
               select: {
                 firma: { select: { nombre: true } },
+              },
+            },
+            detalle: {
+              select: {
+                alcance: true,
+                dependencia_nombre: true,
+                dependencia_responsable_nombre: true,
+                descripcion_empresa: true,
+                fecha_conclusion_proyecto: true,
+                fecha_inicio_proyecto: true,
+                dependencia_domicilio_legal: true,
               },
             },
           },
@@ -81,7 +98,9 @@ async function fileExists(ruta: string): Promise<boolean> {
 type EstadoConvenio = "ACTIVO" | "PRÓXIMO A VENCER" | "VENCIDO" | "SIN FECHA";
 
 // 🔹 Función auxiliar igual que en tu cron job
-function obtenerEstadoDinamico(fechaExpira: Date | string | null): EstadoConvenio {
+function obtenerEstadoDinamico(
+  fechaExpira: Date | string | null
+): EstadoConvenio {
   if (!fechaExpira) return "SIN FECHA";
 
   const hoy = new Date();
@@ -112,8 +131,16 @@ export async function POST(req: NextRequest) {
     const vigencia = formData.get("vigencia") as string;
     const unidad_vigencia = formData.get("unidad_vigencia") as string;
     const archivo = formData.get("documento") as File | null;
+    const id_metas_convenios = Number(formData.get("id_metas_convenios"));
+    const eficiencia = Number(formData.get("eficiencia"));
 
-    if (!id_solicitud || !fecha_firmada || !vigencia || !unidad_vigencia) {
+    if (
+      !id_solicitud ||
+      !fecha_firmada ||
+      !vigencia ||
+      !unidad_vigencia ||
+      !id_metas_convenios
+    ) {
       return NextResponse.json(
         { error: "Faltan campos obligatorios" },
         { status: 400 }
@@ -209,7 +236,9 @@ export async function POST(req: NextRequest) {
           unidad_vigencia,
           fecha_expira,
           documento_ruta,
-          estado_dinamico, // 🟢 Nuevo campo agregado
+          estado_dinamico,
+          id_metas_convenios, // 👈 nuevo campo obligatorio
+          eficiencia, // 👈 nuevo campo opcional/int
         },
       });
 
@@ -232,6 +261,13 @@ export async function POST(req: NextRequest) {
           estado_dinamico: true,
           created_at: true,
           updated_at: true,
+          eficiencia: true,
+          meta: {
+            select: {
+              id_metas_convenios: true,
+              nombre: true,
+            },
+          },
           solicitud: {
             select: {
               id_solicitud: true,
@@ -256,3 +292,138 @@ export async function POST(req: NextRequest) {
   }
 }
 
+export async function PUT(req: NextRequest) {
+  try {
+    const usuario = await getSessionUser();
+
+    // 🔐 Validar permisos
+    if (!usuario || usuario.role !== "Administrador") {
+      return NextResponse.json({ error: "No autorizado" }, { status: 403 });
+    }
+
+    const formData = await req.formData();
+
+    const id_convenio_concretado = Number(
+      formData.get("id_convenio_concretado")
+    );
+    const fecha_firmada = formData.get("fecha_firmada") as string;
+    const vigencia = formData.get("vigencia") as string;
+    const unidad_vigencia = formData.get("unidad_vigencia") as string;
+    const archivo = formData.get("documento") as File | null;
+    const id_metas_convenios = Number(formData.get("id_metas_convenios"));
+    const eficiencia = Number(formData.get("eficiencia"));
+
+    if (
+      !id_convenio_concretado ||
+      !fecha_firmada ||
+      !vigencia ||
+      !unidad_vigencia ||
+      !id_metas_convenios
+    ) {
+      return NextResponse.json(
+        { error: "Faltan campos obligatorios" },
+        { status: 400 }
+      );
+    }
+
+    // 📦 Guardar archivo (si existe)
+    let documento_ruta: string | null = null;
+    if (archivo) {
+      const bytes = await archivo.arrayBuffer();
+      const buffer = Buffer.from(bytes);
+
+      const carpetaDestino = path.join(
+        process.cwd(),
+        "uploads",
+        "Subir_documentos",
+        "convenios_concretados"
+      );
+      await fs.mkdir(carpetaDestino, { recursive: true });
+
+      const nombreOriginal = archivo.name;
+      const extension = path.extname(nombreOriginal);
+      const base = path.basename(nombreOriginal, extension);
+
+      let nombreFinal = nombreOriginal;
+      let ruta = path.join(carpetaDestino, nombreFinal);
+      let contador = 1;
+
+      while (await fileExists(ruta)) {
+        nombreFinal = `${base}_${contador}${extension}`;
+        ruta = path.join(carpetaDestino, nombreFinal);
+        contador++;
+      }
+
+      await writeFile(ruta, buffer);
+      documento_ruta = `/api/Admin/archivos/Subir_documentos/convenios_concretados/${nombreFinal}`;
+    }
+
+    // 🧮 Calcular fecha de expiración
+    const cantidad = parseInt(vigencia);
+    let fecha_expira: Date | null = null;
+    if (!isNaN(cantidad)) {
+      const fecha = new Date(fecha_firmada);
+      switch (unidad_vigencia.toLowerCase()) {
+        case "año":
+        case "años":
+          fecha.setFullYear(fecha.getFullYear() + cantidad);
+          break;
+        case "mes":
+        case "meses":
+          fecha.setMonth(fecha.getMonth() + cantidad);
+          break;
+        case "día":
+        case "días":
+          fecha.setDate(fecha.getDate() + cantidad);
+          break;
+      }
+      fecha_expira = fecha;
+    }
+
+    const estado_dinamico = obtenerEstadoDinamico(fecha_expira);
+
+    // 🔄 Actualizar convenio
+    const convenioActualizado = await prisma.convenio_concretado.update({
+      where: { id_convenio_concretado },
+      data: {
+        fecha_firmada: new Date(fecha_firmada),
+        vigencia,
+        unidad_vigencia,
+        fecha_expira,
+        documento_ruta: documento_ruta ?? undefined, // solo si se sube nuevo archivo
+        estado_dinamico,
+        id_metas_convenios,
+        eficiencia,
+      },
+      select: {
+        id_convenio_concretado: true,
+        documento_ruta: true,
+        fecha_firmada: true,
+        vigencia: true,
+        unidad_vigencia: true,
+        fecha_expira: true,
+        estado_dinamico: true,
+        created_at: true,
+        updated_at: true,
+        eficiencia: true,
+        meta: { select: { id_metas_convenios: true, nombre: true } },
+        solicitud: {
+          select: {
+            id_solicitud: true,
+            tipo: { select: { nombre_tipo: true } },
+            creador: { select: { nombre: true, correo: true } },
+            estado: { select: { nombre_estado: true } },
+            solicitud_firmas_origen: {
+              select: { firma: { select: { nombre: true } } },
+            },
+          },
+        },
+      },
+    });
+
+    return NextResponse.json(convenioActualizado, { status: 200 });
+  } catch (error) {
+    console.error("Error al actualizar convenio concretado:", error);
+    return NextResponse.json({ error: "Error interno" }, { status: 500 });
+  }
+}

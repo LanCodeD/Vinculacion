@@ -550,5 +550,18 @@ model convenio_concretado {
   updated_at             DateTime            @default(now()) @db.DateTime(0)
   unidad_vigencia        String?             @db.VarChar(50)
   estado_dinamico        String?             @db.VarChar(50)
+  eficiencia             Int?               
+  id_metas_convenios     Int
   solicitud              solicitud_convenios @relation(fields: [id_solicitud], references: [id_solicitud])
+
+  meta metas_convenios @relation(fields: [id_metas_convenios], references: [id_metas_convenios])
+}
+
+model metas_convenios {
+  id_metas_convenios Int      @id @default(autoincrement())
+  nombre             String   @db.VarChar(150)
+  descripcion        String?  @db.Text
+  created_at         DateTime @default(now()) @db.DateTime(0)
+
+  convenios convenio_concretado[] // 🔹 inversa: una meta puede tener muchos convenios
 }

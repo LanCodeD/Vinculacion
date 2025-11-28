@@ -7,6 +7,7 @@ import { prisma } from "@/lib/prisma";
 import type { Account } from "next-auth";
 import type { AdapterUser } from "next-auth/adapters";
 import type { Profile } from "next-auth";
+import type { JWT } from "next-auth/jwt";
 
 // 🧩 Validación de entorno
 if (!process.env.NEXTAUTH_SECRET) {
@@ -91,7 +92,21 @@ export const authOptions: NextAuthOptions = {
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID!,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
-      allowDangerousEmailAccountLinking: true,
+
+      profile(profile) {
+        return {
+          id: profile.sub, // NextAuth requiere "id"
+          idGoogle: profile.sub, // <-- nuestro idGoogle correcto
+          nombre: profile.given_name,
+          apellido: profile.family_name,
+          email: profile.email,
+          correo: profile.email, // por compatibilidad con tu BD
+          image: profile.picture,
+
+          tipoCuentaId: null, // requerido por tu interfaz User
+          roles_id: null, // requerido por tu interfaz User
+        };
+      },
     }),
   ],
 
@@ -102,7 +117,7 @@ export const authOptions: NextAuthOptions = {
   },
 
   callbacks: {
-    // dentro de authOptions.callbacks
+    // signIn: mantenemos la firma que NextAuth espera
     async signIn({
       user,
       account,
@@ -113,17 +128,54 @@ export const authOptions: NextAuthOptions = {
       email?: { verificationRequest?: boolean };
       credentials?: Record<string, unknown>;
     }) {
-      if (account?.provider === "google") {
-        const correo = user?.email ?? "";
+      // tipito local para tratar account con propiedades extras (Google)
+      type MaybeGoogleAccount = Account & {
+        provider?: string;
+        providerAccountId?: string;
+        callbackUrl?: string;
+        state?: string;
+        params?: Record<string, string>;
+      };
+
+      const googleAccount = account as MaybeGoogleAccount | null;
+
+      if (googleAccount?.provider === "google") {
+        const correo = (user as any)?.email ?? (user as any)?.correo ?? "";
         if (!correo) {
           return "/IniciarSesion?error=No se pudo obtener el correo de Google.";
         }
 
+        // Buscar usuario por correo
         const usuarioDB = await prisma.usuarios.findUnique({
           where: { correo },
         });
 
         if (usuarioDB) {
+          // intentar sincronizar providerAccountId si hace falta (no rompe flujo on error)
+          try {
+            const providerId = googleAccount.providerAccountId;
+            if (providerId) {
+              const hasProviderAccount = await prisma.accounts.findFirst({
+                where: { provider: "google", providerAccountId: providerId },
+              });
+
+              if (!hasProviderAccount) {
+                // actualizar posibles legacy accounts que guardaban correo en providerAccountId
+                await prisma.accounts.updateMany({
+                  where: {
+                    usuarios_id: usuarioDB.id_usuarios,
+                    provider: "google",
+                    providerAccountId: { contains: "@" }, // heurístico
+                  },
+                  data: { providerAccountId: providerId },
+                });
+              }
+            }
+          } catch (syncErr) {
+            console.warn("Error sincronizando providerAccountId:", syncErr);
+          }
+
+          // Validaciones por tipo de cuenta (egresado / empresa)
           if (usuarioDB.tipos_cuenta_id === 2) {
             const egresado = await prisma.egresados.findFirst({
               where: { usuarios_id: usuarioDB.id_usuarios },
@@ -150,68 +202,77 @@ export const authOptions: NextAuthOptions = {
             }
           }
 
+          // usuario existe y pasó validaciones → permitir
           return true;
         }
 
-        // Si no existe en BD → permitir registro
+        // usuario NO existe → permitir para que el frontend complete registro
         return true;
       }
 
+      // provider distinto de Google -> permitir (o añade lógica para Credentials si quieres)
       return true;
     },
 
-    async jwt({ token, user, account }) {
+    // jwt: construir token con idGoogle (string) de manera segura
+    async jwt({ token, user }) {
       if (process.env.NODE_ENV === "development") {
         console.log("[jwt] usuario:", user);
-        console.log("[jwt] cuenta:", account);
         console.log("🟠 [jwt] before merge:", token);
       }
 
-      if (account?.provider === "google") {
-        token.idGoogle = account.providerAccountId;
+      // 1. Si el provider trae idGoogle desde profile(), usarlo SIEMPRE
+      if (user?.idGoogle) {
+        token.idGoogle = String(user.idGoogle);
       }
 
+      // 2. Si no, intentar sacarlo de user.id (adapter) y forzar a string
+      if (!token.idGoogle && user?.id != null) {
+        token.idGoogle = String(user.id);
+      }
+
+      // 3. Merge con datos de BD
       if (user) {
-        // 🧩 Obtener correo según el tipo de provider
-        const correoUsuario = user.email ?? user.correo;
+        const correoUsuario = user.email ?? (user as any).correo;
 
-        if (!correoUsuario) {
-          console.warn("⚠️ No se encontró correo en user:", user);
-          return token;
-        }
+        if (correoUsuario) {
+          try {
+            const usuario = await prisma.usuarios.findUnique({
+              where: { correo: correoUsuario },
+            });
 
-        const usuario = await prisma.usuarios.findUnique({
-          where: { correo: correoUsuario },
-        });
-
-        if (usuario) {
-          token.id = usuario.id_usuarios;
-          token.nombre = usuario.nombre;
-          token.correo = usuario.correo;
-          token.tipoCuentaId = usuario.tipos_cuenta_id;
-          token.roles_id = usuario.roles_id;
-          token.role = ROLE_MAP[usuario.roles_id] ?? "Usuario";
-        }
-
-        if (process.env.NODE_ENV === "development") {
-          console.log("Usuario logueado:", token.nombre ?? "Desconocido");
-          console.log("Correo logueado:", token.correo ?? "Desconocido");
-          console.log("Rol logueado:", token.roles_id ?? "N/A");
+            if (usuario) {
+              token.id = usuario.id_usuarios;
+              token.nombre = usuario.nombre;
+              token.correo = usuario.correo;
+              token.tipoCuentaId = usuario.tipos_cuenta_id;
+              token.roles_id = usuario.roles_id;
+              token.role = ROLE_MAP[usuario.roles_id] ?? "Usuario";
+            }
+            if (process.env.NODE_ENV === "development") {
+              console.log("Usuario logueado:", token.nombre ?? "Desconocido");
+              console.log("Correo logueado:", token.correo ?? "Desconocido");
+              console.log("Rol logueado:", token.roles_id ?? "N/A");
+            }
+          } catch (err) {
+            console.warn("Error consultando usuario en jwt callback:", err);
+          }
         }
       }
 
       return token;
     },
 
-    async session({ session, token }) {
+    // session: exponer idGoogle (string|null) en session.user.idGoogle
+    async session({ session, token }: { session: any; token: JWT }) {
       if (session.user) {
         session.user.id = token.id;
         session.user.nombre = token.nombre;
         session.user.correo = token.correo;
         session.user.tipoCuentaId = token.tipoCuentaId;
-        session.user.roles_id = token.roles_id!;
+        session.user.roles_id = token.roles_id ?? null;
         session.user.role = token.role as AppRole;
-        session.user.idGoogle = token.idGoogle;
+        session.user.idGoogle = token.idGoogle ?? null; // ya forzado a string arriba
       }
       return session;
     },

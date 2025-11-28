@@ -4,7 +4,10 @@ import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import ModalConfirmacion from "@/components/ModalConfirmacionAdmin";
 import axios from "axios";
+import { FaEye, FaEdit, FaTrash, FaSearch } from "react-icons/fa";
 import ModalConvenioConcretado from "@/components/ModalConvenioConcretado";
+import ModalEditarConvenioConcretado from "@/components/ModalConvenioConcretadoEditar";
+import ModalVerConvenioConcretado from "@/components/ModalConvenioConcretadoVer";
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
 dayjs.extend(utc);
@@ -23,12 +26,26 @@ interface ConvenioConcretado {
   updated_at: string;
   estado_dinamico: EstadoConvenio; // 👈 tipado fuerte, sin usar string suelto
   color_estado: string;
+  eficiencia: number;
+  meta: {
+    id_metas_convenios: number;
+    nombre: string;
+  };
   solicitud: {
     id_solicitud: number;
     tipo?: { nombre_tipo: string };
     creador?: { nombre: string; correo: string };
     estado?: { nombre_estado: string };
     solicitud_firmas_origen?: { firma?: { nombre: string } }[];
+    detalle: {
+      alcance: string;
+      dependencia_nombre: string;
+      dependencia_responsable_nombre: string;
+      descripcion_empresa: string;
+      fecha_conclusion_proyecto: string;
+      fecha_inicio_proyecto: string;
+      dependencia_domicilio_legal: string;
+    };
   };
 }
 
@@ -42,6 +59,18 @@ export default function AdminConveniosConcretados() {
   const [modalCrear, setModalCrear] = useState(false);
   const [creando, setCreando] = useState(false);
   const [solicitudesFinalizadas, setSolicitudesFinalizadas] = useState([]);
+  const [Metas, setMetas] = useState([]);
+  const [modalEditar, setModalEditar] = useState<{
+    abierto: boolean;
+    convenio?: ConvenioConcretado;
+  }>({ abierto: false });
+  const [modalVer, setModalVer] = useState<{
+    abierto: boolean;
+    convenio?: ConvenioConcretado;
+  }>({ abierto: false });
+  const [busqueda, setBusqueda] = useState("");
+  const [paginaActual, setPaginaActual] = useState(1);
+  const conveniosPorPagina = 10;
 
   const obtenerConvenios = async () => {
     try {
@@ -69,13 +98,41 @@ export default function AdminConveniosConcretados() {
     }
   };
 
+  const metasCarga = async () => {
+    try {
+      const { data } = await axios.get(
+        "/api/Admin/Convenios/Concretados/Metas"
+      );
+      setMetas(data);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setCargando(false);
+    }
+  };
+
   useEffect(() => {
     obtenerConvenios();
     cargar();
+    metasCarga();
   }, []);
 
   const confirmarEliminar = async () => {
-    toast("Aquí luego se implementa la eliminación real");
+    if (!modalEliminar.id) return;
+    try {
+      await axios.delete(
+        `/api/Admin/Convenios/Concretados/${modalEliminar.id}`
+      );
+      toast.success(
+        "Convenio eliminado correctamente y solicitud regresada a finalizada"
+      );
+      await obtenerConvenios(); // recarga
+    } catch (error) {
+      console.error(error);
+      toast.error("Error al eliminar convenio");
+    } finally {
+      setModalEliminar({ abierto: false });
+    }
   };
 
   const crearConvenio = async (formData: FormData) => {
@@ -94,6 +151,40 @@ export default function AdminConveniosConcretados() {
       setCreando(false);
     }
   };
+
+  const actualizarConvenio = async (formData: FormData) => {
+    try {
+      setCreando(true);
+      await axios.put("/api/Admin/Convenios/Concretados", formData);
+      toast.success("Convenio actualizado correctamente 🎉");
+      await obtenerConvenios();
+      setModalEditar({ abierto: false });
+    } catch (error) {
+      console.error(error);
+      toast.error("Error al actualizar convenio");
+    } finally {
+      setCreando(false);
+    }
+  };
+
+  const conveniosFiltrados = convenios.filter((c) => {
+    const texto = busqueda.toLowerCase();
+    return (
+      c.solicitud?.creador?.nombre?.toLowerCase().includes(texto) ||
+      c.solicitud?.creador?.correo?.toLowerCase().includes(texto) ||
+      c.solicitud?.tipo?.nombre_tipo?.toLowerCase().includes(texto) ||
+      c.meta?.nombre?.toLowerCase().includes(texto)
+    );
+  });
+
+  const totalPaginas = Math.ceil(
+    conveniosFiltrados.length / conveniosPorPagina
+  );
+  const indiceInicio = (paginaActual - 1) * conveniosPorPagina;
+  const conveniosPaginados = conveniosFiltrados.slice(
+    indiceInicio,
+    indiceInicio + conveniosPorPagina
+  );
 
   if (cargando)
     return (
@@ -115,6 +206,23 @@ export default function AdminConveniosConcretados() {
           + Agregar Convenio
         </button>
       </div>
+      <div className="mb-6 flex items-center justify-between">
+        <div className="relative w-full max-w-md">
+          <input
+            type="text"
+            value={busqueda}
+            onChange={(e) => {
+              setBusqueda(e.target.value);
+              setPaginaActual(1);
+            }}
+            placeholder="Buscar por solicitante, tipo o meta..."
+            className="w-full pl-10 pr-4 py-2 rounded-lg border border-gray-300 shadow-sm focus:outline-none focus:ring-2 focus:ring-[#011848] focus:border-[#011848] text-sm"
+          />
+          <span className="absolute left-3 top-2.5 text-gray-400">
+            <FaSearch size={14} />
+          </span>
+        </div>
+      </div>
 
       <div className="overflow-x-auto bg-white shadow-lg rounded-lg">
         <table className="min-w-full text-sm border-collapse">
@@ -129,11 +237,12 @@ export default function AdminConveniosConcretados() {
               <th className="px-4 py-2 text-left">Unidad Vigencia</th>
               <th className="px-4 py-2 text-left">Fecha Expira</th>
               <th className="px-4 py-2 text-left">Estado</th>
+              <th className="px-4 py-2 text-left">Acción</th>
             </tr>
           </thead>
 
           <tbody>
-            {convenios.map((c) => (
+            {conveniosPaginados.map((c) => (
               <tr
                 key={c.id_convenio_concretado}
                 className="border-b hover:bg-gray-50 transition"
@@ -202,16 +311,90 @@ export default function AdminConveniosConcretados() {
                     ({c.solicitud?.estado?.nombre_estado ?? "—"})
                   </div>
                 </td>
+
+                <td className="px-4 py-2">
+                  <div className="flex items-center justify-center gap-3 h-full">
+                    <button
+                      onClick={() =>
+                        setModalVer({ abierto: true, convenio: c })
+                      }
+                      className="text-blue-600 hover:text-blue-800 transition"
+                      title="Ver"
+                    >
+                      <FaEye size={18} />
+                    </button>
+
+                    <button
+                      onClick={() =>
+                        setModalEditar({ abierto: true, convenio: c })
+                      }
+                      className="text-yellow-600 hover:text-yellow-800 transition"
+                      title="Editar"
+                    >
+                      <FaEdit size={18} />
+                    </button>
+
+                    <button
+                      onClick={() =>
+                        setModalEliminar({
+                          abierto: true,
+                          id: c.id_convenio_concretado,
+                        })
+                      }
+                      className="text-red-600 hover:text-red-800 transition"
+                      title="Eliminar"
+                    >
+                      <FaTrash size={18} />
+                    </button>
+                  </div>
+                </td>
               </tr>
             ))}
           </tbody>
         </table>
       </div>
+      <div className="flex justify-center items-center gap-2 mt-8">
+        <button
+          onClick={() => setPaginaActual((prev) => Math.max(prev - 1, 1))}
+          disabled={paginaActual === 1}
+          className="px-3 py-2 rounded-lg bg-[#011848] text-white hover:bg-[#022063] disabled:bg-gray-300 disabled:text-gray-500 transition"
+        >
+          ←
+        </button>
+
+        {[...Array(totalPaginas)].map((_, i) => {
+          const page = i + 1;
+          const activo = paginaActual === page;
+          return (
+            <button
+              key={page}
+              onClick={() => setPaginaActual(page)}
+              className={`px-3 py-2 rounded-lg text-sm font-medium transition ${
+                activo
+                  ? "bg-[#53b431] text-white"
+                  : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+              }`}
+            >
+              {page}
+            </button>
+          );
+        })}
+
+        <button
+          onClick={() =>
+            setPaginaActual((prev) => Math.min(prev + 1, totalPaginas))
+          }
+          disabled={paginaActual === totalPaginas}
+          className="px-3 py-2 rounded-lg bg-[#011848] text-white hover:bg-[#022063] disabled:bg-gray-300 disabled:text-gray-500 transition"
+        >
+          →
+        </button>
+      </div>
 
       <ModalConfirmacion
         abierto={modalEliminar.abierto}
         titulo="Eliminar convenio concretado"
-        mensaje="¿Estás seguro de eliminar este convenio? Esta acción no se puede deshacer."
+        mensaje="¿Estás seguro de eliminar este convenio concretado? Esta acción no se puede deshacer."
         tipo="eliminar"
         onConfirmar={confirmarEliminar}
         onCancelar={() => setModalEliminar({ abierto: false })}
@@ -224,6 +407,22 @@ export default function AdminConveniosConcretados() {
         onCrear={crearConvenio}
         cargando={creando}
         solicitudesFinalizadas={solicitudesFinalizadas}
+        metasConvenios={Metas}
+      />
+
+      <ModalEditarConvenioConcretado
+        abierto={modalEditar.abierto}
+        onCerrar={() => setModalEditar({ abierto: false })}
+        convenio={modalEditar.convenio ?? null}
+        metasConvenios={Metas}
+        onActualizar={actualizarConvenio}
+        cargando={creando}
+      />
+
+      <ModalVerConvenioConcretado
+        abierto={modalVer.abierto}
+        onCerrar={() => setModalVer({ abierto: false })}
+        convenio={modalVer.convenio ?? null}
       />
     </div>
   );
