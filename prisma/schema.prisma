@@ -99,7 +99,7 @@ model notificaciones {
   titulo            String?    @db.VarChar(250)
   mensaje           String?    @db.Text
   metadata          Json?
-  leido             Int        @default(0) @db.TinyInt
+  leido             Boolean    @default(false)
   creado_en         DateTime   @default(now()) @db.DateTime(0)
   contactos         contactos? @relation(fields: [contactos_id], references: [id_contactos], map: "fk_notifications_contacto")
   usuarios          usuarios?  @relation(fields: [usuarios_id], references: [id_usuarios], onDelete: Cascade, map: "fk_notifications_usuario")

@@ -34,24 +34,21 @@ export default function PostulacionesPage() {
   const { data: session } = useSession();
   const [postulaciones, setPostulaciones] = useState<Postulacion[]>([]);
   const [loading, setLoading] = useState(true);
-  const [expandedId, setExpandedId] = useState<number | null>(null);
   const [selectedPostulante, setSelectedPostulante] = useState<Postulacion | null>(null);
+  const [motivoRechazoTemp, setMotivoRechazoTemp] = useState("");
 
 
   useEffect(() => {
     if (!id) return;
+    if (session === undefined) return; // ⏳ esperar a que session cargue
+
     fetch(`/api/Ofertas/${id}/Postulaciones`)
       .then((res) => res.json())
       .then((data) => {
         if (data.ok) setPostulaciones(data.postulaciones);
       })
       .finally(() => setLoading(false));
-  }, [id]);
-
-  const toggleExpand = (id: number) => {
-    setExpandedId(expandedId === id ? null : id);
-  };
-
+  }, [id, session]);
   // -----------------------------
   // FUNCION DE CONFIRMACIÓN CON TOAST
   // -----------------------------
@@ -68,10 +65,20 @@ export default function PostulacionesPage() {
         <p className="font-semibold text-sm text-gray-800">
           ¿Seguro que quieres {accionTexto} esta postulación?
         </p>
+
+        {accion === "rechazar" && (
+          <textarea
+            placeholder="Escribe el motivo del rechazo"
+            className="border rounded p-2 w-full text-sm"
+            value={motivoRechazoTemp}
+            onChange={(e) => setMotivoRechazoTemp(e.target.value)}
+          />
+        )}
+
         <div className="flex gap-2 mt-2">
           <button
             onClick={async () => {
-              toast.dismiss(t.id); // Cierra el toast
+              toast.dismiss(t.id);
               const toastId = toast.loading("Procesando...");
 
               try {
@@ -81,23 +88,46 @@ export default function PostulacionesPage() {
                   body: JSON.stringify({
                     accion,
                     revisadoPorUsuarioId: session.user.id,
+                    mensaje: accion === "rechazar" ? motivoRechazoTemp : undefined,
                   }),
                 });
 
                 const data = await res.json();
                 if (!data.ok) throw new Error(data.error || "Error al actualizar el estado");
 
+                // limpiar el textarea para la próxima vez
+                setMotivoRechazoTemp("");
+
+                // actualizar lista
                 setPostulaciones((prev) =>
                   prev.map((p) =>
                     p.id_postulaciones === postulacionId
-                      ? { ...p, estado: data.postulacion.estado }
+                      ? {
+                        ...p,
+                        estado: data.postulacion.estado,
+                        mensaje: data.postulacion.mensaje ?? p.mensaje,
+                      }
                       : p
                   )
                 );
 
-                toast.success(`Postulación ${accion === "aprobar" ? "aprobada" : "rechazada"}`, {
-                  id: toastId,
-                });
+                // actualizar modal
+                if (selectedPostulante?.id_postulaciones === postulacionId) {
+                  setSelectedPostulante((prev) =>
+                    prev
+                      ? {
+                        ...prev,
+                        estado: data.postulacion.estado,
+                        mensaje: data.postulacion.mensaje ?? prev.mensaje,
+                      }
+                      : null
+                  );
+                }
+
+                toast.success(
+                  `Postulación ${accion === "aprobar" ? "aprobada" : "rechazada"}`,
+                  { id: toastId }
+                );
               } catch (err) {
                 console.error(err);
                 toast.error("❌ Error al actualizar la postulación", { id: toastId });
@@ -110,6 +140,7 @@ export default function PostulacionesPage() {
           >
             Sí
           </button>
+
           <button
             onClick={() => toast.dismiss(t.id)}
             className="bg-gray-300 hover:bg-gray-400 text-xs px-3 py-1 rounded"
@@ -246,7 +277,7 @@ export default function PostulacionesPage() {
             </AnimatePresence>
           </motion.div>
         ))}
-    </div>
+      </div>
     </section>
   );
 }

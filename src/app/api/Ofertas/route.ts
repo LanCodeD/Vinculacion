@@ -5,7 +5,8 @@ import { authOptions } from "@/app/api/auth/[...nextauth]/authOptions";
 import { prisma } from "@/lib/prisma";
 import { ROLE_MAP, AppRole } from "@/types/roles";
 import { enviarCorreo } from "@/lib/mailer";
-import { plantillaNuevaVacante } from "@/lib/nuevaVacante";
+import { plantillaNuevaVacante } from "@/lib/PlantillasCorreos/nuevaVacante";
+import { getFechaLocalSinHora } from "@/lib/fechaLocal";
 
 export async function GET() {
   try {
@@ -16,38 +17,84 @@ export async function GET() {
         { status: 401 }
       );
     }
-    // Buscar la empresa asociada al usuario
-    const empresa = await prisma.empresas.findFirst({
-      where: { usuarios_id: session.user.id },
-    });
 
-    if (!empresa) {
-      return NextResponse.json(
-        { ok: false, error: "Empresa no encontrada" },
-        { status: 404 }
-      );
+    const role = session.user.roles_id;
+
+    // -------------------------------------------------------------------
+    // 🟦 SI ES ADMIN (rol 4): traer TODAS las vacantes del sistema
+    // -------------------------------------------------------------------
+    if (role === 4) {
+      console.log("👑 Admin detectado → cargando TODAS las vacantes");
+
+      const vacantes = await prisma.ofertas.findMany({
+        select: {
+          id_ofertas: true,
+          titulo: true,
+          puesto: true,
+          descripcion_general: true,
+          requisitos: true,
+          horario: true,
+          modalidad: true,
+          imagen: true,
+          oferta_estados_id: true,
+          fecha_publicacion: true,
+          fecha_cierre: true,
+          empresas: { select: { nombre_comercial: true } },
+           _count: { select: { postulaciones: true } }
+        },
+        orderBy: { fecha_publicacion: "desc" },
+      });
+
+      return NextResponse.json({ ok: true, vacantes });
     }
 
-    // Obtener las vacantes creadas por esta empresa
-    const vacantes = await prisma.ofertas.findMany({
-      where: { empresas_id: empresa.id_empresas },
-      select: {
-        id_ofertas: true,
-        titulo: true,
-        puesto: true,
-        descripcion_general: true,
-        requisitos: true,
-        horario: true,
-        modalidad: true,
-        imagen: true,
-        oferta_estados_id: true,
-        fecha_publicacion: true,
-        fecha_cierre: true,  // ✅ Agregado
-      },
-      orderBy: { fecha_publicacion: "desc" },
-    });
+    // -------------------------------------------------------------------
+    // 🟩 SI ES EMPRESA (rol 3): solo traer sus vacantes
+    // -------------------------------------------------------------------
+    if (role === 3) {
+      console.log("🏢 Empresa detectada → cargando vacantes propias");
 
-    return NextResponse.json({ ok: true, vacantes });
+      const empresa = await prisma.empresas.findFirst({
+        where: { usuarios_id: session.user.id },
+      });
+
+      if (!empresa) {
+        return NextResponse.json(
+          { ok: false, error: "Empresa no encontrada" },
+          { status: 404 }
+        );
+      }
+
+      const vacantes = await prisma.ofertas.findMany({
+        where: { empresas_id: empresa.id_empresas },
+        select: {
+          id_ofertas: true,
+          titulo: true,
+          puesto: true,
+          descripcion_general: true,
+          requisitos: true,
+          horario: true,
+          modalidad: true,
+          imagen: true,
+          oferta_estados_id: true,
+          fecha_publicacion: true,
+          fecha_cierre: true,
+          _count: { select: { postulaciones: true } }
+        },
+        orderBy: { fecha_publicacion: "desc" },
+      });
+
+      return NextResponse.json({ ok: true, vacantes });
+    }
+
+    // -------------------------------------------------------------------
+    // 🚫 Otros roles (egresado, visitante)
+    // -------------------------------------------------------------------
+    return NextResponse.json(
+      { ok: false, error: "Rol no autorizado" },
+      { status: 403 }
+    );
+
   } catch (error) {
     console.error("Error en GET /api/Ofertas:", error);
     return NextResponse.json(
@@ -126,10 +173,10 @@ export async function POST(req: Request) {
         puesto,
         ubicacion,
         imagen,
-        fecha_cierre: new Date(fecha_cierre),
+        fecha_cierre: getFechaLocalSinHora(fecha_cierre),
         empresas_id: empresa.id_empresas,
         creado_por_usuarios_id: session.user.id,
-        fecha_publicacion: new Date(),
+        fecha_publicacion: getFechaLocalSinHora(new Date()),
         oferta_estados_id: 2, // Pendiente de revisión
       },
     });
@@ -157,6 +204,7 @@ export async function POST(req: Request) {
           tipo: "nueva_vacante",
           titulo: "Nueva vacante pendiente de aprobación",
           mensaje: `La empresa "${empresa.nombre_comercial}" ha creado la vacante "${titulo}".`,
+          metadata: { vacanteId: oferta.id_ofertas },
         })),
       });
       // Enviar correos a admins

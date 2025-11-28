@@ -51,3 +51,6 @@ uploads/Subir_documentos/Egresados_Documentos/*
 
 uploads/Subir_imagenes/Perfiles/*
 !uploads/Subir_imagenes/Perfiles/.gitkeep
+
+uploads/Subir_imagenes/Ofertas/*
+!uploads/Subir_imagenes/Ofertas/.gitkeep

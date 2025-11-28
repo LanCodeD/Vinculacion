@@ -103,7 +103,7 @@ export const ADMIN_MENUS = [
     subMenu: [
       { title: "Perfil", path: "/Registro" },
       { title: "Tema", path: "/MenuPrincipal/ConfiTema" },
-      { title: "Gestión", path: "/Admin/VerificarUsuarios" },
+      { title: "Gestión", path: "/Admin/BolsaTrabajoAD/Estadisticas" },
     ],
   },
   {

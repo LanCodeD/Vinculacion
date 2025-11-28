@@ -1,7 +1,8 @@
+// app/Admin/BolsaTrabajoAD/VacantesInfo/page.tsx
 "use client";
 
 import { useEffect, useState } from "react";
-import DetallePostulaciones from "@/components/Componentes_administrador/DetallePostulaciones";
+import  Link  from "next/link";
 
 interface OfertaResumen {
   id_ofertas: number;
@@ -13,7 +14,6 @@ interface OfertaResumen {
 export default function AdminBolsaTrabajo() {
   const [ofertas, setOfertas] = useState<OfertaResumen[]>([]);
   const [loading, setLoading] = useState(true);
-  const [detalleOfertaId, setDetalleOfertaId] = useState<number | null>(null);
 
   useEffect(() => {
     setLoading(true);
@@ -47,25 +47,18 @@ export default function AdminBolsaTrabajo() {
                 <td className="px-4 py-2">{o.empresa}</td>
                 <td className="px-4 py-2">{o.estado}</td>
                 <td className="px-4 py-2">
-                  <button
-                    onClick={() => setDetalleOfertaId(o.id_ofertas)}
+                  <Link
+                    href={`/Admin/BolsaTrabajoAD/VacantesInfo/${o.id_ofertas}`}
                     className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 transition"
                   >
-                    Ver postulaciones
-                  </button>
+                    Ver detalles
+                  </Link>
                 </td>
               </tr>
             ))}
           </tbody>
         </table>
       </div>
-
-      {detalleOfertaId && (
-        <DetallePostulaciones
-          ofertaId={detalleOfertaId}
-          onClose={() => setDetalleOfertaId(null)}
-        />
-      )}
     </div>
   );
 }

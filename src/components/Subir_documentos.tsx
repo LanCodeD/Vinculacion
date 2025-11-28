@@ -1,11 +1,12 @@
-// src/components/Subir_documentos.tsx
 'use client';
+
 import { useState } from 'react';
 import toast from 'react-hot-toast';
+import { Upload } from 'lucide-react';
 
 interface UploadProps {
   userId: number;
-  tipo: 'cv' | 'foto_usuario' | 'imagen_oferta'; // Cambiado para foto de perfil global
+  tipo: 'cv' | 'foto_usuario' | 'imagen_oferta';
   idEgresado?: number;
   onUploaded?: (url: string) => void;
 }
@@ -13,6 +14,8 @@ interface UploadProps {
 export default function UploadFile({ userId, tipo, idEgresado, onUploaded }: UploadProps) {
   const [file, setFile] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
+
+  const isImage = tipo !== "cv";
 
   const handleUpload = async () => {
     if (!file) return;
@@ -28,34 +31,50 @@ export default function UploadFile({ userId, tipo, idEgresado, onUploaded }: Upl
     }
 
     try {
-      const res = await fetch("/api/Admin/BolsaTrabajo/Subir_IMG_PDF", { method: "POST", body: formData });
+      const res = await fetch("/api/Admin/BolsaTrabajo/Subir_IMG_PDF", {
+        method: "POST",
+        body: formData,
+      });
+
       const data = await res.json();
-      if (data.ok && data.url && onUploaded) {
-        onUploaded(data.url);
+
+      if (data.ok && data.url) {
+        toast.success("Archivo subido correctamente");
+        onUploaded?.(data.url);
       } else {
-        toast("Error al subir archivo: " + data.error);
+        toast.error("Error al subir archivo");
       }
     } catch (err) {
+      toast.error("Error al subir archivo");
       console.error(err);
-      toast("Error al subir archivo");
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="mt-2">
-      <input
-        type="file"
-        accept={tipo === 'cv' ? ".pdf,.doc,.docx" : "image/*"}
-        onChange={e => setFile(e.target.files?.[0] || null)}
-        className="mb-2"
-      />
+    <div className="mt-3 flex items-center gap-3">
+
+      {/* Campo compacto */}
+      <label className="cursor-pointer bg-gray-100 text-gray-700 border border-gray-300 rounded px-3 py-1.5 text-sm hover:bg-gray-200 transition">
+        Seleccionar archivo
+        <input
+          type="file"
+          className="hidden"
+          accept={isImage ? "image/*" : ".pdf,.doc,.docx"}
+          onChange={e => setFile(e.target.files?.[0] || null)}
+        />
+      </label>
+
+      {/* Botón elegante */}
       <button
         onClick={handleUpload}
-        className="bg-blue-600 text-white px-4 py-2 rounded"
         disabled={loading || !file}
+        className={`flex items-center gap-2 px-3 py-1.5 rounded text-sm text-white transition
+          ${!file || loading ? "bg-gray-400" : "bg-blue-600 hover:bg-blue-700"}
+        `}
       >
+        <Upload size={16} />
         {loading ? "Subiendo..." : "Subir"}
       </button>
     </div>

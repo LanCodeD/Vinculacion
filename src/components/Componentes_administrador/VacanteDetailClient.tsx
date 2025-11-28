@@ -34,6 +34,15 @@ export default function AdminVacanteDetailClient({ vacante }: Props) {
   const { data: session } = useSession();
   const [loading, setLoading] = useState(false);
   const router = useRouter();
+  const formatFecha = (fecha: string | Date) => {
+    if (!fecha) return "";
+
+    const f = new Date(fecha);
+
+    // Asegurar que se use la fecha UTC sin aplicar ajuste de zona
+    return f.toISOString().slice(0, 10); // "YYYY-MM-DD"
+  };
+
 
   const handleAction = async (accion: "aprobar" | "rechazar") => {
     if (!session?.user) return;
@@ -96,12 +105,12 @@ export default function AdminVacanteDetailClient({ vacante }: Props) {
         </button>
         <span
           className={`px-3 py-1 rounded-full text-sm font-semibold ${vacante.oferta_estados_id === 3
-              ? "bg-green-100 text-green-800 border border-green-300"
-              : vacante.oferta_estados_id === 4
-                ? "bg-red-100 text-red-800 border border-red-300"
-                : vacante.oferta_estados_id === 2
-                  ? "bg-blue-100 text-blue-800 border border-blue-300"
-                  : "bg-gray-100 text-gray-800 border border-gray-300"
+            ? "bg-green-100 text-green-800 border border-green-300"
+            : vacante.oferta_estados_id === 4
+              ? "bg-red-100 text-red-800 border border-red-300"
+              : vacante.oferta_estados_id === 2
+                ? "bg-blue-100 text-blue-800 border border-blue-300"
+                : "bg-gray-100 text-gray-800 border border-gray-300"
             }`}
         >
           {vacante.estado.nombre_estado}
@@ -159,19 +168,19 @@ export default function AdminVacanteDetailClient({ vacante }: Props) {
             <p>
               <strong>Fecha de publicación:</strong>{" "}
               {vacante.fecha_publicacion
-                ? new Date(vacante.fecha_publicacion).toLocaleDateString()
+                ? formatFecha(vacante.fecha_publicacion)
                 : "No publicada"}
             </p>
             <p>
               <strong>Fecha de cierre:</strong>{" "}
               {vacante.fecha_cierre
-                ? new Date(vacante.fecha_cierre).toLocaleDateString()
+                ? formatFecha(vacante.fecha_cierre)
                 : "No definida"}
             </p>
             <p>
               <strong>Última actualización:</strong>{" "}
               {vacante.actualizado_en
-                ? new Date(vacante.actualizado_en).toLocaleDateString()
+                ? formatFecha(vacante.actualizado_en)
                 : "N/A"}
             </p>
           </div>

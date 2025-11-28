@@ -1,3 +1,4 @@
+// api/Admin/BolsaTrabajo/Ofertas/route.ts
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getServerSession } from "next-auth/next";
@@ -26,8 +27,8 @@ export async function GET() {
 
     const data = ofertas.map(oferta => {
       const total = oferta.postulaciones.length;
-      const aceptados = oferta.postulaciones.filter(p => p.estado.id_postulacion_estados === 3).length; // Aceptada
-      const rechazados = oferta.postulaciones.filter(p => p.estado.id_postulacion_estados === 4).length; // Rechazada
+      const aceptados = oferta.postulaciones.filter(p => p.estado.id_postulacion_estados === 3).length;
+      const rechazados = oferta.postulaciones.filter(p => p.estado.id_postulacion_estados === 4).length;
       const pendientes = total - aceptados - rechazados;
 
       return {

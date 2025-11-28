@@ -1,5 +1,5 @@
 // src/lib/plantillas/nuevaVacante.ts
-import { plantillaCorreoBase } from "../lib/plantillaCorreoBase";
+import { plantillaCorreoBase } from "./plantillaCorreoBase";
 
 export function plantillaNuevaVacante({
   adminNombre,

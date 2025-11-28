@@ -3,6 +3,10 @@ import { NextResponse, NextRequest } from "next/server";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/app/api/auth/[...nextauth]/authOptions";
 import { prisma } from "@/lib/prisma";
+import { plantillaVacanteEditadaAdmin } from "@/lib/PlantillasCorreos/vacanteEditadaAdmin";
+import { plantillaVacanteEditadaEgresado } from "@/lib/PlantillasCorreos/vacanteEditadaEgresado";
+import { enviarCorreo } from "@/lib/mailer";
+import { getFechaLocalSinHora } from "@/lib/fechaLocal";
 
 // Obtener detalle de la vacante
 export async function GET(
@@ -17,7 +21,7 @@ export async function GET(
         { status: 401 }
       );
 
-    const { id } = await context.params; 
+    const { id } = await context.params;
     const idNumber = parseInt(id);
 
     if (isNaN(idNumber))
@@ -147,7 +151,6 @@ export async function DELETE(
   }
 }
 
-// Editar vacante
 // Editar o cambiar estado de vacante
 export async function PATCH(
   req: NextRequest,
@@ -216,7 +219,9 @@ export async function PATCH(
         puesto,
         ubicacion,
         imagen,
-        fecha_cierre: fecha_cierre ? new Date(fecha_cierre) : vacante.fecha_cierre,
+        fecha_cierre: fecha_cierre
+          ? getFechaLocalSinHora(fecha_cierre)
+          : vacante.fecha_cierre,
         oferta_estados_id: 2, // Solo aquí se manda a revisión
       },
     });
@@ -238,6 +243,58 @@ export async function PATCH(
           })),
         });
       }
+    }
+
+    // 📌 Notificar EGRESADOS (rol 2) que ya estaban postulados
+    const postulados = await prisma.postulaciones.findMany({
+      where: { ofertas_id: idNumber },
+      include: { usuario: true },
+    });
+
+    for (const post of postulados) {
+      const html = plantillaVacanteEditadaEgresado({
+        nombreEgresado: post.usuario.nombre,
+        tituloVacante: updated.titulo,
+        empresa: empresa.nombre_comercial,
+        botonUrl: `http://localhost:3000/BolsaTrabajo/MisPostulacionesFront/${updated.id_ofertas}`,
+      });
+
+      await enviarCorreo({
+        to: post.usuario.correo,
+        subject: "Actualización importante en una vacante",
+        html,
+      });
+
+      // Notificación interna
+      await prisma.notificaciones.create({
+        data: {
+          usuarios_id: post.usuarios_id,
+          tipo: "vacante_editada",
+          titulo: "La vacante que postulaste fue actualizada",
+          mensaje: `La vacante "${updated.titulo}" ha sido modificada por la empresa.`,
+          metadata: { vacanteId: updated.id_ofertas },
+        },
+      });
+    }
+
+    // 📌 Notificar ADMINS (rol 4)
+    const admins = await prisma.usuarios.findMany({
+      where: { roles_id: 4 },
+    });
+
+    for (const admin of admins) {
+      const html = plantillaVacanteEditadaAdmin({
+        adminNombre: admin.nombre,
+        empresaNombre: empresa.nombre_comercial,
+        tituloVacante: updated.titulo,
+        botonUrl: `http://localhost:3000/Admin/BolsaTrabajoAD`,
+      });
+
+      await enviarCorreo({
+        to: admin.correo,
+        subject: "Vacante editada — Revisión requerida",
+        html,
+      });
     }
 
     return NextResponse.json({ ok: true, updated });

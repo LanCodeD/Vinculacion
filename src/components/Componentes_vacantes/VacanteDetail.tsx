@@ -158,7 +158,6 @@ export default function VacanteDetail({
         body: JSON.stringify({
           ofertaId: id,
           usuarioId: session.user.id,
-          mensaje: "Estoy interesado en esta vacante.",
         }),
       });
 

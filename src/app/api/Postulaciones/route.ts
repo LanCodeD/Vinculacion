@@ -8,7 +8,6 @@ export async function POST(req: Request) {
     const body = await req.json();
     const ofertaId = parseInt(body.ofertaId);
     const usuarioId = parseInt(body.usuarioId);
-    const mensaje = body.mensaje || "";
 
     const egresado = await prisma.egresados.findFirst({
       where: { usuarios_id: usuarioId },
@@ -45,7 +44,6 @@ export async function POST(req: Request) {
       data: {
         ofertas_id: ofertaId,
         usuarios_id: usuarioId,
-        mensaje,
         postulacion_estados_id: 1, // Enviada
       },
       include: {
@@ -62,6 +60,10 @@ export async function POST(req: Request) {
         tipo: "nueva_postulacion",
         titulo: "Nueva postulación recibida",
         mensaje: `Un egresado se ha postulado a "${postulacion.oferta.titulo}".`,
+        metadata: {
+          vacanteId: postulacion.oferta.id_ofertas,
+          postulacionId: postulacion.id_postulaciones // ✅ aquí va la postulación específica
+        },
       },
     });
 
