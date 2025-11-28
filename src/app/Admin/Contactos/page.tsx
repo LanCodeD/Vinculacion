@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import axios from "axios";
+import { FaFilePdf } from "react-icons/fa";
 
 interface Contacto {
   id_contactos: number;
@@ -25,6 +26,7 @@ interface Contacto {
 export default function ContactoEstadosPage() {
   const [contactos, setContactos] = useState<Contacto[]>([]);
   const [error, setError] = useState<string | null>(null);
+  const [descargando, setDescargando] = useState(false);
 
   const cargarDatos = useCallback(async () => {
     try {
@@ -56,6 +58,45 @@ export default function ContactoEstadosPage() {
       </h1>
 
       {error && <p className="text-red-500 mb-4">{error}</p>}
+      <div className="flex justify-end mb-4">
+ <button
+    onClick={async () => {
+      try {
+        setDescargando(true); // 🔵 Bloquea el botón
+
+        const res = await axios.post(
+          "/api/Admin/Convenios/Concretados/reportes/Contactos",
+          { contactos },
+          { responseType: "blob" }
+        );
+
+        const url = URL.createObjectURL(res.data);
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = `ReporteContactos-${new Date().toISOString().slice(0, 10)}.pdf`;
+        link.click();
+        URL.revokeObjectURL(url);
+      } catch (error) {
+        console.error("Error al generar PDF:", error);
+      } finally {
+        setDescargando(false); // 🔴 Libera el botón
+      }
+    }}
+    disabled={descargando}
+    className={`flex items-center gap-2 px-4 py-2 rounded-lg text-white transition shadow-lg ${
+      descargando ? "bg-gray-500 cursor-not-allowed" : "bg-[#011848] hover:bg-[#022063]"
+    }`}
+  >
+    {!descargando ? (
+      <>
+        <FaFilePdf className="text-xl" />
+        Exportar a PDF
+      </>
+    ) : (
+      <span className="animate-pulse">Descargando...</span>
+    )}
+  </button>
+      </div>
 
       <div className="overflow-x-auto rounded-lg shadow border border-gray-200">
         <table className="min-w-full text-sm text-left bg-white">

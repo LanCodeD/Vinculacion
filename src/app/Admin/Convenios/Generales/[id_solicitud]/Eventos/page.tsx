@@ -3,6 +3,12 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { useParams } from "next/navigation";
+import dayjs from "dayjs";
+import utc from "dayjs/plugin/utc";
+import timezone from "dayjs/plugin/timezone";
+
+dayjs.extend(utc);
+dayjs.extend(timezone);
 
 export default function AdminEventos() {
   const { id_solicitud } = useParams();
@@ -26,10 +32,7 @@ export default function AdminEventos() {
           setForm({
             ceremonia_realizara: !!data.ceremonia_realizara,
             ceremonia_fecha_hora: data.ceremonia_fecha_hora
-              ? new Date(data.ceremonia_fecha_hora).toLocaleString("es-MX", {
-                  dateStyle: "short",
-                  timeStyle: "short",
-                })
+              ? new Date(data.ceremonia_fecha_hora).toISOString().slice(0, 16)
               : "",
             ceremonia_lugar: data.ceremonia_lugar || "",
             requerimientos_evento: data.requerimientos_evento || "",
@@ -76,7 +79,11 @@ export default function AdminEventos() {
                 Fecha y hora del evento
               </p>
               <p className="mt-1 border rounded-lg p-3 bg-gray-50">
-                {form.ceremonia_fecha_hora || "—"}
+                {form.ceremonia_fecha_hora
+                  ? dayjs(form.ceremonia_fecha_hora).format(
+                      "DD/MM/YYYY hh:mm A"
+                    )
+                  : "—"}
               </p>
             </div>
 

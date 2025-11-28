@@ -3,6 +3,12 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { useParams } from "next/navigation";
+import dayjs from "dayjs";
+import utc from "dayjs/plugin/utc";
+import timezone from "dayjs/plugin/timezone";
+
+dayjs.extend(utc);
+dayjs.extend(timezone);
 
 export default function PasoEventosEspecificoAdmin() {
   const { id_solicitud } = useParams();
@@ -24,10 +30,7 @@ export default function PasoEventosEspecificoAdmin() {
         setForm({
           ceremonia_realizara: !!data.ceremonia_realizara,
           ceremonia_fecha_hora: data.ceremonia_fecha_hora
-            ? new Date(data.ceremonia_fecha_hora).toLocaleString("es-MX", {
-                dateStyle: "long",
-                timeStyle: "short",
-              })
+            ? new Date(data.ceremonia_fecha_hora).toISOString().slice(0, 16)
             : "",
           ceremonia_lugar: data.ceremonia_lugar || "",
           requerimientos_evento: data.requerimientos_evento || "",
@@ -46,9 +49,7 @@ export default function PasoEventosEspecificoAdmin() {
 
   return (
     <div className="max-w-3xl mx-auto space-y-6 text-black">
-      <h2 className="text-2xl font-bold text-[#011848]">
-        Detalles del Evento
-      </h2>
+      <h2 className="text-2xl font-bold text-[#011848]">Detalles del Evento</h2>
 
       {/* ======= Información principal ======= */}
       <div className="border rounded-lg bg-white shadow p-5 space-y-4">
@@ -64,7 +65,13 @@ export default function PasoEventosEspecificoAdmin() {
             <p>
               <strong>Fecha y hora:</strong>{" "}
               <span className="text-gray-700">
-                {form.ceremonia_fecha_hora || "—"}
+               
+                  {form.ceremonia_fecha_hora
+                    ? dayjs(form.ceremonia_fecha_hora).format(
+                        "DD/MM/YYYY hh:mm A"
+                      )
+                    : "—"}
+
               </span>
             </p>
 

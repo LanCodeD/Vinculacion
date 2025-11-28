@@ -5,6 +5,7 @@ import Link from "next/link";
 import axios from "axios";
 import ModalConfirmacion from "@/components/ModalConfirmacionAdmin";
 import toast from "react-hot-toast";
+import { FaSearch } from "react-icons/fa";
 
 interface Solicitud {
   id_solicitud: number;
@@ -44,6 +45,9 @@ export default function AdminSolicitudesEspecificos() {
   const cerrarModalEliminar = () => {
     setModalEliminar({ abierto: false, id: undefined });
   };
+  const [busqueda, setBusqueda] = useState("");
+  const [paginaActual, setPaginaActual] = useState(1);
+  const solicitudesPorPagina = 10;
 
   useEffect(() => {
     const cargar = async () => {
@@ -94,6 +98,25 @@ export default function AdminSolicitudesEspecificos() {
     }
   };
 
+  const solicitudesFiltradas = solicitudes.filter((s) => {
+    const texto = busqueda.toLowerCase();
+    return (
+      s.creador?.nombre?.toLowerCase().includes(texto) ||
+      s.creador?.correo?.toLowerCase().includes(texto) ||
+      s.revisor?.nombre?.toLowerCase().includes(texto) ||
+      s.estado?.nombre_estado?.toLowerCase().includes(texto)
+    );
+  });
+
+  const totalPaginas = Math.ceil(
+    solicitudesFiltradas.length / solicitudesPorPagina
+  );
+  const indiceInicio = (paginaActual - 1) * solicitudesPorPagina;
+  const solicitudesPaginadas = solicitudesFiltradas.slice(
+    indiceInicio,
+    indiceInicio + solicitudesPorPagina
+  );
+
   if (cargando)
     return (
       <p className="text-center py-10 text-black">Cargando solicitudes...</p>
@@ -104,6 +127,23 @@ export default function AdminSolicitudesEspecificos() {
       <h1 className="text-2xl font-bold text-[#011848] text-center mb-6">
         Panel de Convenios Especificos
       </h1>
+      <div className="mb-6 flex items-center justify-center">
+        <div className="relative w-full max-w-md">
+          <input
+            type="text"
+            value={busqueda}
+            onChange={(e) => {
+              setBusqueda(e.target.value);
+              setPaginaActual(1);
+            }}
+            placeholder="Buscar por creador, revisor o estado..."
+            className="w-full pl-10 pr-4 py-2 rounded-lg border border-gray-300 shadow-sm focus:outline-none focus:ring-2 focus:ring-[#011848] focus:border-[#011848] text-sm"
+          />
+          <span className="absolute left-3 top-2.5 text-gray-400">
+            <FaSearch size={14} />
+          </span>
+        </div>
+      </div>
 
       <div className="overflow-x-auto bg-white shadow-lg rounded-lg">
         <table className="min-w-full text-sm border-collapse">
@@ -119,7 +159,7 @@ export default function AdminSolicitudesEspecificos() {
             </tr>
           </thead>
           <tbody>
-            {solicitudes.map((s) => (
+            {solicitudesPaginadas.map((s) => (
               <tr
                 key={s.id_solicitud}
                 className="border-b hover:bg-gray-50 transition"
@@ -203,6 +243,44 @@ export default function AdminSolicitudesEspecificos() {
           </tbody>
         </table>
       </div>
+      <div className="flex justify-center items-center gap-4 mt-8">
+        <button
+          onClick={() => setPaginaActual((prev) => Math.max(prev - 1, 1))}
+          disabled={paginaActual === 1}
+          className="px-4 py-2 rounded-lg bg-[#011848] text-white hover:bg-[#022063] disabled:bg-gray-300 disabled:text-gray-500 transition"
+        >
+          ←
+        </button>
+
+        {[...Array(totalPaginas)].map((_, i) => {
+          const page = i + 1;
+          const activo = paginaActual === page;
+          return (
+            <button
+              key={page}
+              onClick={() => setPaginaActual(page)}
+              className={`px-3 py-2 rounded-lg text-sm font-medium transition ${
+                activo
+                  ? "bg-[#53b431] text-white"
+                  : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+              }`}
+            >
+              {page}
+            </button>
+          );
+        })}
+
+        <button
+          onClick={() =>
+            setPaginaActual((prev) => Math.min(prev + 1, totalPaginas))
+          }
+          disabled={paginaActual === totalPaginas}
+          className="px-4 py-2 rounded-lg bg-[#011848] text-white hover:bg-[#022063] disabled:bg-gray-300 disabled:text-gray-500 transition"
+        >
+          →
+        </button>
+      </div>
+
       <ModalConfirmacion
         abierto={modalFinalizar.abierto}
         titulo="Confirmar finalización"

@@ -64,16 +64,11 @@ export const ADMIN_MENUS = [
     path: "/Admin/ConfiguracionAdmin",
   },
   {
-    title: "Gestión Usuarios",
-    icon: <MdSpaceDashboard />,
-    path: "/Admin/GestionUsuario",
-  },
-  {
     title: "Gestión",
     icon: <FaGears />,
     key: "gestion",
     subMenu: [
-      { title: "Usuarios", path: "/Admin/GestionUsuarios" },
+      { title: "Gestión Usuarios", path: "/Admin/GestionUsuario" },
       {
         title: "Convenios",
         key: "admin-convenios",
@@ -91,7 +86,39 @@ export const ADMIN_MENUS = [
         key: "admin-bolsa",
         subMenu: [
           { title: "Vacantes", path: "/Admin/BolsaTrabajoAD" },
-          { title: "Postulaciones", path: "/Admin/BolsaTrabajoAD/VacantesInfo" },
+          {
+            title: "Postulaciones",
+            path: "/Admin/BolsaTrabajoAD/VacantesInfo",
+          },
+        ],
+      },
+    ],
+  },
+  {
+    title: "Reportes",
+    icon: <FaGears />,
+    key: "reportes",
+    subMenu: [
+      {
+        title: "Reporte de Convenios",
+        key: "reporte-convenios",
+        subMenu: [
+          { title: "Reporte Convenios Concretados", path: "/Admin/Convenios/Reportes" },
+          {
+            title: "Reporte Solicitudes No Finalizadas",
+            path: "/Admin/Convenios/Reportes/Solicitudes",
+          },
+        ],
+      },
+      {
+        title: "Reporte Bolsa de Trabajo",
+        key: "reporte-admin-bolsa",
+        subMenu: [
+          { title: "Vacantes", path: "/Admin/BolsaTrabajoAD" },
+          {
+            title: "Postulaciones",
+            path: "/Admin/BolsaTrabajoAD/VacantesInfo",
+          },
         ],
       },
     ],
