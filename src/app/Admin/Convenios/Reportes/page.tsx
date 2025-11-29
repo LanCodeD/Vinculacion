@@ -220,7 +220,7 @@ export default function ReporteConveniosPage() {
                   </thead>
 
                   <tbody>
-                    {reporte.convenios.map((c: any) => (
+                    {reporte.convenios.map((c: ReporteConvenios["convenios"][number]) => (
                       <tr
                         key={c.id_convenio_concretado}
                         className="border-b hover:bg-blue-50 transition"

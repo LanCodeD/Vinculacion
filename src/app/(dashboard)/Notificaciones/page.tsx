@@ -21,11 +21,14 @@ export default function NotificacionesPage() {
   const skipRef = useRef(0);
   const take = 20; // cantidad por página
 
-  const fetchNotificaciones = async () => {
+  // 🟢 fetchNotificaciones envuelto en useCallback
+  const fetchNotificaciones = useCallback(async () => {
     if (!hasMore) return;
     setLoading(true);
     try {
-      const res = await fetch(`/api/Notificaciones?skip=${skipRef.current}&take=${take}`);
+      const res = await fetch(
+        `/api/Notificaciones?skip=${skipRef.current}&take=${take}`
+      );
       const data = await res.json();
       if (data.ok) {
         if (data.notificaciones.length < take) setHasMore(false);
@@ -37,13 +40,15 @@ export default function NotificacionesPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [hasMore, take]); // 👈 dependencias reales
 
   const marcarLeida = async (id: number) => {
     try {
       await fetch(`/api/Notificaciones/leer/${id}`, { method: "PATCH" });
       setNotificaciones((prev) =>
-        prev.map((n) => (n.id_notificaciones === id ? { ...n, leido: true } : n))
+        prev.map((n) =>
+          n.id_notificaciones === id ? { ...n, leido: true } : n
+        )
       );
     } catch (error) {
       console.error("Error al marcar como leída", error);
@@ -59,11 +64,12 @@ export default function NotificacionesPage() {
     }
   };
 
+  // 🟢 useEffect con dependencia
   useEffect(() => {
     fetchNotificaciones();
-  }, []);
+  }, [fetchNotificaciones]);
 
-  // Scroll infinito
+  // 🟢 Scroll infinito con dependencia
   const observer = useRef<IntersectionObserver | null>(null);
   const lastNotificacionRef = useCallback(
     (node: HTMLLIElement) => {
@@ -76,7 +82,7 @@ export default function NotificacionesPage() {
       });
       if (node) observer.current.observe(node);
     },
-    [loading, hasMore]
+    [loading, hasMore, fetchNotificaciones] // 👈 añadimos la función
   );
 
   const handleClickNotificacion = (n: Notificacion) => {
@@ -85,8 +91,8 @@ export default function NotificacionesPage() {
     const url = n.metadata?.vacanteId
       ? `/Admin/BolsaTrabajoAD/${n.metadata.vacanteId}`
       : n.metadata?.postulacionId
-        ? `/BolsaTrabajo/Postulaciones/${n.metadata.postulacionId}`
-        : undefined;
+      ? `/BolsaTrabajo/Postulaciones/${n.metadata.postulacionId}`
+      : undefined;
 
     if (url) router.push(url);
   };
@@ -110,7 +116,9 @@ export default function NotificacionesPage() {
       </div>
 
       {notificaciones.length === 0 ? (
-        <p className="text-gray-500 text-center py-10">No tienes notificaciones</p>
+        <p className="text-gray-500 text-center py-10">
+          No tienes notificaciones
+        </p>
       ) : (
         <ul className="space-y-3">
           {notificaciones.map((n, index) => {
@@ -147,7 +155,9 @@ export default function NotificacionesPage() {
         <p className="text-center mt-6 text-gray-500">Cargando más...</p>
       )}
       {!hasMore && notificaciones.length > 0 && (
-        <p className="text-center mt-6 text-gray-400">No hay más notificaciones</p>
+        <p className="text-center mt-6 text-gray-400">
+          No hay más notificaciones
+        </p>
       )}
     </div>
   );

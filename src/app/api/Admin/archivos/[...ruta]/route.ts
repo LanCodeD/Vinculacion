@@ -35,7 +35,7 @@ export async function GET(
 ) {
   const { ruta: rutaParts } = await context.params;
 
-  console.log("🔍 Ruta solicitada:", rutaParts);
+  //console.log("🔍 Ruta solicitada:", rutaParts);
   try {
     // dentro de GET, arriba
     const user = await getSessionUser();
@@ -60,9 +60,9 @@ export async function GET(
 
     const filePath = path.join(process.cwd(), "uploads", ...safeParts);
 
-    console.log("Ruta solicitada:", rutaParts);
-    console.log("Ruta segura:", safeParts);
-    console.log("Ruta física:", filePath);
+    //console.log("Ruta solicitada:", rutaParts);
+    //console.log("Ruta segura:", safeParts);
+    //console.log("Ruta física:", filePath);
 
     // Verificamos existencia
     await fs.access(filePath);

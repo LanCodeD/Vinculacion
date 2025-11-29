@@ -8,7 +8,9 @@ import type { Account } from "next-auth";
 import type { AdapterUser } from "next-auth/adapters";
 import type { Profile } from "next-auth";
 import type { JWT } from "next-auth/jwt";
+import type { Session } from "next-auth";
 
+type ExtendedUser = User & { correo?: string };
 // 🧩 Validación de entorno
 if (!process.env.NEXTAUTH_SECRET) {
   throw new Error("NEXTAUTH_SECRET no está definido en el entorno");
@@ -118,6 +120,7 @@ export const authOptions: NextAuthOptions = {
 
   callbacks: {
     // signIn: mantenemos la firma que NextAuth espera
+
     async signIn({
       user,
       account,
@@ -140,7 +143,9 @@ export const authOptions: NextAuthOptions = {
       const googleAccount = account as MaybeGoogleAccount | null;
 
       if (googleAccount?.provider === "google") {
-        const correo = (user as any)?.email ?? (user as any)?.correo ?? "";
+        const correo =
+          (user as ExtendedUser)?.email ?? (user as ExtendedUser)?.correo ?? "";
+
         if (!correo) {
           return "/IniciarSesion?error=No se pudo obtener el correo de Google.";
         }
@@ -233,7 +238,8 @@ export const authOptions: NextAuthOptions = {
 
       // 3. Merge con datos de BD
       if (user) {
-        const correoUsuario = user.email ?? (user as any).correo;
+        const correoUsuario =
+          (user as ExtendedUser)?.email ?? (user as ExtendedUser)?.correo;
 
         if (correoUsuario) {
           try {
@@ -264,7 +270,7 @@ export const authOptions: NextAuthOptions = {
     },
 
     // session: exponer idGoogle (string|null) en session.user.idGoogle
-    async session({ session, token }: { session: any; token: JWT }) {
+    async session({ session, token }: { session: Session; token: JWT }) {
       if (session.user) {
         session.user.id = token.id;
         session.user.nombre = token.nombre;

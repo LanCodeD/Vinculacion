@@ -5,10 +5,10 @@ import utc from "dayjs/plugin/utc";
 
 dayjs.extend(utc);
 
-interface MetaConvenio {
+/* interface MetaConvenio {
   id_metas_convenios: number;
   nombre: string;
-}
+} */
 
 type EstadoConvenio = "ACTIVO" | "PRÓXIMO A VENCER" | "VENCIDO" | "SIN FECHA";
 

@@ -1,10 +1,22 @@
 // src/VinculacionReporte/Contactos/ReporteContactosTemplate.ts
 import dayjs from "dayjs";
 
-export function renderReporteContactosHTML(contactos: any[]) {
+type Contacto = {
+  nombre?: string;
+  apellido?: string;
+  correo?: string;
+  puesto?: string;
+  empresas?: { nombre_comercial?: string };
+  grupos_id?: number;
+  contacto_estados?: { nombre_estado?: string };
+  creado_en: string;
+};
+
+
+export function renderReporteContactosHTML(contactos: Contacto[]) {
   const rows = contactos
     .map(
-      (c: any) => `
+      (c: Contacto) => `
       <tr>
         <td class="cell">${c.nombre ?? "—"}</td>
         <td class="cell">${c.apellido ?? "—"}</td>

@@ -90,7 +90,7 @@ export default function PasoTipoConvenio() {
 
   const bloqueadoPaso =
     bloqueado || estadoPaso === "EN REVISION" || estadoPaso === "APROBADO";
-  console.log("paso actual: ", estadoPaso);
+  //console.log("paso actual: ", estadoPaso);
 
   // 🔹 Manejo del checkbox múltiple
   const toggleFirma = (id: number) => {

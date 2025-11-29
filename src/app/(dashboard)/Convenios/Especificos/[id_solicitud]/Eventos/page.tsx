@@ -75,7 +75,7 @@ export default function EventoPage() {
 
   const bloqueadoPaso =
     bloqueado || estadoPaso === "EN REVISION" || estadoPaso === "APROBADO";
-  console.log("paso actual: ", estadoPaso);
+  //console.log("paso actual: ", estadoPaso);
   return (
     <div className="max-w-2xl mx-auto space-y-6">
       <h2 className="text-xl font-bold text-[#011848]">

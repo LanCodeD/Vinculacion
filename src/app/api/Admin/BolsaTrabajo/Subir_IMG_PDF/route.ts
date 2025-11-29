@@ -80,7 +80,7 @@ export async function POST(req: NextRequest) {
     try {
       await fs.access(rutaFinal);
       await fs.unlink(rutaFinal);
-      console.log(`🗑️ Archivo anterior eliminado: ${rutaFinal}`);
+      //console.log(`🗑️ Archivo anterior eliminado: ${rutaFinal}`);
     } catch {
       // No existía antes, no pasa nada
     }

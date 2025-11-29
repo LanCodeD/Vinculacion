@@ -3,16 +3,38 @@ import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
 dayjs.extend(utc);
 
-export function renderReporteConveniosHTML(convenios: any[]) {
+type Convenio = {
+  id_convenio_concretado: number;
+  fecha_firmada: string | null;
+  fecha_expira: string | null;
+  estado_dinamico:
+    | "ACTIVO"
+    | "PRÓXIMO A VENCER"
+    | "VENCIDO"
+    | "SIN FECHA"
+    | null;
+  eficiencia?: number;
+  meta?: { id_metas_convenios: number; nombre: string } | null;
+};
+
+export function renderReporteConveniosHTML(convenios: Convenio[]) {
   const rows = convenios
     .map(
-      (c: any) => `
+      (c: Convenio) => `
       <tr>
         <td class="cell">${c.meta?.nombre ?? "—"}</td>
-        <td class="cell">${c.fecha_firmada ? dayjs.utc(c.fecha_firmada).format("DD/MM/YYYY") : "—"}</td>
-        <td class="cell">${c.fecha_expira ? dayjs(c.fecha_expira).format("DD/MM/YYYY") : "—"}</td>
+        <td class="cell">${
+          c.fecha_firmada
+            ? dayjs.utc(c.fecha_firmada).format("DD/MM/YYYY")
+            : "—"
+        }</td>
+        <td class="cell">${
+          c.fecha_expira ? dayjs(c.fecha_expira).format("DD/MM/YYYY") : "—"
+        }</td>
         <td class="cell">${c.estado_dinamico ?? "—"}</td>
-        <td class="cell">${typeof c.eficiencia === "number" ? `${c.eficiencia} act.` : "—"}</td>
+        <td class="cell">${
+          typeof c.eficiencia === "number" ? `${c.eficiencia} act.` : "—"
+        }</td>
       </tr>
     `
     )

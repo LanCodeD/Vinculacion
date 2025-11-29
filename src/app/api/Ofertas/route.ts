@@ -40,7 +40,7 @@ export async function GET() {
           fecha_publicacion: true,
           fecha_cierre: true,
           empresas: { select: { nombre_comercial: true } },
-           _count: { select: { postulaciones: true } }
+          _count: { select: { postulaciones: true } },
         },
         orderBy: { fecha_publicacion: "desc" },
       });
@@ -79,7 +79,7 @@ export async function GET() {
           oferta_estados_id: true,
           fecha_publicacion: true,
           fecha_cierre: true,
-          _count: { select: { postulaciones: true } }
+          _count: { select: { postulaciones: true } },
         },
         orderBy: { fecha_publicacion: "desc" },
       });
@@ -94,7 +94,6 @@ export async function GET() {
       { ok: false, error: "Rol no autorizado" },
       { status: 403 }
     );
-
   } catch (error) {
     console.error("Error en GET /api/Ofertas:", error);
     return NextResponse.json(
@@ -113,9 +112,19 @@ export async function POST(req: Request) {
         { status: 401 }
       );
     }
+    const roleId = session.user.roles_id;
+
+    if (roleId == null) {
+      return NextResponse.json(
+        { ok: false, error: "Usuario sin rol asignado" },
+        { status: 403 }
+      );
+    }
+
+    const userRole: AppRole = ROLE_MAP[roleId];
 
     // Validar rol usando ROLE_MAP
-    const userRole: AppRole = ROLE_MAP[session.user.roles_id];
+    //const userRole: AppRole = ROLE_MAP[session.user.roles_id];
     if (userRole !== "Empresa") {
       console.log("Rol no autorizado para crear ofertas:", userRole);
       return NextResponse.json(
@@ -159,8 +168,17 @@ export async function POST(req: Request) {
       );
     }
 
-    const { titulo, descripcion_general, requisitos, horario, modalidad, puesto, ubicacion, imagen, fecha_cierre } =
-      body;
+    const {
+      titulo,
+      descripcion_general,
+      requisitos,
+      horario,
+      modalidad,
+      puesto,
+      ubicacion,
+      imagen,
+      fecha_cierre,
+    } = body;
 
     // Crear la oferta
     const oferta = await prisma.ofertas.create({
@@ -186,11 +204,10 @@ export async function POST(req: Request) {
       await prisma.ofertas_ingenierias.createMany({
         data: ingenierias.map((ingId: number) => ({
           ofertas_id: oferta.id_ofertas,
-          academias_id: ingId
+          academias_id: ingId,
         })),
       });
     }
-
 
     // Notificar admins y subadmins
     const admins = await prisma.usuarios.findMany({
@@ -229,11 +246,14 @@ export async function POST(req: Request) {
             });
             console.log("📧 Correo enviado a admin:", admin.correo);
           } catch (err) {
-            console.error("❌ Error al enviar correo al admin:", admin.correo, err);
+            console.error(
+              "❌ Error al enviar correo al admin:",
+              admin.correo,
+              err
+            );
           }
         }
       }
-
     }
 
     console.log("Vacante creada correctamente:", oferta.titulo);

@@ -2,16 +2,32 @@ import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
 dayjs.extend(utc);
 
-export function renderReporteSolicitudesHTML(solicitudes: any[]) {
+type Solicitud = {
+  fecha_solicitud: string | null;
+  creador?: { nombre: string; apellido?: string };
+  tipo?: { nombre_tipo: string };
+  estado?: { nombre_estado: string };
+  revisor?: { nombre: string; apellido?: string };
+};
+
+export function renderReporteSolicitudesHTML(solicitudes: Solicitud[]) {
   const rows = solicitudes
     .map(
-      (s: any) => `
+      (s: Solicitud) => `
       <tr>
-        <td class="cell">${s.fecha_solicitud ? dayjs.utc(s.fecha_solicitud).format("DD/MM/YYYY") : "—"}</td>
-        <td class="cell">${s.creador ? `${s.creador.nombre} ${s.creador.apellido}` : "—"}</td>
+        <td class="cell">${
+          s.fecha_solicitud
+            ? dayjs.utc(s.fecha_solicitud).format("DD/MM/YYYY")
+            : "—"
+        }</td>
+        <td class="cell">${
+          s.creador ? `${s.creador.nombre} ${s.creador.apellido}` : "—"
+        }</td>
         <td class="cell">${s.tipo?.nombre_tipo ?? "—"}</td>
         <td class="cell">${s.estado?.nombre_estado ?? "—"}</td>
-        <td class="cell">${s.revisor ? `${s.revisor.nombre} ${s.revisor.apellido}` : "—"}</td>
+        <td class="cell">${
+          s.revisor ? `${s.revisor.nombre} ${s.revisor.apellido}` : "—"
+        }</td>
       </tr>
     `
     )

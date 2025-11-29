@@ -84,7 +84,7 @@ export default function RegistroWizard() {
     }
   }, [paso, registro.usuarioId, registro.tipoCuentaId]);
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+ 
   useEffect(() => {
     if (!session?.user?.email) return;
     if (registro.usuarioId) return;
@@ -120,13 +120,13 @@ export default function RegistroWizard() {
           );
           setPaso(4);
         }
-      } catch (err) {
+      } catch {
         toast.error("Error al completar registro.");
       }
     };
 
     completarRegistroGoogle();
-  }, [session]);
+  }, [session, registro.usuarioId, registro.tipoCuentaId]);
 
   return (
     <div className="w-full h-full flex flex-col items-center justify-center">
