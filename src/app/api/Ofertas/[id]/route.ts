@@ -1,7 +1,7 @@
 // src/app/api/Ofertas/[id]/route.ts
 import { NextResponse, NextRequest } from "next/server";
 import { getServerSession } from "next-auth/next";
-import { authOptions } from "@/app/api/auth/[...nextauth]/authOptions";
+import { authOptions } from "@/app/api/auth/[...nextauth]/authOptionsCredencial";
 import { prisma } from "@/lib/prisma";
 import { plantillaVacanteEditadaAdmin } from "@/lib/PlantillasCorreos/vacanteEditadaAdmin";
 import { plantillaVacanteEditadaEgresado } from "@/lib/PlantillasCorreos/vacanteEditadaEgresado";

@@ -83,6 +83,7 @@ export const authOptions: NextAuthOptions = {
         return {
           id: usuario.id_usuarios,
           nombre: usuario.nombre,
+          apellido: usuario.apellido,
           correo: usuario.correo,
           tipoCuentaId: usuario.tipos_cuenta_id,
           roles_id: usuario.roles_id,
@@ -250,6 +251,7 @@ export const authOptions: NextAuthOptions = {
             if (usuario) {
               token.id = usuario.id_usuarios;
               token.nombre = usuario.nombre;
+              token.apellido = usuario.apellido;
               token.correo = usuario.correo;
               token.tipoCuentaId = usuario.tipos_cuenta_id;
               token.roles_id = usuario.roles_id;
@@ -274,6 +276,7 @@ export const authOptions: NextAuthOptions = {
       if (session.user) {
         session.user.id = token.id;
         session.user.nombre = token.nombre;
+        session.user.apellido = token.apellido;
         session.user.correo = token.correo;
         session.user.tipoCuentaId = token.tipoCuentaId;
         session.user.roles_id = token.roles_id ?? null;

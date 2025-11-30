@@ -2,7 +2,7 @@
 import React from "react";
 import { prisma } from "@/lib/prisma";
 import { getServerSession } from "next-auth/next";
-import { authOptions } from "@/app/api/auth/[...nextauth]/authOptions";
+import { authOptions } from "@/app/api/auth/[...nextauth]/authOptionsCredencial";
 import VacanteCard from "@/components/Componentes_vacantes/VacanteCard";
 import VacantesEmpresaLista from "@/components/Componentes_empresas/VacanteEmpresaLista";
 import Link from "next/link";

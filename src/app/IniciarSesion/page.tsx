@@ -1,26 +1,25 @@
 "use client";
 
 import { signIn, getSession } from "next-auth/react";
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useState, useEffect } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import toast, { Toaster } from "react-hot-toast";
 import BotonGoogle from "../Registro/Pasos/BotonGoogle";
-import { useSearchParams } from "next/navigation";
-import { useEffect } from "react";
+import Link from "next/link";
+import { FaEye, FaEyeSlash } from "react-icons/fa";
 
 export default function LoginForm() {
   const [correo, setCorreo] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false); // 👈 nuevo estado
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  // 🧩 Mostrar error si viene desde Google (o cualquier OAuth)
   useEffect(() => {
     const error = searchParams.get("error");
     if (error) {
       toast.error(decodeURIComponent(error), { position: "top-right" });
-      // Limpia la URL
       router.replace("/IniciarSesion");
     }
   }, [searchParams, router]);
@@ -32,29 +31,26 @@ export default function LoginForm() {
     const res = await signIn("credentials", {
       correo,
       password,
-      redirect: false, // controlamos manualmente
+      redirect: false,
     });
 
     setLoading(false);
 
     if (res?.error) {
-      toast.error(res.error, {
-        position: "top-right",
-      });
+      toast.error(res.error, { position: "top-right" });
     } else {
       toast.success("Login correcto 🎉", {
         position: "top-right",
         duration: 1500,
       });
-      // 👇 Obtenemos la sesión actual para saber el rol
       const session = await getSession();
       const role = session?.user.role;
 
       setTimeout(() => {
         if (role === "Administrador") {
-          router.push("../Admin/ConfiguracionAdmin"); // vista del admin
+          router.push("../Admin/ConfiguracionAdmin");
         } else {
-          router.push("/MenuPrincipal"); // vista de usuarios normales
+          router.push("/MenuPrincipal");
         }
       }, 1600);
     }
@@ -62,12 +58,9 @@ export default function LoginForm() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-linear-to-br from-sky-600 via-gray-50 to-cyan-500 text-black">
-      {/* 🔔 Notificaciones */}
       <Toaster />
-
       <div className="relative w-full max-w-md">
         <div className="relative">
-          {/* 🌈 Círculo decorativo difuminado */}
           <div className="absolute inset-0 bg-linear-to-r from-yellow-100 to-yellow-100 rounded-3xl blur opacity-60 animate-pulse pointer-events-none z-0"></div>
 
           <form
@@ -88,6 +81,7 @@ export default function LoginForm() {
               </label>
               <div className="relative">
                 <span className="absolute inset-y-0 left-3 flex items-center text-gray-400">
+                  {/* ícono correo */}
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     className="h-5 w-5"
@@ -113,13 +107,14 @@ export default function LoginForm() {
               </div>
             </div>
 
-            {/* 🔒 Contraseña */}
+            {/* 🔒 Contraseña con toggle */}
             <div className="space-y-1">
               <label className="text-sm font-medium text-gray-700">
                 Contraseña
               </label>
               <div className="relative">
                 <span className="absolute inset-y-0 left-3 flex items-center text-gray-400">
+                  {/* ícono candado */}
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     className="h-5 w-5"
@@ -136,12 +131,18 @@ export default function LoginForm() {
                   </svg>
                 </span>
                 <input
-                  type="password"
+                  type={showPassword ? "text" : "password"}
                   placeholder="********"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full pl-10 pr-3 py-2 rounded-lg border border-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all outline-none"
+                  className="w-full pl-10 pr-10 py-2 rounded-lg border border-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all outline-none"
                 />
+                <span
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute inset-y-0 right-3 flex items-center text-gray-500 cursor-pointer"
+                >
+                  {showPassword ? <FaEyeSlash /> : <FaEye />}
+                </span>
               </div>
             </div>
 
@@ -157,16 +158,15 @@ export default function LoginForm() {
             {/* 🧩 Opcional: enlace de recuperación */}
             <p className="text-center text-sm text-gray-500 mt-3">
               ¿Olvidaste tu contraseña?{" "}
-              <a
-                href="#"
+              <Link
+                href="/IniciarSesion/Olvidar_Password"
                 className="text-indigo-600 hover:text-indigo-700 font-medium"
               >
                 Recuperar
-              </a>
+              </Link>
             </p>
           </form>
         </div>
-        {/* 🌐 Botón Google — fuera del form pero visualmente alineado */}
         <div className="mt-4 px-8">
           <BotonGoogle texto="Iniciar sesión con Google" modo="login" />
         </div>

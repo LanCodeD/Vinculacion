@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { Toaster } from "react-hot-toast";
 import SessionWrapper from "./SessionWrapper";
-import { authOptions } from "./api/auth/[...nextauth]/authOptions";
+import { authOptions } from "./api/auth/[...nextauth]/authOptionsCredencial";
 import { getServerSession } from "next-auth";
 
 // 🧩 Importa el cron job

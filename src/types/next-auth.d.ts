@@ -6,6 +6,7 @@ declare module "next-auth" {
     user: {
       id: number;
       nombre: string;
+      apellido: string;
       correo: string;
       tipoCuentaId: number | null;   // ✔ ahora permite null
       roles_id: number | null;       // ✔ ahora permite null
@@ -17,6 +18,7 @@ declare module "next-auth" {
   interface User extends DefaultUser {
     id: number;
     nombre: string;
+    apellido: string;
     correo: string;
     tipoCuentaId: number | null;    // ✔ correcto
     roles_id: number | null;        // ✔ correcto
@@ -28,6 +30,7 @@ declare module "next-auth/jwt" {
   interface JWT {
     id: number;
     nombre: string;
+    apellido: string;
     correo: string;
     tipoCuentaId: number | null;   // ✔ ahora permite null
     roles_id: number | null;       // ✔ ahora permite null

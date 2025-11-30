@@ -8,6 +8,7 @@ import type { Dispatch, SetStateAction } from "react";
 import toast from "react-hot-toast";
 import { z } from "zod";
 import BotonGoogle from "./BotonGoogle";
+import { FaEye, FaEyeSlash } from "react-icons/fa";
 
 interface Props {
   registro: DatosRegistro;
@@ -50,6 +51,7 @@ export default function PasoDatosBasicos({
 
   const [form, setForm] = useState<DatosBasicos>(initial);
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   useEffect(() => {
     if (registro.datosBasicos) setForm(registro.datosBasicos);
@@ -161,13 +163,22 @@ export default function PasoDatosBasicos({
             <label className="text-sm font-semibold text-gray-600 mb-1">
               Contraseña
             </label>
-            <input
-              type="password"
-              value={form.password}
-              onChange={(e) => handleChange("password", e.target.value)}
-              placeholder="********"
-              className="p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none placeholder:text-gray-400 transition-all"
-            />
+            <div className="relative">
+              <input
+                type={showPassword ? "text" : "password"}
+                value={form.password}
+                onChange={(e) => handleChange("password", e.target.value)}
+                placeholder="********"
+                className="w-full p-3 pr-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none placeholder:text-gray-400 transition-all"
+              />
+
+              <span
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute inset-y-0 right-3 flex items-center text-gray-500 cursor-pointer"
+              >
+                {showPassword ? <FaEyeSlash /> : <FaEye />}
+              </span>
+            </div>
           </div>
 
           <div className="flex flex-col">
@@ -203,7 +214,7 @@ export default function PasoDatosBasicos({
         <div className="mt-6 text-center">
           <BotonGoogle
             texto="Registrarse con Google"
-            modo="registro" 
+            modo="registro"
             tipoCuenta={registro.tipoCuentaId}
           />
         </div>

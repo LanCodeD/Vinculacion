@@ -153,7 +153,7 @@ export default function GraficaOfertasPorMes() {
                             Mes: {ultimoMes.mes.toUpperCase()}
                         </p>
 
-                        <hr className="w-full h-[1px] mt-4 bg-[#CBC8D4]" />
+                        <hr className="w-full h-px mt-4 bg-[#CBC8D4]" />
 
                         <div className="mt-4 text-[#072635] text-[15px] font-light">
                             Comparación con meses anteriores no implementada aún

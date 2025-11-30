@@ -1,7 +1,7 @@
 // src/app/api/Ofertas/route.ts
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth/next";
-import { authOptions } from "@/app/api/auth/[...nextauth]/authOptions";
+import { authOptions } from "@/app/api/auth/[...nextauth]/authOptionsCredencial";
 import { prisma } from "@/lib/prisma";
 import { ROLE_MAP, AppRole } from "@/types/roles";
 import { enviarCorreo } from "@/lib/mailer";

@@ -1,7 +1,7 @@
 // api/Notificaciones/leer/[id]/route.ts
 import { NextResponse, NextRequest } from "next/server";
 import { getServerSession } from "next-auth";
-import { authOptions } from "@/app/api/auth/[...nextauth]/authOptions";
+import { authOptions } from "@/app/api/auth/[...nextauth]/authOptionsCredencial";
 import { prisma } from "@/lib/prisma";
 
 export async function PATCH(

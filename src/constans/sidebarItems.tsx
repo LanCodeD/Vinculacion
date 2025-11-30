@@ -1,8 +1,6 @@
 // constants/sidebarItems.ts
 import { MdSpaceDashboard, MdOutlineHeadsetMic } from "react-icons/md";
 import { BiChat } from "react-icons/bi";
-import { TiCalendar } from "react-icons/ti";
-import { FiTable } from "react-icons/fi";
 import { GoGraph } from "react-icons/go";
 import { FaGears } from "react-icons/fa6";
 import { IoIosContacts } from "react-icons/io";
@@ -41,10 +39,10 @@ export const USER_MENUS = [
       },
     ],
   },
-  { title: "Calendario", icon: <TiCalendar />, path: "/Calendar" },
-  { title: "Tablas", icon: <FiTable />, path: "/BolsaTrabajo/Postulaciones" },
+  //{ title: "Calendario", icon: <TiCalendar />, path: "/Calendar" },
+  //{ title: "Tablas", icon: <FiTable />, path: "/BolsaTrabajo/Postulaciones" },
   { title: "Historial", icon: <GoGraph />, path: "/Historial" },
-  { title: "Soporte", icon: <MdOutlineHeadsetMic />, path: "/support" },
+  //{ title: "Soporte", icon: <MdOutlineHeadsetMic />, path: "/support" },
   {
     title: "Configuración",
     icon: <FaGears />,
