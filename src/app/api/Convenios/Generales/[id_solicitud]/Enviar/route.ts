@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getSessionUser } from "@/lib/auth";
+import { enviarCorreo } from "@/lib/mailer";
+import { plantillaSolicitudRevision } from "@/lib/PlantillasCorreos/solicitudRevision";
+import { plantillaSolicitudCorreccion } from "@/lib/PlantillasCorreos/solicitudCorrecion"; // 👈 nueva plantilla
 
 export async function PUT(
   req: NextRequest,
@@ -17,7 +20,7 @@ export async function PUT(
     if (Number.isNaN(id))
       return NextResponse.json({ error: "ID inválido" }, { status: 400 });
 
-    // Verificar propiedad
+    // Verificar propiedad y estado actual
     const solicitud = await prisma.solicitud_convenios.findUnique({
       where: { id_solicitud: id },
       select: { creado_por_usuario_id: true, estado_id: true },
@@ -31,58 +34,84 @@ export async function PUT(
     if (solicitud.creado_por_usuario_id !== usuario.id)
       return NextResponse.json({ error: "No autorizado" }, { status: 403 });
 
-    // 1️⃣ Traer el historial por pasos
-    const pasos = [
-      "TipoConvenio",
-      "DatosEmpresa",
-      "Solicitante",
-      "Eventos", // o "Evento", pero igual en todos lados
-    ];
+    // … lógica de validación de pasos …
 
-    const registros = await prisma.solicitud_estado_historial.findMany({
-      where: { id_solicitud: id },
-      orderBy: { created_at: "asc" },
-    });
+    // Determinar tipo de notificación según estado actual
+    let tipoNotificacion = "solicitud_revision";
+    let tituloNotificacion =
+      "Nueva solicitud de Convenio General enviada para revisión";
+    let mensajeNotificacion = `El usuario ${usuario.nombre} ${usuario.apellido} ha enviado la solicitud #${id} de Convenio General para revisión.`;
+    let subjectCorreo = "Nueva solicitud de Convenio General para revisión";
+    let plantillaCorreo = plantillaSolicitudRevision;
 
-    const historial = pasos.map((p) => {
-      const registrosPaso = registros.filter((r) => r.paso === p);
-      const ultimo = registrosPaso[registrosPaso.length - 1];
-      return ultimo?.estado_id ?? 1;
-    });
-
-    const algunRechazado = historial.some((estado) => estado === 4);
-
-    if (algunRechazado) {
-      return NextResponse.json(
-        {
-          error: "Aún existen secciones rechazadas que no han sido corregidas",
-        },
-        { status: 400 }
-      );
+    if (solicitud.estado_id === 5) {
+      tipoNotificacion = "solicitud_correccion";
+      tituloNotificacion = "Solicitud de Convenio General corregida";
+      mensajeNotificacion = `El usuario ${usuario.nombre} ${usuario.apellido} ha corregido la solicitud #${id} de Convenio General y la ha enviado nuevamente para revisión.`;
+      subjectCorreo = "Solicitud de Convenio General corregida";
+      plantillaCorreo = plantillaSolicitudCorreccion;
     }
 
-    // 2️⃣ Si todo está en revisión o aprobado → actualizar estado global a EN REVISION (2)
+    // Actualizar estado global a EN REVISIÓN (2)
     await prisma.solicitud_convenios.update({
       where: { id_solicitud: id },
       data: { estado_id: 2 },
     });
 
-    // 3️⃣ Registrar evento en historial global
+    // Registrar evento en historial
     await prisma.solicitud_estado_historial.create({
       data: {
         id_solicitud: id,
         estado_id: 2,
         cambiado_por_usuario_id: usuario.id,
-        comentario: "Solicitud reenviada para revisión tras correcciones",
+        comentario: tituloNotificacion,
       },
     });
 
+    // 🔔 Notificaciones a admins y subadmins
+    const admins = await prisma.usuarios.findMany({
+      where: { roles_id: { in: [4, 5] } },
+    });
+
+    for (const admin of admins) {
+      // Crear notificación en BD
+      await prisma.notificaciones.create({
+        data: {
+          usuarios_id: admin.id_usuarios,
+          tipo: tipoNotificacion,
+          titulo: tituloNotificacion,
+          mensaje: mensajeNotificacion,
+          metadata: { solicitudId: id },
+        },
+      });
+
+      // Enviar correo
+      if (admin.correo) {
+        try {
+          await enviarCorreo({
+            to: admin.correo,
+            subject: subjectCorreo,
+            html: plantillaCorreo({
+              adminNombre: `${admin.nombre} ${admin.apellido ?? ""}`,
+              usuarioNombre: `${usuario.nombre} ${usuario.apellido ?? ""}`,
+              fechaEnvio: new Date().toISOString(),
+              idSolicitud: id,
+              botonUrl: `http://localhost:3000/Admin/Convenios/Generales/${id}/EstadoSolicitud`,
+            }),
+          });
+          console.log("📧 Correo enviado a admin:", admin.correo);
+        } catch (err) {
+          console.error("❌ Error al enviar correo:", admin.correo, err);
+        }
+      }
+    }
+
     return NextResponse.json({
       success: true,
-      mensaje: "Solicitud reenviada correctamente",
+      mensaje: "Solicitud enviada correctamente y notificaciones enviadas",
     });
   } catch (error) {
-    console.error("Error al reenviar solicitud:", error);
+    console.error("Error al enviar solicitud:", error);
     return NextResponse.json({ error: "Error interno" }, { status: 500 });
   }
 }

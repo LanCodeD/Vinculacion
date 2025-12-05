@@ -34,7 +34,7 @@ interface ConvenioConcretado {
   solicitud: {
     id_solicitud: number;
     tipo?: { nombre_tipo: string };
-    creador?: { nombre: string; correo: string };
+    creador?: { nombre: string; correo: string; apellido: string };
     estado?: { nombre_estado: string };
     solicitud_firmas_origen?: { firma?: { nombre: string } }[];
     detalle: {
@@ -262,7 +262,7 @@ export default function AdminConveniosConcretados() {
 
                 <td className="px-4 py-2">
                   <p className="font-semibold">
-                    {c.solicitud?.creador?.nombre ?? "—"}
+                    {c.solicitud?.creador?.nombre ?? "—"} {c.solicitud?.creador?.apellido ?? "-"}
                   </p>
                   <p className="text-xs text-gray-500">
                     {c.solicitud?.creador?.correo ?? "—"}

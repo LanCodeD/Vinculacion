@@ -73,6 +73,19 @@ export default function EstadoSolicitudAdmin() {
     }
   };
 
+  const notificarSolicitante = async () => {
+    const toastId = toast.loading("Enviando notificación...");
+    try {
+      await axios.post(
+        `/api/Admin/Convenios/${id_solicitud}/NotificarResultadoGene`
+      );
+      toast.success("Notificación enviada correctamente ✅", { id: toastId });
+    } catch (err) {
+      console.error("Error al notificar:", err);
+      toast.error("Error al enviar la notificación ❌", { id: toastId });
+    }
+  };
+
   if (cargando)
     return (
       <p className="text-center py-8 text-gray-700">Cargando solicitud...</p>
@@ -80,6 +93,11 @@ export default function EstadoSolicitudAdmin() {
 
   // 🔹 Nombres actualizados de los pasos
   const pasos = ["TipoConvenio", "DatosEmpresa", "Solicitante", "Eventos"];
+
+  const todosRevisados = pasos.every((p) => {
+    const reg = historial.find((h) => h.paso === p);
+    return reg?.estado_id === 3 || reg?.estado_id === 4;
+  });
 
   const estados = ["", "PENDIENTE", "EN_REVISIÓN", "APROBADO", "CORREGIR"];
   const bloqueado =
@@ -189,6 +207,17 @@ export default function EstadoSolicitudAdmin() {
           placeholder="Escribe un comentario sobre tu decisión..."
         />
       </div>
+
+      {todosRevisados && (
+        <div className="flex justify-end mt-4">
+          <button
+            onClick={notificarSolicitante}
+            className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded"
+          >
+            Notificar al solicitante
+          </button>
+        </div>
+      )}
     </div>
   );
 }

@@ -5,6 +5,8 @@ import { getSessionUser } from "@/lib/auth"; // ⚠️ ya lo usas antes, así qu
 import { writeFile } from "fs/promises";
 import fs from "fs/promises";
 import path from "path";
+import { plantillaConvenioConcretado } from "@/lib/PlantillasCorreos/convenioCocretado";
+import { enviarCorreo } from "@/lib/mailer";
 
 // 📌 Obtener todos los convenios concretados
 export async function GET() {
@@ -31,7 +33,7 @@ export async function GET() {
         solicitud: {
           select: {
             id_solicitud: true,
-            creador: { select: { nombre: true, correo: true } },
+            creador: { select: { nombre: true, correo: true, apellido:true } },
             estado: { select: { nombre_estado: true } },
             tipo: { select: { nombre_tipo: true } },
             solicitud_firmas_origen: {
@@ -272,7 +274,14 @@ export async function POST(req: NextRequest) {
             select: {
               id_solicitud: true,
               tipo: { select: { nombre_tipo: true } },
-              creador: { select: { nombre: true, correo: true } },
+              creador: {
+                select: {
+                  nombre: true,
+                  correo: true,
+                  id_usuarios: true,
+                  apellido: true,
+                },
+              },
               estado: { select: { nombre_estado: true } },
               solicitud_firmas_origen: {
                 select: {
@@ -284,6 +293,39 @@ export async function POST(req: NextRequest) {
         },
       });
     });
+
+    // Después de la transacción
+    // 🔔 Notificar al solicitante
+    if (resultado?.solicitud?.creador?.correo) {
+      const solicitanteId = resultado.solicitud.id_solicitud;
+      const solicitanteNombreCompleto = `${
+        resultado.solicitud.creador.nombre
+      } ${resultado.solicitud.creador.apellido ?? ""}`;
+      const solicitanteCorreo = resultado.solicitud.creador.correo;
+      const tipoConvenio = resultado.solicitud.tipo?.nombre_tipo; // "General" o "Específico"
+
+      // 1️⃣ Crear notificación en BD
+      await prisma.notificaciones.create({
+        data: {
+          usuarios_id: resultado.solicitud.creador.id_usuarios,
+          tipo: "convenio_concretado",
+          titulo: `Tu convenio ${tipoConvenio} ha sido concretado`,
+          mensaje: `El convenio ${tipoConvenio} correspondiente a tu solicitud #${solicitanteId} ha sido firmado y registrado en el sistema.`,
+          metadata: { solicitudId: solicitanteId },
+        },
+      });
+
+      await enviarCorreo({
+        to: solicitanteCorreo,
+        subject: `Tu convenio ${tipoConvenio} ha sido concretado`,
+        html: plantillaConvenioConcretado({
+          usuarioNombre: solicitanteNombreCompleto,
+          idSolicitud: solicitanteId,
+          tipoConvenio,
+          botonUrl: `http://localhost:3000/Historial`,
+        }),
+      });
+    }
 
     return NextResponse.json(resultado, { status: 201 });
   } catch (error) {
