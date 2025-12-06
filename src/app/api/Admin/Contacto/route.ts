@@ -30,7 +30,14 @@ export async function GET() {
         },
         empresas: {
           select: {
-            nombre_comercial: true,
+            id_empresas: true,
+            nombre_comercial: true, // 🔹 nombre de la empresa
+          },
+        },
+        grupos: {
+          select: {
+            id_grupos: true,
+            nombre_grupo: true, // 🔹 nombre del grupo
           },
         },
       },
@@ -42,3 +49,47 @@ export async function GET() {
     return NextResponse.json({ error: "Error interno" }, { status: 500 });
   }
 }
+
+export async function POST(req: Request) {
+  try {
+    const usuario = await getSessionUser();
+
+    if (!usuario || usuario.role !== "Administrador") {
+      return NextResponse.json({ error: "No autorizado" }, { status: 403 });
+    }
+
+    const body = await req.json();
+
+    const nuevoContacto = await prisma.contactos.create({
+      data: {
+        nombre: body.nombre,
+        apellido: body.apellido,
+        correo: body.correo,
+        puesto: body.puesto,
+        titulo: body.titulo,
+        empresas_id: body.empresas_id, // viene del Select
+        grupos_id: body.grupos_id || null, // opcional
+        es_representante: body.es_representante ?? 0,
+        contacto_estados_id: 1, // por defecto "Activo"
+      },
+      select: {
+        id_contactos: true,
+        nombre: true,
+        apellido: true,
+        correo: true,
+        puesto: true,
+        titulo: true,
+        empresas: { select: { id_empresas: true, nombre_comercial: true } },
+        grupos: { select: { id_grupos: true, nombre_grupo: true } },
+        contacto_estados: { select: { nombre_estado: true } },
+        creado_en: true,
+      },
+    });
+
+    return NextResponse.json(nuevoContacto, { status: 201 });
+  } catch (error) {
+    console.error("❌ Error al crear contacto:", error);
+    return NextResponse.json({ error: "Error interno" }, { status: 500 });
+  }
+}
+
