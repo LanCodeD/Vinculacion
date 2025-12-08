@@ -44,7 +44,7 @@ model contactos {
   actualizado_en      DateTime         @default(now()) @db.DateTime(0)
   empresas            empresas         @relation(fields: [empresas_id], references: [id_empresas], map: "fk_contactos_empresa")
   contacto_estados    contacto_estados @relation(fields: [contacto_estados_id], references: [id_contacto_estados], map: "fk_contactos_estado")
-  grupos              grupos?          @relation(fields: [grupos_id], references: [id_grupos], map: "fk_contactos_grupo")
+  grupos              grupos?          @relation(fields: [grupos_id], references: [id_grupos], map: "fk_contactos_grupo", onDelete: Restrict)
   usuarios            usuarios?        @relation(fields: [usuarios_id], references: [id_usuarios], map: "fk_contactos_usuario")
   notificaciones      notificaciones[]
 

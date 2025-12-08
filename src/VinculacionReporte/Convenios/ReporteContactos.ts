@@ -6,12 +6,13 @@ type Contacto = {
   apellido?: string;
   correo?: string;
   puesto?: string;
+  titulo?: string;
   empresas?: { nombre_comercial?: string };
-  grupos_id?: number;
+ // grupos?: {nombre_grupo?: string};
   contacto_estados?: { nombre_estado?: string };
-  creado_en: string;
+  celular?: string;
+  //creado_en: string;
 };
-
 
 export function renderReporteContactosHTML(contactos: Contacto[]) {
   const rows = contactos
@@ -21,11 +22,11 @@ export function renderReporteContactosHTML(contactos: Contacto[]) {
         <td class="cell">${c.nombre ?? "—"}</td>
         <td class="cell">${c.apellido ?? "—"}</td>
         <td class="cell">${c.correo ?? "—"}</td>
-        <td class="cell">${c.puesto ?? "—"}</td>
+        <td class="cell">${c.celular ?? "—"}</td>
+        <td class="cell">${c.titulo ?? "—"}</td>
         <td class="cell">${c.empresas?.nombre_comercial ?? "—"}</td>
-        <td class="cell">${c.grupos_id ?? "—"}</td>
+        <td class="cell">${c.puesto ?? "—"}</td>
         <td class="cell">${c.contacto_estados?.nombre_estado ?? "—"}</td>
-        <td class="cell">${dayjs(c.creado_en).format("DD/MM/YYYY")}</td>
       </tr>
     `
     )
@@ -46,11 +47,11 @@ export function renderReporteContactosHTML(contactos: Contacto[]) {
           <th>Nombre</th>
           <th>Apellido</th>
           <th>Correo</th>
-          <th>Puesto</th>
+          <th>Celular</th>
+          <th>Grado Académico</th>
           <th>Empresa</th>
-          <th>Grupo ID</th>
+          <th>Puesto</th>
           <th>Estado</th>
-          <th>Creado</th>
         </tr>
       </thead>
       <tbody>

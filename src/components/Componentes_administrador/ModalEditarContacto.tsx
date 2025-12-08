@@ -1,6 +1,6 @@
 import { AnimatePresence, motion } from "framer-motion";
 import Select, { SingleValue } from "react-select";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Contacto } from "@/app/Admin/Contactos/page"; // tu interfaz centralizada
 import axios from "axios";
 import toast from "react-hot-toast";
@@ -17,6 +17,7 @@ interface ModalEditarContactoProps {
   contacto: Contacto | null;
   empresas: { id_empresas: number; nombre_comercial: string }[];
   grupos: { id_grupos: number; nombre_grupo: string }[];
+  activos: { id_contacto_estados: number; nombre_estado: string }[];
 }
 
 export default function ModalEditarContacto({
@@ -26,6 +27,7 @@ export default function ModalEditarContacto({
   contacto,
   empresas,
   grupos,
+  activos,
 }: ModalEditarContactoProps) {
   const [empresaSeleccionada, setEmpresaSeleccionada] = useState<number | null>(
     contacto?.empresas?.id_empresas ?? null
@@ -33,7 +35,21 @@ export default function ModalEditarContacto({
   const [grupoSeleccionado, setGrupoSeleccionado] = useState<number | null>(
     contacto?.grupos?.id_grupos ?? null
   );
+  const [estadoSeleccionado, setEstadoSeleccionado] = useState<number>(
+    contacto?.contacto_estados?.id_contacto_estados ?? 1
+  );
+
   const [cargando, setCargando] = useState(false);
+
+  useEffect(() => {
+    if (contacto) {
+      setEmpresaSeleccionada(contacto.empresas?.id_empresas ?? null);
+      setGrupoSeleccionado(contacto.grupos?.id_grupos ?? null);
+      setEstadoSeleccionado(
+        contacto.contacto_estados?.id_contacto_estados ?? 2
+      );
+    }
+  }, [contacto]);
 
   if (!abierto || !contacto) return null;
 
@@ -48,10 +64,12 @@ export default function ModalEditarContacto({
         apellido: formData.get("apellido"),
         correo: formData.get("correo"),
         puesto: formData.get("puesto"),
+        celular: formData.get("celular"),
         titulo: formData.get("titulo"),
         empresas_id: empresaSeleccionada,
         grupos_id: grupoSeleccionado,
         es_representante: formData.get("es_representante") ? 1 : 0,
+        contacto_estados_id: estadoSeleccionado, // 👈 nuevo campo
       });
       toast.success("Contacto actualizado correctamente");
       onUpdated();
@@ -137,6 +155,45 @@ export default function ModalEditarContacto({
               />
             </div>
 
+            {/* 🔹 Celular */}
+            <div className="mb-3">
+              <label className="block text-sm font-medium">Celular</label>
+              <input
+                name="celular"
+                defaultValue={contacto.celular ?? ""}
+                className="w-full border rounded-lg px-3 py-2 mt-1 focus:ring-2 focus:ring-[#011848]"
+              />
+            </div>
+
+            {/* 🔹 Estado */}
+            <div className="mb-3">
+              <label className="block text-sm font-medium">Estado</label>
+              <Select
+                value={
+                  estadoSeleccionado
+                    ? {
+                        value: estadoSeleccionado,
+                        label:
+                          activos.find(
+                            (e) => e.id_contacto_estados === estadoSeleccionado
+                          )?.nombre_estado || "Activo",
+                      }
+                    : null
+                }
+                options={activos.map((e) => ({
+                  value: e.id_contacto_estados,
+                  label: e.nombre_estado,
+                }))}
+                className="mt-1"
+                classNamePrefix="react-select"
+                placeholder="Seleccione estado..."
+                isSearchable={false}
+                onChange={(opt: SingleValue<OptionType>) =>
+                  setEstadoSeleccionado(opt ? opt.value : 1)
+                }
+              />
+            </div>
+
             {/* 🔹 Empresa */}
             <div className="mb-3">
               <label className="block text-sm font-medium">Empresa</label>
@@ -165,7 +222,9 @@ export default function ModalEditarContacto({
 
             {/* 🔹 Grupo */}
             <div className="mb-3">
-              <label className="block text-sm font-medium">Grupo (opcional)</label>
+              <label className="block text-sm font-medium">
+                Grupo (opcional)
+              </label>
               <Select
                 defaultValue={
                   contacto.grupos

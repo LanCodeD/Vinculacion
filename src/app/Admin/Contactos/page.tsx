@@ -5,18 +5,21 @@ import axios from "axios";
 import { FaFilePdf } from "react-icons/fa";
 import ModalCrearContacto from "@/components/Componentes_administrador/ModalCrearContacto";
 import ModalEditarContacto from "@/components/Componentes_administrador/ModalEditarContacto";
+import { FaEdit } from "react-icons/fa";
 
- export interface Contacto {
+export interface Contacto {
   id_contactos: number;
   nombre: string | null;
   apellido: string | null;
   correo: string | null;
   puesto: string | null;
+  celular: string | null;
   titulo: string | null;
   empresas_id: number;
   es_representante: number;
   creado_en: string;
   contacto_estados: {
+    id_contacto_estados: number;
     nombre_estado: string;
   };
   empresas: {
@@ -40,9 +43,35 @@ export default function ContactoEstadosPage() {
   const [grupos, setGrupos] = useState<
     { id_grupos: number; nombre_grupo: string }[]
   >([]);
+  const [activos, setActivos] = useState<
+    { id_contacto_estados: number; nombre_estado: string }[]
+  >([]);
   const [modalEditar, setModalEditar] = useState(false);
   const [contactoSeleccionado, setContactoSeleccionado] =
     useState<Contacto | null>(null);
+
+  const [busqueda, setBusqueda] = useState("");
+  const [paginaActual, setPaginaActual] = useState(1);
+  const contactosPorPagina = 6;
+
+  // Filtrar por búsqueda
+  const contactosFiltrados = contactos.filter((c) =>
+    `${c.nombre} ${c.apellido} ${c.correo} ${c.empresas.nombre_comercial} ${c.titulo}`
+      .toLowerCase()
+      .includes(busqueda.toLowerCase())
+  );
+
+  // Paginación
+  const indiceUltimo = paginaActual * contactosPorPagina;
+  const indicePrimero = indiceUltimo - contactosPorPagina;
+  const contactosPaginados = contactosFiltrados.slice(
+    indicePrimero,
+    indiceUltimo
+  );
+
+  const totalPaginas = Math.ceil(
+    contactosFiltrados.length / contactosPorPagina
+  );
 
   const cargarDatos = useCallback(async () => {
     try {
@@ -54,6 +83,9 @@ export default function ContactoEstadosPage() {
 
       const dataGrupos = await fetchGrupos();
       setGrupos(dataGrupos);
+
+      const dataActivos = await fetchActivo();
+      setActivos(dataActivos);
     } catch (err) {
       setError((err as Error).message);
     }
@@ -85,6 +117,19 @@ export default function ContactoEstadosPage() {
     }
   };
 
+  // 🔹 Recuperar todas las empresas
+  const fetchActivo = async (): Promise<
+    { id_contacto_estados: number; nombre_estado: string }[]
+  > => {
+    try {
+      const res = await axios.get("/api/Admin/Contacto/Activo");
+      return res.data;
+    } catch (err) {
+      console.error("Error al cargar empresas:", err);
+      throw new Error("No se pudo cargar la información de empresas");
+    }
+  };
+
   // 🔹 Recuperar todos los grupos
   const fetchGrupos = async (): Promise<
     { id_grupos: number; nombre_grupo: string }[]
@@ -99,9 +144,10 @@ export default function ContactoEstadosPage() {
   };
 
   return (
-    <main className="p-6 text-black">
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold mb-6 text-gray-800">
+    <main className="p-6 text-black space-y-6">
+      {/* Encabezado */}
+      <div className="flex justify-between items-center">
+        <h1 className="text-3xl font-bold text-gray-800 flex items-center gap-2">
           Contactos Registrados
         </h1>
         <button
@@ -112,19 +158,27 @@ export default function ContactoEstadosPage() {
         </button>
       </div>
 
-      {error && <p className="text-red-500 mb-4">{error}</p>}
-      <div className="flex justify-end mb-4">
+      {error && <p className="text-red-500">{error}</p>}
+
+      {/* Toolbar: búsqueda + exportar */}
+      <div className="flex justify-between items-center mb-4">
+        <input
+          type="text"
+          value={busqueda}
+          onChange={(e) => setBusqueda(e.target.value)}
+          placeholder="Buscar contacto..."
+          className="border rounded-lg px-3 py-2 w-64 focus:ring-2 focus:ring-[#011848]"
+        />
+
         <button
           onClick={async () => {
             try {
-              setDescargando(true); // 🔵 Bloquea el botón
-
+              setDescargando(true);
               const res = await axios.post(
                 "/api/Admin/Convenios/Concretados/reportes/Contactos",
                 { contactos },
                 { responseType: "blob" }
               );
-
               const url = URL.createObjectURL(res.data);
               const link = document.createElement("a");
               link.href = url;
@@ -136,7 +190,7 @@ export default function ContactoEstadosPage() {
             } catch (error) {
               console.error("Error al generar PDF:", error);
             } finally {
-              setDescargando(false); // 🔴 Libera el botón
+              setDescargando(false);
             }
           }}
           disabled={descargando}
@@ -157,39 +211,49 @@ export default function ContactoEstadosPage() {
         </button>
       </div>
 
+      {/* Tabla */}
       <div className="overflow-x-auto rounded-lg shadow border border-gray-200">
         <table className="min-w-full text-sm text-left bg-white">
-          <thead className="bg-gray-50 text-gray-700 text-sm font-semibold">
+          <thead className="bg-[#011848] text-white text-sm font-semibold">
             <tr>
-              <th className="px-4 py-3 border-b text-left">ID</th>
-              <th className="px-4 py-3 border-b text-left">Nombre</th>
-              <th className="px-4 py-3 border-b text-left">Apellido</th>
-              <th className="px-4 py-3 border-b text-left">Correo</th>
-              <th className="px-4 py-3 border-b text-left">Puesto</th>
-              <th className="px-4 py-3 border-b text-left">Empresa</th>
-              <th className="px-4 py-3 border-b text-left">Grupo ID</th>
-              <th className="px-4 py-3 border-b text-left">Representante</th>
-              <th className="px-4 py-3 border-b text-left">Estado</th>
-              <th className="px-4 py-3 border-b text-left">Creado</th>
-              <th className="px-4 py-3 border-b text-left">Acciones</th>
+              
+              <th className="px-4 py-3">Nombre</th>
+              <th className="px-4 py-3">Apellido</th>
+              <th className="px-4 py-3">Correo</th>
+              <th className="px-4 py-3">Celular</th>
+              <th className="px-4 py-3">Grado Académico</th>
+              <th className="px-4 py-3">Empresa</th>
+              <th className="px-4 py-3">Puesto</th>
+              <th className="px-4 py-3">Grupo</th>
+              <th className="px-4 py-3 text-center">Representante</th>
+              <th className="px-4 py-3">Estado</th>
+            
+              <th className="px-4 py-3 text-center">Acciones</th>
             </tr>
           </thead>
 
-          <tbody className="divide-y divide-gray-100">
-            {contactos.map((c) => (
-              <tr key={c.id_contactos} className="hover:bg-gray-50 transition">
-                <td className="px-4 py-2">{c.id_contactos}</td>
+          <tbody>
+            {contactosPaginados.map((c, idx) => (
+              <tr
+                key={c.id_contactos}
+                className={`${
+                  idx % 2 === 0 ? "bg-white" : "bg-gray-50"
+                } hover:bg-gray-100 transition`}
+              >
+                
                 <td className="px-4 py-2">{c.nombre ?? "—"}</td>
                 <td className="px-4 py-2">{c.apellido ?? "—"}</td>
                 <td className="px-4 py-2">{c.correo ?? "—"}</td>
-                <td className="px-4 py-2">{c.puesto ?? "—"}</td>
+                <td className="px-4 py-2">{c.celular ?? "—"}</td>
+                <td className="px-4 py-2">{c.titulo ?? "—"}</td>
                 <td className="px-4 py-2">
                   {c.empresas?.nombre_comercial ?? "—"}
                 </td>
+                <td className="px-4 py-2">{c.puesto ?? "—"}</td>
                 <td className="px-4 py-2">
                   {c.grupos?.nombre_grupo ?? "Sin Grupo"}
                 </td>
-                <td className="px-4 py-2">
+                <td className="px-4 py-2 text-center">
                   <span
                     className={`px-2 py-1 rounded text-xs font-medium ${
                       c.es_representante === 1
@@ -211,24 +275,50 @@ export default function ContactoEstadosPage() {
                     {c.contacto_estados?.nombre_estado ?? "—"}
                   </span>
                 </td>
-                <td className="px-4 py-2">
-                  {new Date(c.creado_en).toLocaleDateString()}
-                </td>
-                <td className="px-4 py-2">
+                <td className="px-4 py-2 text-center">
                   <button
                     onClick={() => {
                       setContactoSeleccionado(c);
                       setModalEditar(true);
                     }}
-                    className="px-3 py-1 text-xs rounded bg-yellow-500 text-white hover:bg-yellow-600 transition"
+                    className="p-2 rounded-full bg-yellow-50 text-yellow-600 hover:bg-yellow-100 transition"
+                    title="Editar"
                   >
-                    Editar
+                    <FaEdit />
                   </button>
                 </td>
               </tr>
             ))}
           </tbody>
         </table>
+      </div>
+      {/* Paginación */}
+      <div className="flex justify-center mt-4 gap-2">
+        <button
+          disabled={paginaActual === 1}
+          onClick={() => setPaginaActual(paginaActual - 1)}
+          className="px-3 py-1 rounded-full border disabled:opacity-50"
+        >
+          ←
+        </button>
+        {Array.from({ length: totalPaginas }, (_, i) => (
+          <button
+            key={i}
+            onClick={() => setPaginaActual(i + 1)}
+            className={`px-3 py-1 rounded-full border ${
+              paginaActual === i + 1 ? "bg-[#011848] text-white" : "bg-white"
+            }`}
+          >
+            {i + 1}
+          </button>
+        ))}
+        <button
+          disabled={paginaActual === totalPaginas}
+          onClick={() => setPaginaActual(paginaActual + 1)}
+          className="px-3 py-1 rounded-full border disabled:opacity-50"
+        >
+          →
+        </button>
       </div>
       <ModalCrearContacto
         abierto={modalCrear}
@@ -238,14 +328,14 @@ export default function ContactoEstadosPage() {
         grupos={grupos}
       />
       <ModalEditarContacto
-  abierto={modalEditar}
-  onClose={() => setModalEditar(false)}
-  onUpdated={cargarDatos}
-  contacto={contactoSeleccionado}
-  empresas={empresas}
-  grupos={grupos}
-/>
-
+        abierto={modalEditar}
+        onClose={() => setModalEditar(false)}
+        onUpdated={cargarDatos}
+        contacto={contactoSeleccionado}
+        empresas={empresas}
+        grupos={grupos}
+        activos={activos}
+      />
     </main>
   );
 }

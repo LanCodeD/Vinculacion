@@ -1,14 +1,11 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getSessionUser } from "@/lib/auth";
 
-interface Params {
-  params: {
-    id: string;
-  };
-}
-
-export async function PUT(req: Request, { params }: Params) {
+export async function PUT(
+  req: NextRequest,
+  context: { params: Promise<{ id_contactos: string }> }
+) {
   try {
     const usuario = await getSessionUser();
 
@@ -16,8 +13,10 @@ export async function PUT(req: Request, { params }: Params) {
       return NextResponse.json({ error: "No autorizado" }, { status: 403 });
     }
 
-    const id = Number(params.id);
+    const { id_contactos } = await context.params;
+    const id = parseInt(id_contactos, 10);
     const body = await req.json();
+    console.log("esto recupera del body frontend: ", body)
 
     const contactoActualizado = await prisma.contactos.update({
       where: { id_contactos: id },
@@ -26,9 +25,13 @@ export async function PUT(req: Request, { params }: Params) {
         apellido: body.apellido,
         correo: body.correo,
         puesto: body.puesto,
+        celular: body.celular,
         titulo: body.titulo,
-        empresas_id: body.empresas_id,
-        grupos_id: body.grupos_id || null,
+        empresas: { connect: { id_empresas: body.empresas_id } }, // 👈 relación
+        grupos: body.grupos_id
+          ? { connect: { id_grupos: body.grupos_id } }
+          : { disconnect: true }, // 👈 opcional: desconectar si viene null
+        contacto_estados: { connect: { id_contacto_estados: body.contacto_estados_id } }, // 👈 relación
         es_representante: body.es_representante ?? 0,
         actualizado_en: new Date(),
       },
@@ -38,10 +41,11 @@ export async function PUT(req: Request, { params }: Params) {
         apellido: true,
         correo: true,
         puesto: true,
+        celular: true,
         titulo: true,
         empresas: { select: { id_empresas: true, nombre_comercial: true } },
         grupos: { select: { id_grupos: true, nombre_grupo: true } },
-        contacto_estados: { select: { nombre_estado: true } },
+        contacto_estados: { select: { id_contacto_estados: true, nombre_estado:true } },
         creado_en: true,
         actualizado_en: true,
       },

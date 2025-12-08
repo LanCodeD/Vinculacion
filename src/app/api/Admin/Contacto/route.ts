@@ -17,6 +17,7 @@ export async function GET() {
         nombre: true,
         apellido: true,
         correo: true,
+        celular: true,
         puesto: true,
         titulo: true,
         empresas_id: true,
@@ -25,6 +26,7 @@ export async function GET() {
         creado_en: true,
         contacto_estados: {
           select: {
+            id_contacto_estados:true,
             nombre_estado: true,
           },
         },
@@ -66,6 +68,7 @@ export async function POST(req: Request) {
         apellido: body.apellido,
         correo: body.correo,
         puesto: body.puesto,
+        celular: body.celular,
         titulo: body.titulo,
         empresas_id: body.empresas_id, // viene del Select
         grupos_id: body.grupos_id || null, // opcional
@@ -78,6 +81,7 @@ export async function POST(req: Request) {
         apellido: true,
         correo: true,
         puesto: true,
+        celular: true,
         titulo: true,
         empresas: { select: { id_empresas: true, nombre_comercial: true } },
         grupos: { select: { id_grupos: true, nombre_grupo: true } },

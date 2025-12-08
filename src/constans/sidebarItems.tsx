@@ -4,6 +4,7 @@ import { BiChat } from "react-icons/bi";
 import { GoGraph } from "react-icons/go";
 import { FaGears } from "react-icons/fa6";
 import { IoIosContacts } from "react-icons/io";
+import { IoIosContact } from "react-icons/io";
 
 export const USER_MENUS = [
   {
@@ -101,7 +102,10 @@ export const ADMIN_MENUS = [
         title: "Reporte de Convenios",
         key: "reporte-convenios",
         subMenu: [
-          { title: "Reporte Convenios Concretados", path: "/Admin/Convenios/Reportes" },
+          {
+            title: "Reporte Convenios Concretados",
+            path: "/Admin/Convenios/Reportes",
+          },
           {
             title: "Reporte Solicitudes No Finalizadas",
             path: "/Admin/Convenios/Reportes/Solicitudes",
@@ -135,5 +139,10 @@ export const ADMIN_MENUS = [
     title: "Contactos",
     icon: <IoIosContacts />,
     path: "/Admin/Contactos",
+  },
+  {
+    title: "Grupos",
+    icon: <IoIosContact />,
+    path: "/Admin/Grupos",
   },
 ];

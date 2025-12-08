@@ -44,6 +44,7 @@ export default function ModalCrearContacto({
         apellido: formData.get("apellido"),
         correo: formData.get("correo"),
         puesto: formData.get("puesto"),
+        celular: formData.get("celular"),
         titulo: formData.get("titulo"),
         empresas_id: empresaSeleccionada, // 🔹 viene del Select
         grupos_id: grupoSeleccionado, // 🔹 viene del Select
@@ -111,7 +112,9 @@ export default function ModalCrearContacto({
             </div>
             {/* 🔹 Título */}
             <div className="mb-3">
-              <label className="block text-sm font-medium">Título</label>
+              <label className="block text-sm font-medium">
+                Grado Académico
+              </label>
               <input
                 name="titulo"
                 className="w-full border rounded-lg px-3 py-2 mt-1 focus:ring-2 focus:ring-[#011848]"
@@ -124,6 +127,17 @@ export default function ModalCrearContacto({
               <label className="block text-sm font-medium">Puesto</label>
               <input
                 name="puesto"
+                placeholder="Recursos Humanos, Ventas..."
+                className="w-full border rounded-lg px-3 py-2 mt-1 focus:ring-2 focus:ring-[#011848]"
+              />
+            </div>
+
+            {/* 🔹 Celular */}
+            <div className="mb-3">
+              <label className="block text-sm font-medium">Celular</label>
+              <input
+                name="celular"
+                placeholder="985..."
                 className="w-full border rounded-lg px-3 py-2 mt-1 focus:ring-2 focus:ring-[#011848]"
               />
             </div>
