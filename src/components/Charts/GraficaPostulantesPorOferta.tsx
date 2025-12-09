@@ -36,12 +36,10 @@ export default function GraficaPostulantesPorOferta() {
         const json = await resp.json();
         if (!json.ok) return;
 
-        // ya vienen: postulantes, aceptados, rechazados
         const ordenado = json.data.sort(
           (a: OfertaDashboardData, b: OfertaDashboardData) =>
             b.postulantes - a.postulantes
         );
-
 
         setData(ordenado);
       } catch (e) {
@@ -53,18 +51,24 @@ export default function GraficaPostulantesPorOferta() {
   }, []);
 
   return (
-    <div className="bg-white shadow-lg rounded-2xl p-6 w-full">
-      <h2 className="text-xl font-bold text-gray-800 mb-4">
-        📊 Postulantes por Oferta
-      </h2>
-      <p className="text-gray-500 text-sm mb-4">
-        Total, aceptados y rechazados por oferta.
+    <div className="bg-white rounded-xl shadow-md w-full p-6 flex flex-col space-y-6">
+
+      {/* TÍTULO ESTILO PROFESIONAL VERDE */}
+      <div className="flex items-center justify-between w-full">
+        <h2 className="text-2xl font-bold text-gray-800 border-l-4 border-green-500 pl-4">
+          Postulantes por oferta
+        </h2>
+      </div>
+
+      <p className="text-gray-500 text-sm -mt-2">
+        Comparativa de postulantes, aceptados y rechazados por vacante.
       </p>
 
+      {/* GRÁFICA */}
       <div className="w-full h-[420px]">
         <ResponsiveContainer width="100%" height="100%">
           <BarChart data={data}>
-            <CartesianGrid strokeDasharray="3 3" opacity={0.2} />
+            <CartesianGrid strokeDasharray="3 3" opacity={0.25} />
 
             <XAxis
               dataKey="titulo"
@@ -81,6 +85,8 @@ export default function GraficaPostulantesPorOferta() {
               contentStyle={{
                 borderRadius: "10px",
                 padding: "8px 12px",
+                background: "white",
+                border: "1px solid #e5e7eb",
               }}
             />
 
@@ -112,6 +118,7 @@ export default function GraficaPostulantesPorOferta() {
           </BarChart>
         </ResponsiveContainer>
       </div>
+
     </div>
   );
 }

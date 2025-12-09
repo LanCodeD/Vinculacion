@@ -1,6 +1,10 @@
 // src/app/Admin/BolsaTrabajoAD/page.tsx
 import { prisma } from "@/lib/prisma";
 import TablaVacantes from "@/components/Componentes_administrador/TablaVacantes";
+import dayjs from "dayjs";
+import utc from "dayjs/plugin/utc";
+
+dayjs.extend(utc);
 
 type VacanteConRelaciones = {
   id_ofertas: number;

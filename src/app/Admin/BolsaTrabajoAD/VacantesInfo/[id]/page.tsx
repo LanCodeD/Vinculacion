@@ -5,6 +5,10 @@ import Link from "next/link";
 import React from "react";
 import { getFechaLocalSinHora } from "@/lib/fechaLocal";
 import Image from "next/image";
+import dayjs from "dayjs";
+import utc from "dayjs/plugin/utc";
+
+dayjs.extend(utc);
 
 interface Oferta {
   id: number;

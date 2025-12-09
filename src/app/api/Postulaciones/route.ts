@@ -2,6 +2,7 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { enviarCorreo } from '@/lib/mailer'; // tu función de envío de correo
+import { correoNuevaPostulacion } from "@/lib/PlantillasCorreos/postulantesOfertas";
 
 export async function POST(req: Request) {
   try {
@@ -73,14 +74,18 @@ export async function POST(req: Request) {
     });
 
     if (usuarioEmpresa?.correo) {
+      const htmlCorreo = correoNuevaPostulacion({
+        nombreEmpresa: usuarioEmpresa.nombre,
+        tituloOferta: postulacion.oferta.titulo,
+        urlPanel: `${process.env.NEXT_PUBLIC_URL}/empresa/postulaciones/${postulacion.id_postulaciones}`,
+      });
+
       await enviarCorreo({
         to: usuarioEmpresa.correo,
-        subject: `Nueva postulación a "${postulacion.oferta.titulo}"`,
-        html: `<p>Hola ${usuarioEmpresa.nombre},</p>
-               <p>Un egresado se ha postulado a tu vacante "<strong>${postulacion.oferta.titulo}</strong>".</p>
-               <p>Revisa la postulación en el panel de administración de tu empresa.</p>
-               <p>Saludos,<br/>Equipo de Vinculación</p>`,
+        subject: "Nueva postulación recibida",
+        html: htmlCorreo,
       });
+
       console.log("Correo enviado a empresa:", usuarioEmpresa.correo);
     }
 

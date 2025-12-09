@@ -123,11 +123,13 @@ export default function BolsaTrabajo() {
           </div>
 
           {/* GRÁFICAS */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <div className="bg-white rounded-xl p-6 border border-gray-200 shadow-md">
+          <div className="flex flex-col gap-6">
+            <div className="rounded-xl border p-0 border-gray-200 shadow-md">
               <GraficaOfertasPorMes />
             </div>
-            <div className="bg-white rounded-xl p-6 border border-gray-200 shadow-md">
+
+
+            <div className="rounded-xl border p-0 border-gray-200 shadow-md">
               <GraficaPostulantesPorOferta />
             </div>
           </div>

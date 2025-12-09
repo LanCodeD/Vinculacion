@@ -116,10 +116,10 @@ export const ADMIN_MENUS = [
         title: "Reporte Bolsa de Trabajo",
         key: "reporte-admin-bolsa",
         subMenu: [
-          { title: "Vacantes", path: "/Admin/BolsaTrabajoAD" },
+          { title: "Vacantes", path: "/Admin/BolsaTrabajoAD/ReportesBolsa" },
           {
             title: "Postulaciones",
-            path: "/Admin/BolsaTrabajoAD/VacantesInfo",
+            path: "/Admin/BolsaTrabajoAD/ReportesBolsa/Postulaciones",
           },
         ],
       },
