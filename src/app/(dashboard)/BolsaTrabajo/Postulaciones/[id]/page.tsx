@@ -38,15 +38,6 @@ export default function PostulacionesPage() {
   const [selectedPostulante, setSelectedPostulante] =
     useState<Postulacion | null>(null);
 
-  // textarea dentro del toast
-  const [motivoRechazoTemp, setMotivoRechazoTemp] = useState("");
-
-  // textarea del modal interno dentro del modal del postulante
-  const [motivoRechazo, setMotivoRechazo] = useState("");
-
-  // id del modal interno de rechazo
-  const [modalRechazoId, setModalRechazoId] = useState<number | null>(null);
-
   useEffect(() => {
     if (!id) return;
     if (session === undefined) return;
@@ -65,7 +56,6 @@ export default function PostulacionesPage() {
   const confirmarCambioEstado = (
     postulacionId: number,
     accion: "aprobar" | "rechazar",
-    motivo?: string // ← 🔵 NUEVO
   ) => {
     if (!session?.user) {
       toast("Debes iniciar sesión");
