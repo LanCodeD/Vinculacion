@@ -144,7 +144,7 @@ export default function ContactoEstadosPage() {
   };
 
   return (
-    <main className="p-6 text-black space-y-6">
+     <div className="p-6 bg-white rounded-xl shadow-lg text-black space-y-6 w-full h-full">
       {/* Encabezado */}
       <div className="flex justify-between items-center">
         <h1 className="text-3xl font-bold text-gray-800 flex items-center gap-2">
@@ -336,6 +336,6 @@ export default function ContactoEstadosPage() {
         grupos={grupos}
         activos={activos}
       />
-    </main>
+    </div>
   );
 }

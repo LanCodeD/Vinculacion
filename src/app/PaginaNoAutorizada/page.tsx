@@ -3,7 +3,7 @@ import { LockKeyhole } from "lucide-react";
 
 export default function PaginaNoAutorizada() {
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-br from-slate-100 via-white to-slate-200 dark:from-slate-900 dark:via-slate-950 dark:to-slate-900">
+    <div className="flex min-h-screen flex-col items-center justify-center bg-linear-to-br from-slate-100 via-white to-slate-200 dark:from-slate-900 dark:via-slate-950 dark:to-slate-900">
       <div className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl rounded-2xl shadow-xl p-10 text-center max-w-lg">
         {/* Icono */}
         <div className="flex justify-center mb-6">
@@ -40,7 +40,7 @@ export default function PaginaNoAutorizada() {
 
       {/* Footer con un toque */}
       <p className="mt-8 text-sm text-slate-500 dark:text-slate-400">
-        Error 403 · © {new Date().getFullYear()} Vinculación
+        Error 403 · © {new Date().getFullYear()} Vinculación ITSVA
       </p>
     </div>
   );

@@ -6,6 +6,8 @@ import toast from "react-hot-toast";
 import { ModalEditarGrupo } from "@/components/Componentes_administrador/ModalEditarGrupo";
 import ModalConfirmacion from "@/components/ModalConfirmacionAdmin";
 import { FaEdit, FaTrash } from "react-icons/fa";
+import { useSession } from "next-auth/react";
+import PaginaNoPermisos from "@/app/PaginaNoAutorizada/NoPermisos/page";
 
 interface Grupo {
   id_grupos: number;
@@ -16,6 +18,8 @@ interface Grupo {
 }
 
 export default function AdminGrupos() {
+  const { data: session } = useSession();
+  const role = session?.user?.role;
   const [grupos, setGrupos] = useState<Grupo[]>([]);
   const [nuevoGrupo, setNuevoGrupo] = useState("");
   const [cargando, setCargando] = useState(false);
@@ -55,7 +59,7 @@ export default function AdminGrupos() {
 
   const cargarGrupos = async () => {
     try {
-      const res = await axios.get<Grupo[]>("/api/Admin/Contacto/Grupos");
+      const res = await axios.get<Grupo[]>("/api/Admin/Contacto/Grupos/valida");
       setGrupos(res.data);
     } catch {
       toast.error("No se pudieron cargar los grupos");
@@ -85,6 +89,9 @@ export default function AdminGrupos() {
     fetchGrupos();
   }, []);
 
+  if (role === "Personal-Plantel") {
+    return <PaginaNoPermisos />;
+  }
   // 🔹 Crear grupo
   const manejarCrearGrupo = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -101,9 +108,14 @@ export default function AdminGrupos() {
       toast.success("Grupo creado correctamente");
       setGrupos(res.data); // añadir al inicio
       setNuevoGrupo("");
-    } catch (err: any) {
-      console.error("Error al crear grupo:", err);
-      toast.error(err.response?.data?.error || "No se pudo crear el grupo");
+    } catch (err: unknown) {
+      if (axios.isAxiosError(err)) {
+        console.error("Error al crear grupo:", err);
+        toast.error(err.response?.data?.error || "No se pudo crear el grupo");
+      } else {
+        console.error("Error inesperado:", err);
+        toast.error("No se pudo crear el grupo");
+      }
     } finally {
       setCargando(false);
     }
@@ -257,8 +269,14 @@ export default function AdminGrupos() {
             toast.success("Grupo eliminado correctamente");
             cerrarModalEliminar();
             cargarGrupos();
-          } catch (err: any) {
-            toast.error(err.response?.data?.error || "Error al eliminar grupo");
+          } catch (err: unknown) {
+            if (axios.isAxiosError(err)) {
+              toast.error(
+                err.response?.data?.error || "Error al eliminar grupo"
+              );
+            } else {
+              toast.error("Error inesperado al eliminar grupo");
+            }
           } finally {
             setConfirmando(false);
           }

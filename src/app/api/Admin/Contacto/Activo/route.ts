@@ -6,7 +6,10 @@ export async function GET() {
   try {
     const usuario = await getSessionUser();
 
-    if (!usuario || usuario.role !== "Administrador") {
+    if (
+      !usuario ||
+      (usuario.role !== "Administrador" && usuario.role !== "Personal-Plantel")
+    ) {
       return NextResponse.json({ error: "No autorizado" }, { status: 403 });
     }
 

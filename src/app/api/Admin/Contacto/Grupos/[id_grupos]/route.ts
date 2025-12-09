@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { getSessionUser } from "@/lib/auth";
 
@@ -37,14 +38,18 @@ export async function PUT(
     });
 
     return NextResponse.json(grupoActualizado, { status: 200 });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("❌ Error al actualizar grupo:", error);
-    if (error.code === "P2002") {
-      return NextResponse.json(
-        { error: "Ya existe un grupo con ese nombre" },
-        { status: 409 }
-      );
+
+    if (error instanceof Prisma.PrismaClientKnownRequestError) {
+      if (error.code === "P2002") {
+        return NextResponse.json(
+          { error: "Ya existe un grupo con ese nombre" },
+          { status: 409 }
+        );
+      }
     }
+
     return NextResponse.json({ error: "Error interno" }, { status: 500 });
   }
 }
@@ -52,7 +57,7 @@ export async function PUT(
 export async function DELETE(
   req: NextRequest,
   context: { params: Promise<{ id_grupos: string }> }
-){
+) {
   try {
     const usuario = await getSessionUser();
     if (!usuario || usuario.role !== "Administrador") {
@@ -67,18 +72,19 @@ export async function DELETE(
     });
 
     return NextResponse.json({ message: "Grupo eliminado correctamente" });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("❌ Error al eliminar grupo:", error);
 
-    // Prisma lanza error de restricción referencial si hay contactos asociados
-    if (error.code === "P2003") {
-      return NextResponse.json(
-        {
-          error:
-            "No puedes eliminar este grupo porque tiene contactos asociados. Asigna esos contactos a otro grupo o elimínalos primero.",
-        },
-        { status: 400 }
-      );
+    if (error instanceof Prisma.PrismaClientKnownRequestError) {
+      if (error.code === "P2003") {
+        return NextResponse.json(
+          {
+            error:
+              "No puedes eliminar este grupo porque tiene contactos asociados. Asigna esos contactos a otro grupo o elimínalos primero.",
+          },
+          { status: 400 }
+        );
+      }
     }
 
     return NextResponse.json({ error: "Error interno" }, { status: 500 });

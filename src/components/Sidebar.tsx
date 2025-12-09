@@ -8,7 +8,11 @@ import {
   TbLayoutSidebarLeftCollapse,
   TbLayoutSidebarLeftExpand,
 } from "react-icons/tb";
-import { USER_MENUS, ADMIN_MENUS } from "@/constans/sidebarItems";
+import {
+  USER_MENUS,
+  ADMIN_MENUS,
+  PERSONAL_PLANTEL_MENUS,
+} from "@/constans/sidebarItems";
 import Image from "next/image";
 
 interface SidebarItem {
@@ -25,7 +29,12 @@ export default function Sidebar({ role }: { role: AppRole }) {
   const [subMenus, setSubMenus] = useState<{ [key: string]: boolean }>({});
 
   // Menús según el rol del usuario
-  const Menus = role === "Administrador" ? ADMIN_MENUS : USER_MENUS;
+  let Menus: SidebarItem[] = USER_MENUS;
+  if (role === "Administrador") {
+    Menus = ADMIN_MENUS;
+  } else if (role === "Personal-Plantel") {
+    Menus = PERSONAL_PLANTEL_MENUS;
+  }
 
   // Alterna submenús por su "key"
   const toggleSubMenu = (key: string) => {

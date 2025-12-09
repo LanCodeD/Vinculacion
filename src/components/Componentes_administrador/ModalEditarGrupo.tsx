@@ -46,10 +46,15 @@ export function ModalEditarGrupo({
       });
       toast.success("Grupo actualizado correctamente");
       onUpdated(); // que el padre recargue los datos
-      onClose();   // cierra el modal
-    } catch (err: any) {
+      onClose(); // cierra el modal
+    } catch (err: unknown) {
       console.error("Error al actualizar grupo:", err);
-      toast.error(err.response?.data?.error || "Error al actualizar grupo");
+
+      if (axios.isAxiosError(err)) {
+        toast.error(err.response?.data?.error || "Error al actualizar grupo");
+      } else {
+        toast.error("Error inesperado al actualizar grupo");
+      }
     }
   };
 

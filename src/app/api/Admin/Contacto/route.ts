@@ -6,7 +6,10 @@ export async function GET() {
   try {
     const usuario = await getSessionUser();
 
-    if (!usuario || usuario.role !== "Administrador") {
+    if (
+      !usuario ||
+      (usuario.role !== "Administrador" && usuario.role !== "Personal-Plantel")
+    ) {
       return NextResponse.json({ error: "No autorizado" }, { status: 403 });
     }
 
@@ -26,7 +29,7 @@ export async function GET() {
         creado_en: true,
         contacto_estados: {
           select: {
-            id_contacto_estados:true,
+            id_contacto_estados: true,
             nombre_estado: true,
           },
         },
@@ -96,4 +99,3 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Error interno" }, { status: 500 });
   }
 }
-
