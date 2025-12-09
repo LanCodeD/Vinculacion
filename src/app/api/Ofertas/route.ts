@@ -194,7 +194,9 @@ export async function POST(req: Request) {
         fecha_cierre: getFechaLocalSinHora(fecha_cierre),
         empresas_id: empresa.id_empresas,
         creado_por_usuarios_id: session.user.id,
+        creado_en: getFechaLocalSinHora(new Date()),
         fecha_publicacion: getFechaLocalSinHora(new Date()),
+        actualizado_en: getFechaLocalSinHora(new Date()),
         oferta_estados_id: 2, // Pendiente de revisión
       },
     });

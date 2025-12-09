@@ -34,7 +34,7 @@ interface UserProfile {
     cv_url?: string;
     foto_perfil?: string;
   }[];
-    docentes?: {
+  docentes?: {
     id_docentes: number;
     titulo?: string;
     puesto?: string;
@@ -99,9 +99,9 @@ export default function Perfil() {
   if (!user) return <div>Cargando datos del usuario...</div>;
 
   return (
-    <div className="p-6 bg-white rounded shadow text-black max-w-3xl mx-auto">
+    <div className="p-6 bg-white rounded shadow text-black w-full">
       {/* CABECERA */}
-      <div className="flex items-center gap-4 mb-6">
+      <div className="flex flex-col items-center gap-4 mb-6 w-full">
         {user.imagen_perfil ? (
           <div className="relative w-24 h-24 rounded-full overflow-hidden border border-gray-300">
             <Image
@@ -119,7 +119,7 @@ export default function Perfil() {
           </div>
         )}
 
-        <div>
+        <div className="text-center">
           {editMode ? (
             <>
               <input
@@ -130,7 +130,7 @@ export default function Perfil() {
                     prev ? { ...prev, nombre: e.target.value } : prev
                   )
                 }
-                className="border rounded p-1 mr-2"
+                className="border rounded p-1 mr-2 "
               />
               <input
                 type="text"
@@ -176,7 +176,7 @@ export default function Perfil() {
       </div>
 
       {/* BOTONES */}
-      <div className="mb-4 flex gap-2">
+      <div className="mb-4 flex gap-2 items-center justify-center">
         {!editMode ? (
           <button
             onClick={() => setEditMode(true)}
@@ -205,7 +205,7 @@ export default function Perfil() {
         )}
       </div>
 
-            {/* INFORMACIÓN DE DOCENTE */}
+      {/* INFORMACIÓN DE DOCENTE */}
       {user.rol === "Docente" && formData?.docentes && (
         <div>
           <h2 className="text-xl font-semibold mb-2">Información de Docente</h2>
@@ -221,11 +221,11 @@ export default function Perfil() {
                       setFormData((prev) =>
                         prev
                           ? {
-                              ...prev,
-                              docentes: prev.docentes?.map((d, idx) =>
-                                idx === i ? { ...d, titulo: e.target.value } : d
-                              ),
-                            }
+                            ...prev,
+                            docentes: prev.docentes?.map((d, idx) =>
+                              idx === i ? { ...d, titulo: e.target.value } : d
+                            ),
+                          }
                           : prev
                       )
                     }
@@ -245,11 +245,11 @@ export default function Perfil() {
                       setFormData((prev) =>
                         prev
                           ? {
-                              ...prev,
-                              docentes: prev.docentes?.map((d, idx) =>
-                                idx === i ? { ...d, puesto: e.target.value } : d
-                              ),
-                            }
+                            ...prev,
+                            docentes: prev.docentes?.map((d, idx) =>
+                              idx === i ? { ...d, puesto: e.target.value } : d
+                            ),
+                          }
                           : prev
                       )
                     }
@@ -266,10 +266,10 @@ export default function Perfil() {
 
       {/* INFORMACIÓN DE EMPRESA */}
       {user.rol === "Empresa" && formData?.empresas && (
-        <div>
+        <div className="text-center">
           <h2 className="text-xl font-semibold mb-2">Información de Empresa</h2>
           {formData.empresas.map((emp, i) => (
-            <div key={emp.id_empresas} className="mb-4 p-4 border rounded">
+            <div key={emp.id_empresas} className="mb-4 p-4 border-0 rounded">
               <p>
                 <strong>Nombre Comercial:</strong>{" "}
                 {editMode ? (
@@ -379,7 +379,7 @@ export default function Perfil() {
                       className="border rounded p-1 ml-2 w-full"
                     />
                   ) : (
-                    emp.correo_empresas 
+                    emp.correo_empresas
                   )}
                 </p>
               )}

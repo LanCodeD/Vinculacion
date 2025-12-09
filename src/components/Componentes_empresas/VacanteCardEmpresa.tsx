@@ -72,7 +72,7 @@ const VacanteCard: React.FC<VacanteCardProps> = ({
             "bg-gray-900 text-white px-4 py-2 rounded-lg shadow-lg border border-gray-700",
         }}
       />
-      <div className="bg-white p-6 rounded-xl shadow-md border hover:shadow-lg hover:-translate-y-1 transition duration-300 flex flex-col justify-between h-full">
+      <div className="bg-white p-6 rounded-xl shadow-md hover:shadow-lg hover:-translate-y-1 transition duration-300 flex flex-col justify-between h-full">
         {/* Imagen */}
         <Image
           unoptimized

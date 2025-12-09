@@ -31,6 +31,19 @@ export default function MisPostulaciones() {
       .finally(() => setLoading(false));
   }, []);
 
+  const obtenerEstadoUsuario = (idEstado: number) => {
+    switch (idEstado) {
+      case 1:
+        return { texto: "Enviada", color: "text-yellow-500" };
+      case 3:
+        return { texto: "Aceptada", color: "text-green-500" };
+      case 4:
+        return { texto: "Finalizado", color: "text-red-500" };
+      default:
+        return { texto: "", color: "text-gray-400" }; // No mostrar para otros estados
+    }
+  };
+
   const handleEliminar = async (id: number) => {
     try {
       const res = await fetch(
@@ -49,7 +62,7 @@ export default function MisPostulaciones() {
       setPostulaciones((prev) => prev.filter((p) => p.id_postulaciones !== id));
       toast.success("Postulación eliminada");
     } catch (error: unknown) {
-      console.error(error); // 👈 ya lo usas, se quita el warning
+      console.error(error);
       toast.error("Error al eliminar la postulación");
     }
   };
@@ -65,17 +78,17 @@ export default function MisPostulaciones() {
 
     const opciones: Intl.DateTimeFormatOptions = conHora
       ? {
-          day: "2-digit",
-          month: "2-digit",
-          year: "numeric",
-          hour: "2-digit",
-          minute: "2-digit",
-        }
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+      }
       : {
-          day: "2-digit",
-          month: "2-digit",
-          year: "numeric",
-        };
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric",
+      };
 
     return d.toLocaleString("es-ES", opciones);
   };
@@ -104,15 +117,15 @@ export default function MisPostulaciones() {
               <p className="text-gray-600">
                 {p.oferta.titulo ?? "Empresa desconocida"}
               </p>
-              <p
-                className={`mt-1 font-medium text-sm ${
-                  p.estado.nombre_estado.toLowerCase() === "finalizado"
-                    ? "text-red-500"
-                    : "text-green-500"
-                }`}
-              >
-                {p.estado.nombre_estado}
-              </p>
+              {(() => {
+                const estadoUsuario = obtenerEstadoUsuario(p.estado.id_postulacion_estados);
+                return estadoUsuario.texto ? (
+                  <p className={`mt-1 font-medium text-sm ${estadoUsuario.color}`}>
+                    {estadoUsuario.texto}
+                  </p>
+                ) : null;
+              })()}
+
             </div>
 
             {/* Acciones */}
@@ -246,11 +259,11 @@ export default function MisPostulaciones() {
                     {showFullDesc
                       ? selectedOferta.oferta.descripcion_general
                       : selectedOferta.oferta.descripcion_general.length > 100
-                      ? selectedOferta.oferta.descripcion_general.slice(
+                        ? selectedOferta.oferta.descripcion_general.slice(
                           0,
                           100
                         ) + "..."
-                      : selectedOferta.oferta.descripcion_general}
+                        : selectedOferta.oferta.descripcion_general}
                   </p>
                   {selectedOferta.oferta.descripcion_general.length > 100 && (
                     <button
@@ -259,9 +272,8 @@ export default function MisPostulaciones() {
                     >
                       {showFullDesc ? "Mostrar menos" : "Leer más"}
                       <svg
-                        className={`w-4 h-4 transition-transform duration-200 ${
-                          showFullDesc ? "rotate-180" : ""
-                        }`}
+                        className={`w-4 h-4 transition-transform duration-200 ${showFullDesc ? "rotate-180" : ""
+                          }`}
                         fill="none"
                         stroke="currentColor"
                         viewBox="0 0 24 24"

@@ -37,11 +37,19 @@ export default function PostulacionesPage() {
   const [loading, setLoading] = useState(true);
   const [selectedPostulante, setSelectedPostulante] =
     useState<Postulacion | null>(null);
+
+  // textarea dentro del toast
   const [motivoRechazoTemp, setMotivoRechazoTemp] = useState("");
+
+  // textarea del modal interno dentro del modal del postulante
+  const [motivoRechazo, setMotivoRechazo] = useState("");
+
+  // id del modal interno de rechazo
+  const [modalRechazoId, setModalRechazoId] = useState<number | null>(null);
 
   useEffect(() => {
     if (!id) return;
-    if (session === undefined) return; // ⏳ esperar a que session cargue
+    if (session === undefined) return;
 
     fetch(`/api/Ofertas/${id}/Postulaciones`)
       .then((res) => res.json())
@@ -50,12 +58,14 @@ export default function PostulacionesPage() {
       })
       .finally(() => setLoading(false));
   }, [id, session]);
+
   // -----------------------------
   // FUNCION DE CONFIRMACIÓN CON TOAST
   // -----------------------------
   const confirmarCambioEstado = (
     postulacionId: number,
-    accion: "aprobar" | "rechazar"
+    accion: "aprobar" | "rechazar",
+    motivo?: string // ← 🔵 NUEVO
   ) => {
     if (!session?.user) {
       toast("Debes iniciar sesión");
@@ -64,109 +74,107 @@ export default function PostulacionesPage() {
 
     const accionTexto = accion === "aprobar" ? "aprobar" : "rechazar";
 
-    toast((t) => (
-      <div className="flex flex-col gap-2">
-        <p className="font-semibold text-sm text-gray-800">
-          ¿Seguro que quieres {accionTexto} esta postulación?
-        </p>
+    toast((t) => {
+      let textoLocal = ""; // ⭐ estado LOCAL por toast
 
-        {accion === "rechazar" && (
-          <textarea
-            placeholder="Escribe el motivo del rechazo"
-            className="border rounded p-2 w-full text-sm"
-            value={motivoRechazoTemp}
-            onChange={(e) => setMotivoRechazoTemp(e.target.value)}
-          />
-        )}
+      return (
+        <div className="flex flex-col gap-2">
+          <p className="font-semibold text-sm text-gray-800">
+            ¿Seguro que quieres {accionTexto} esta postulación?
+            *Una vez que se seleccione no se podra cambiar*
+          </p>
 
-        <div className="flex gap-2 mt-2">
-          <button
-            onClick={async () => {
-              toast.dismiss(t.id);
-              const toastId = toast.loading("Procesando...");
+          {accion === "rechazar" && (
+            <textarea
+              placeholder="Escribe el motivo del rechazo"
+              className="border rounded p-2 w-full text-sm"
+              onChange={(e) => {
+                textoLocal = e.target.value; // ⭐ guarda localmente
+              }}
+            />
+          )}
 
-              try {
-                const res = await fetch(
-                  `/api/Postulaciones/${postulacionId}/estadoVacante`,
-                  {
-                    method: "PATCH",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({
-                      accion,
-                      revisadoPorUsuarioId: session.user.id,
-                      mensaje:
-                        accion === "rechazar" ? motivoRechazoTemp : undefined,
-                    }),
-                  }
-                );
+          <div className="flex gap-2 mt-2">
+            <button
+              onClick={async () => {
+                toast.dismiss(t.id);
+                const toastId = toast.loading("Procesando...");
 
-                const data = await res.json();
-                if (!data.ok)
-                  throw new Error(
-                    data.error || "Error al actualizar el estado"
+                try {
+                  const res = await fetch(
+                    `/api/Postulaciones/${postulacionId}/estadoVacante`,
+                    {
+                      method: "PATCH",
+                      headers: { "Content-Type": "application/json" },
+                      body: JSON.stringify({
+                        accion,
+                        revisadoPorUsuarioId: session.user.id,
+                        mensaje: accion === "rechazar" ? textoLocal : undefined, // ⭐ ENVÍA el texto correcto
+                      }),
+                    }
                   );
 
-                // limpiar el textarea para la próxima vez
-                setMotivoRechazoTemp("");
+                  const data = await res.json();
+                  if (!data.ok)
+                    throw new Error(data.error || "Error al actualizar el estado");
 
-                // actualizar lista
-                setPostulaciones((prev) =>
-                  prev.map((p) =>
-                    p.id_postulaciones === postulacionId
-                      ? {
+                  // actualizar lista
+                  setPostulaciones((prev) =>
+                    prev.map((p) =>
+                      p.id_postulaciones === postulacionId
+                        ? {
                           ...p,
                           estado: data.postulacion.estado,
                           mensaje: data.postulacion.mensaje ?? p.mensaje,
                         }
-                      : p
-                  )
-                );
+                        : p
+                    )
+                  );
 
-                // actualizar modal
-                if (selectedPostulante?.id_postulaciones === postulacionId) {
-                  setSelectedPostulante((prev) =>
-                    prev
-                      ? {
+                  // actualizar modal si está abierto
+                  if (selectedPostulante?.id_postulaciones === postulacionId) {
+                    setSelectedPostulante((prev) =>
+                      prev
+                        ? {
                           ...prev,
                           estado: data.postulacion.estado,
                           mensaje: data.postulacion.mensaje ?? prev.mensaje,
                         }
-                      : null
-                  );
-                }
+                        : null
+                    );
+                  }
 
-                toast.success(
-                  `Postulación ${
-                    accion === "aprobar" ? "aprobada" : "rechazada"
-                  }`,
-                  { id: toastId }
-                );
-              } catch (err) {
-                console.error(err);
-                toast.error("❌ Error al actualizar la postulación", {
-                  id: toastId,
-                });
-              }
-            }}
-            className={`px-3 py-1 text-white rounded ${
-              accion === "aprobar"
+                  toast.success(
+                    `Postulación ${accion === "aprobar" ? "aprobada" : "rechazada"
+                    }`,
+                    { id: toastId }
+                  );
+                } catch (err) {
+                  console.error(err);
+                  toast.error("❌ Error al actualizar la postulación", {
+                    id: toastId,
+                  });
+                }
+              }}
+              className={`px-3 py-1 text-white rounded ${accion === "aprobar"
                 ? "bg-green-500 hover:bg-green-600"
                 : "bg-red-500 hover:bg-red-600"
-            }`}
-          >
-            Sí
-          </button>
+                }`}
+            >
+              Sí
+            </button>
 
-          <button
-            onClick={() => toast.dismiss(t.id)}
-            className="bg-gray-300 hover:bg-gray-400 text-xs px-3 py-1 rounded"
-          >
-            Cancelar
-          </button>
+            <button
+              onClick={() => toast.dismiss(t.id)}
+              className="bg-gray-300 hover:bg-gray-400 text-xs px-3 py-1 rounded"
+            >
+              Cancelar
+            </button>
+          </div>
         </div>
-      </div>
-    ));
-  };
+      );
+    });
+  }
 
   if (loading) return <p className="p-6">Cargando postulaciones...</p>;
   if (postulaciones.length === 0)
@@ -296,23 +304,34 @@ export default function PostulacionesPage() {
                       <div className="flex gap-2 mt-4">
                         <button
                           onClick={() =>
-                            confirmarCambioEstado(
-                              selectedPostulante.id_postulaciones,
-                              "aprobar"
-                            )
+                            confirmarCambioEstado(selectedPostulante.id_postulaciones, "aprobar")
                           }
-                          className="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600"
+                          className={`px-3 py-1 rounded text-white ${selectedPostulante.estado.id_postulacion_estados === 3 ||
+                              selectedPostulante.estado.id_postulacion_estados === 4
+                              ? "bg-gray-400 cursor-not-allowed"
+                              : "bg-green-500 hover:bg-green-600"
+                            }`}
+                          disabled={
+                            selectedPostulante.estado.id_postulacion_estados === 3 ||
+                            selectedPostulante.estado.id_postulacion_estados === 4
+                          }
                         >
                           Aprobar
                         </button>
+
                         <button
                           onClick={() =>
-                            confirmarCambioEstado(
-                              selectedPostulante.id_postulaciones,
-                              "rechazar"
-                            )
+                            confirmarCambioEstado(selectedPostulante.id_postulaciones, "rechazar")
                           }
-                          className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"
+                          className={`px-3 py-1 rounded text-white ${selectedPostulante.estado.id_postulacion_estados === 3 ||
+                              selectedPostulante.estado.id_postulacion_estados === 4
+                              ? "bg-gray-400 cursor-not-allowed"
+                              : "bg-red-500 hover:bg-red-600"
+                            }`}
+                          disabled={
+                            selectedPostulante.estado.id_postulacion_estados === 3 ||
+                            selectedPostulante.estado.id_postulacion_estados === 4
+                          }
                         >
                           Rechazar
                         </button>

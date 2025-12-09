@@ -5,6 +5,11 @@ import { prisma } from "@/lib/prisma";
 export async function GET() {
   try {
     const ofertas = await prisma.ofertas.findMany({
+      where: {
+        oferta_estados_id: {
+          in: [3, 5], // 3 = PUBLICADA, 5 = CERRADA
+        },
+      },
       select: {
         id_ofertas: true,
         titulo: true,

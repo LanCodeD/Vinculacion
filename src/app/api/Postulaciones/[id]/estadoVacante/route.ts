@@ -6,8 +6,8 @@ import { enviarCorreo } from "@/lib/mailer";
 
 export async function PATCH(
   req: Request,
-   { params }: { params: Promise<{ id: string }> }
-  ) {
+  { params }: { params: Promise<{ id: string }> }
+) {
   try {
     const { id } = await params;
     const idNum = parseInt(id);
@@ -20,8 +20,28 @@ export async function PATCH(
       );
     }
 
-    const nuevoEstadoId =
-      accion === "aprobar" ? 3 : accion === "rechazar" ? 4 : 2;
+    // ⚠️ Obtener el estado actual antes de actualizar
+    const postulacionActual = await prisma.postulaciones.findUnique({
+      where: { id_postulaciones: idNum },
+      select: { postulacion_estados_id: true },
+    });
+
+    if (!postulacionActual) {
+      return NextResponse.json(
+        { ok: false, error: "Postulación no encontrada" },
+        { status: 404 }
+      );
+    }
+
+    // 🚫 Bloquear cambios si ya está Aprobada (3) o Rechazada (4)
+    if (postulacionActual.postulacion_estados_id === 3 || postulacionActual.postulacion_estados_id === 4) {
+      return NextResponse.json(
+        { ok: false, error: "No se puede cambiar el estado de una postulación ya aprobada o rechazada" },
+        { status: 400 }
+      );
+    }
+
+    const nuevoEstadoId = accion === "aprobar" ? 3 : accion === "rechazar" ? 4 : 2;
 
     const postulacion = await prisma.postulaciones.update({
       where: { id_postulaciones: idNum },
@@ -32,23 +52,18 @@ export async function PATCH(
         ...(accion === "rechazar" && mensaje ? { mensaje } : {}),
       },
       include: {
-        usuario: true, // Tiene nombre, correo
+        usuario: true,
         oferta: { include: { empresas: true } },
         estado: true,
       },
     });
 
-    // 📩 Enviar correo al egresado
+    // 📩 Enviar correo
     const correoHtml = plantillaEstadoPostulante({
       nombreEgresado: postulacion.usuario.nombre,
       tituloVacante: postulacion.oferta.titulo,
       empresa: postulacion.oferta.empresas.nombre_comercial,
-      estado:
-        nuevoEstadoId === 3
-          ? "aprobada"
-          : nuevoEstadoId === 4
-            ? "rechazada"
-            : "revision",
+      estado: nuevoEstadoId === 3 ? "aprobada" : nuevoEstadoId === 4 ? "rechazada" : "revision",
       botonUrl: `https://tu-sistema.com/postulaciones/${postulacion.id_postulaciones}`,
     });
 
@@ -63,7 +78,7 @@ export async function PATCH(
       html: correoHtml,
     });
 
-    // 👇 Tu notificación en BD ya estaba bien:
+    // 👇 Notificación en BD
     await prisma.notificaciones.create({
       data: {
         usuarios_id: postulacion.usuarios_id,
@@ -74,12 +89,7 @@ export async function PATCH(
             : nuevoEstadoId === 4
               ? "Tu postulación fue rechazada"
               : "Tu postulación está en revisión",
-        mensaje: `Tu postulación a "${postulacion.oferta.titulo}" fue ${nuevoEstadoId === 3
-            ? "aprobada"
-            : nuevoEstadoId === 4
-              ? "rechazada"
-              : "marcada como en revisión"
-          }.`,
+        mensaje: `Tu postulación a "${postulacion.oferta.titulo}" fue ${nuevoEstadoId === 3 ? "aprobada" : nuevoEstadoId === 4 ? "rechazada" : "marcada como en revisión"}.`,
       },
     });
 

@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import bcrypt from "bcrypt";
 import crypto from "crypto";
 import { enviarCorreo } from "@/lib/mailer"; // 👈 usamos helper con OAuth2
+import { correoVerificacionCuenta } from "@/lib/Verificar/verificarCuenta";
 
 // Regex institucional (docente)
 const regexInstitucional =
@@ -113,20 +114,17 @@ export async function POST(req: Request) {
       },
     });
 
-    // 5️⃣ Enviar correo con helper OAuth2
+    // 5️⃣ Enviar correo con plantilla
+    const htmlCorreo = correoVerificacionCuenta({
+      nombreUsuario: nombre,
+      codigo,
+    });
+
     await enviarCorreo({
       to: correo,
       subject: "Código de verificación",
-      html: `
-        <h2>Bienvenido, ${nombre}!</h2>
-        <p>Tu código de verificación es:</p>
-        <h1 style="font-size:32px; letter-spacing:8px;">${codigo}</h1>
-        <p>Este código expirará en 15 minutos.</p>
-        <br>
-        <small>Zona horaria: UTC-06:00 (México)</small>
-      `,
+      html: htmlCorreo,
     });
-
     // Respuesta limpia
     return NextResponse.json(
       {
