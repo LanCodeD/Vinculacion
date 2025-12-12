@@ -191,11 +191,11 @@ export default function VacanteDetail({
 
       if (!data.ok) throw new Error(data.error || "Error al postular.");
       setYaPostulado(true);
-      toast.success("✅ Te has postulado correctamente.");
+      toast.success("Te has postulado correctamente.");
     } catch (err: unknown) {
       const mensaje =
         err instanceof Error ? err.message : "Error inesperado al postular.";
-      toast.success(`${mensaje}`);
+      toast.error(`${mensaje}`);
     } finally {
       setLoading(false);
     }
