@@ -10,7 +10,7 @@ export async function PUT(
   context: { params: Promise<{ id_solicitud: string }> }
 ) {
   const { id_solicitud } = await context.params;
-
+  const baseUrl = process.env.NEXTAUTH_URL ?? "http://localhost:3000";
   try {
     const usuario = await getSessionUser();
     if (!usuario)
@@ -26,7 +26,10 @@ export async function PUT(
     });
 
     if (!solicitud)
-      return NextResponse.json({ error: "No existe la solicitud" }, { status: 404 });
+      return NextResponse.json(
+        { error: "No existe la solicitud" },
+        { status: 404 }
+      );
     if (solicitud.creado_por_usuario_id !== usuario.id)
       return NextResponse.json({ error: "No autorizado" }, { status: 403 });
 
@@ -35,7 +38,8 @@ export async function PUT(
 
     // Determinar tipo de notificación
     let tipoNotificacion = "solicitud_revision_especifico";
-    let tituloNotificacion = "Nueva solicitud de Convenio Específico enviada para revisión";
+    let tituloNotificacion =
+      "Nueva solicitud de Convenio Específico enviada para revisión";
     let mensajeNotificacion = `El usuario ${usuario.nombre} ${usuario.apellido} ha enviado la solicitud #${id} de Convenio Específico para revisión.`;
     let subjectCorreo = "Nueva solicitud de Convenio Específico para revisión";
     let plantillaCorreo = plantillaSolicitudRevisionEspecifico;
@@ -89,7 +93,7 @@ export async function PUT(
             usuarioNombre: `${usuario.nombre} ${usuario.apellido ?? ""}`,
             fechaEnvio: new Date().toISOString(),
             idSolicitud: id,
-            botonUrl: `http://localhost:3000/Admin/Convenios/Especificos/${id}/EstadoSolicitud`,
+            botonUrl: `${baseUrl}/Admin/Convenios/Especificos/${id}/EstadoSolicitud`,
           }),
         });
       }
@@ -97,7 +101,8 @@ export async function PUT(
 
     return NextResponse.json({
       success: true,
-      mensaje: "Solicitud de Convenio Específico enviada correctamente y notificaciones enviadas",
+      mensaje:
+        "Solicitud de Convenio Específico enviada correctamente y notificaciones enviadas",
     });
   } catch (error) {
     console.error("Error al enviar solicitud específica:", error);

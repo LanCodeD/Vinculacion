@@ -102,7 +102,7 @@ export default function AdminGrupos() {
 
     try {
       setCargando(true);
-      const res = await axios.post("/api/Admin/Contacto/Grupos", {
+      const res = await axios.post("/api/Admin/Contacto/Grupos/valida", {
         nombre_grupo: nuevoGrupo,
       });
       toast.success("Grupo creado correctamente");
@@ -271,12 +271,14 @@ export default function AdminGrupos() {
             cargarGrupos();
           } catch (err: unknown) {
             if (axios.isAxiosError(err)) {
+              // 👇 aquí sí debería mostrar el mensaje del backend
               toast.error(
                 err.response?.data?.error || "Error al eliminar grupo"
               );
             } else {
               toast.error("Error inesperado al eliminar grupo");
             }
+            // ❌ no cierres el modal aquí, deja que el usuario vea el error
           } finally {
             setConfirmando(false);
           }

@@ -10,6 +10,7 @@ export async function PUT(
   context: { params: Promise<{ id_solicitud: string }> }
 ) {
   const { id_solicitud } = await context.params;
+  const baseUrl = process.env.NEXTAUTH_URL ?? "http://localhost:3000";
 
   try {
     const usuario = await getSessionUser();
@@ -96,7 +97,7 @@ export async function PUT(
               usuarioNombre: `${usuario.nombre} ${usuario.apellido ?? ""}`,
               fechaEnvio: new Date().toISOString(),
               idSolicitud: id,
-              botonUrl: `http://localhost:3000/Admin/Convenios/Generales/${id}/EstadoSolicitud`,
+              botonUrl: `${baseUrl}/Admin/Convenios/Generales/${id}/EstadoSolicitud`,
             }),
           });
           console.log("📧 Correo enviado a admin:", admin.correo);

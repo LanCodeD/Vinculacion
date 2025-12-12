@@ -214,6 +214,7 @@ export async function POST(req: NextRequest) {
 
     // 🔍 Calcular el estado dinámico al crear
     const estado_dinamico = obtenerEstadoDinamico(fecha_expira);
+    const baseUrl = process.env.NEXTAUTH_URL ?? "http://localhost:3000";
 
     // 🧠 Transacción para crear el convenio y actualizar la solicitud
     const resultado = await prisma.$transaction(async (tx) => {
@@ -322,7 +323,7 @@ export async function POST(req: NextRequest) {
           usuarioNombre: solicitanteNombreCompleto,
           idSolicitud: solicitanteId,
           tipoConvenio,
-          botonUrl: `http://localhost:3000/Historial`,
+          botonUrl: `${baseUrl}/Historial`,
         }),
       });
     }
