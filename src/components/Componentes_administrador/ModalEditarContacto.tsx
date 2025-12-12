@@ -96,31 +96,31 @@ export default function ModalEditarContacto({
             initial={{ scale: 0.9, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             exit={{ scale: 0.9, opacity: 0 }}
-            className="bg-white rounded-2xl shadow-2xl border border-gray-200 w-full max-w-lg p-6 text-black"
+            className="bg-white rounded-2xl shadow-2xl border border-gray-200 w-full max-w-2xl max-h-[90vh] p-6 text-black overflow-y-auto"
           >
             <h2 className="text-xl font-semibold text-[#011848] mb-4">
               Editar Contacto
             </h2>
 
-            {/* 🔹 Nombre */}
-            <div className="mb-3">
-              <label className="block text-sm font-medium">Nombre</label>
-              <input
-                name="nombre"
-                defaultValue={contacto.nombre ?? ""}
-                className="w-full border rounded-lg px-3 py-2 mt-1 focus:ring-2 focus:ring-[#011848]"
-                required
-              />
-            </div>
-
-            {/* 🔹 Apellido */}
-            <div className="mb-3">
-              <label className="block text-sm font-medium">Apellido</label>
-              <input
-                name="apellido"
-                defaultValue={contacto.apellido ?? ""}
-                className="w-full border rounded-lg px-3 py-2 mt-1 focus:ring-2 focus:ring-[#011848]"
-              />
+            {/* 🔹 Nombre + Apellido */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-3">
+              <div>
+                <label className="block text-sm font-medium">Nombre</label>
+                <input
+                  name="nombre"
+                  defaultValue={contacto.nombre ?? ""}
+                  className="w-full border rounded-lg px-3 py-2 mt-1 focus:ring-2 focus:ring-[#011848]"
+                  required
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium">Apellido</label>
+                <input
+                  name="apellido"
+                  defaultValue={contacto.apellido ?? ""}
+                  className="w-full border rounded-lg px-3 py-2 mt-1 focus:ring-2 focus:ring-[#011848]"
+                />
+              </div>
             </div>
 
             {/* 🔹 Correo */}
@@ -134,25 +134,25 @@ export default function ModalEditarContacto({
               />
             </div>
 
-            {/* 🔹 Título */}
-            <div className="mb-3">
-              <label className="block text-sm font-medium">Título</label>
-              <input
-                name="titulo"
-                defaultValue={contacto.titulo ?? ""}
-                className="w-full border rounded-lg px-3 py-2 mt-1 focus:ring-2 focus:ring-[#011848]"
-                placeholder="Ej. Lic., Ing., Dr."
-              />
-            </div>
-
-            {/* 🔹 Puesto */}
-            <div className="mb-3">
-              <label className="block text-sm font-medium">Puesto</label>
-              <input
-                name="puesto"
-                defaultValue={contacto.puesto ?? ""}
-                className="w-full border rounded-lg px-3 py-2 mt-1 focus:ring-2 focus:ring-[#011848]"
-              />
+            {/* 🔹 Título + Puesto */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-3">
+              <div>
+                <label className="block text-sm font-medium">Grado Académico</label>
+                <input
+                  name="titulo"
+                  defaultValue={contacto.titulo ?? ""}
+                  className="w-full border rounded-lg px-3 py-2 mt-1 focus:ring-2 focus:ring-[#011848]"
+                  placeholder="Ej. Lic., Ing., Dr."
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium">Puesto</label>
+                <input
+                  name="puesto"
+                  defaultValue={contacto.puesto ?? ""}
+                  className="w-full border rounded-lg px-3 py-2 mt-1 focus:ring-2 focus:ring-[#011848]"
+                />
+              </div>
             </div>
 
             {/* 🔹 Celular */}
@@ -267,7 +267,6 @@ export default function ModalEditarContacto({
               >
                 Cancelar
               </button>
-
               <button
                 type="submit"
                 disabled={cargando}

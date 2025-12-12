@@ -30,6 +30,7 @@ export async function POST(
       );
     }
 
+    const baseUrl = process.env.NEXTAUTH_URL ?? "http://localhost:3000";
     // 🔹 Decidir mensaje según estado global
     const fueRechazada = solicitud.estado_id === 5; // EN CORRECCIÓN
     const fueAprobada = solicitud.estado_id === 3; // APROBADO
@@ -71,7 +72,7 @@ export async function POST(
         usuarioNombre: `${solicitud.creador.nombre} ${solicitud.creador.apellido ?? ""}`,
         idSolicitud: id,
         fueRechazada,
-        botonUrl: `http://localhost:3000/Convenios/Especificos/${id}/EstadoSolicitud`,
+        botonUrl: `${baseUrl}/Convenios/Especificos/${id}/EstadoSolicitud`,
       }),
     });
 

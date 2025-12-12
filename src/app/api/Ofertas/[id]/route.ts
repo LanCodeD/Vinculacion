@@ -157,6 +157,7 @@ export async function PATCH(
   context: { params: Promise<{ id: string }> }
 ) {
   try {
+    const baseUrl = process.env.NEXTAUTH_URL ?? "http://localhost:3000";
     const session = await getServerSession(authOptions);
     if (!session?.user)
       return NextResponse.json({ ok: false, error: "No autorizado" }, { status: 401 });
@@ -256,7 +257,7 @@ export async function PATCH(
         nombreEgresado: post.usuario.nombre,
         tituloVacante: updated.titulo,
         empresa: empresa.nombre_comercial,
-        botonUrl: `http://localhost:3000/BolsaTrabajo/MisPostulacionesFront/${updated.id_ofertas}`,
+        botonUrl: `${baseUrl}/BolsaTrabajo/MisPostulacionesFront/${updated.id_ofertas}`,
       });
 
       await enviarCorreo({
@@ -287,7 +288,7 @@ export async function PATCH(
         adminNombre: admin.nombre,
         empresaNombre: empresa.nombre_comercial,
         tituloVacante: updated.titulo,
-        botonUrl: `http://localhost:3000/Admin/BolsaTrabajoAD`,
+        botonUrl: `${baseUrl}/Admin/BolsaTrabajoAD`,
       });
 
       await enviarCorreo({

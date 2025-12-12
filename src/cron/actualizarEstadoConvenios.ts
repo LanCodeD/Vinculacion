@@ -26,6 +26,7 @@ function obtenerEstadoDinamico(fechaExpira: Date | string | null): EstadoConveni
 // 🚀 Función principal que actualiza los convenios
 async function actualizarEstadoConvenios() {
   console.log("⏰ Ejecutando cron job: actualización de estados dinámicos...");
+  const baseUrl = process.env.NEXTAUTH_URL ?? "http://localhost:3000";
 
   try {
     const convenios = await prisma.convenio_concretado.findMany({
@@ -90,7 +91,7 @@ async function actualizarEstadoConvenios() {
                   tipoConvenio: convenio.solicitud?.tipo?.nombre_tipo,
                   solicitante: `${convenio.solicitud?.creador?.nombre} ${convenio.solicitud?.creador?.apellido ?? ""}`,
                   mesesRestantes: diferenciaMeses,
-                  botonUrl: `http://localhost:3000/Admin/Convenios/Concretados`,
+                  botonUrl: `${baseUrl}/Admin/Convenios/Concretados`,
                 }),
               });
             }
