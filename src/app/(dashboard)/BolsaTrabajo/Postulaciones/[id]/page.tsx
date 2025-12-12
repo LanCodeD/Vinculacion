@@ -4,7 +4,6 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { useSession } from "next-auth/react";
-import { toast } from "react-hot-toast";
 import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
 
@@ -33,14 +32,22 @@ interface Postulacion {
 export default function PostulacionesPage() {
   const { id } = useParams();
   const { data: session } = useSession();
+
   const [postulaciones, setPostulaciones] = useState<Postulacion[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedPostulante, setSelectedPostulante] =
     useState<Postulacion | null>(null);
 
+  // Estados de modales
+  const [modalAccion, setModalAccion] = useState<"aprobar" | "rechazar" | null>(
+    null
+  );
+  const [motivoRechazo, setMotivoRechazo] = useState("");
+  const [processing, setProcessing] = useState(false);
+
+  // Cargar postulaciones
   useEffect(() => {
-    if (!id) return;
-    if (session === undefined) return;
+    if (!id || session === undefined) return;
 
     fetch(`/api/Ofertas/${id}/Postulaciones`)
       .then((res) => res.json())
@@ -51,120 +58,73 @@ export default function PostulacionesPage() {
   }, [id, session]);
 
   // -----------------------------
-  // FUNCION DE CONFIRMACIÓN CON TOAST
+  // ACTUALIZAR ESTADO
   // -----------------------------
-  const confirmarCambioEstado = (
+  const cambiarEstado = async (
     postulacionId: number,
-    accion: "aprobar" | "rechazar",
+    accion: "aprobar" | "rechazar"
   ) => {
-    if (!session?.user) {
-      toast("Debes iniciar sesión");
-      return;
-    }
+    if (!session?.user) return;
 
-    const accionTexto = accion === "aprobar" ? "aprobar" : "rechazar";
+    setProcessing(true);
 
-    toast((t) => {
-      let textoLocal = ""; // ⭐ estado LOCAL por toast
-
-      return (
-        <div className="flex flex-col gap-2">
-          <p className="font-semibold text-sm text-gray-800">
-            ¿Seguro que quieres {accionTexto} esta postulación?
-            *Una vez que se seleccione no se podra cambiar*
-          </p>
-
-          {accion === "rechazar" && (
-            <textarea
-              placeholder="Escribe el motivo del rechazo"
-              className="border rounded p-2 w-full text-sm"
-              onChange={(e) => {
-                textoLocal = e.target.value; // ⭐ guarda localmente
-              }}
-            />
-          )}
-
-          <div className="flex gap-2 mt-2">
-            <button
-              onClick={async () => {
-                toast.dismiss(t.id);
-                const toastId = toast.loading("Procesando...");
-
-                try {
-                  const res = await fetch(
-                    `/api/Postulaciones/${postulacionId}/estadoVacante`,
-                    {
-                      method: "PATCH",
-                      headers: { "Content-Type": "application/json" },
-                      body: JSON.stringify({
-                        accion,
-                        revisadoPorUsuarioId: session.user.id,
-                        mensaje: accion === "rechazar" ? textoLocal : undefined, // ⭐ ENVÍA el texto correcto
-                      }),
-                    }
-                  );
-
-                  const data = await res.json();
-                  if (!data.ok)
-                    throw new Error(data.error || "Error al actualizar el estado");
-
-                  // actualizar lista
-                  setPostulaciones((prev) =>
-                    prev.map((p) =>
-                      p.id_postulaciones === postulacionId
-                        ? {
-                          ...p,
-                          estado: data.postulacion.estado,
-                          mensaje: data.postulacion.mensaje ?? p.mensaje,
-                        }
-                        : p
-                    )
-                  );
-
-                  // actualizar modal si está abierto
-                  if (selectedPostulante?.id_postulaciones === postulacionId) {
-                    setSelectedPostulante((prev) =>
-                      prev
-                        ? {
-                          ...prev,
-                          estado: data.postulacion.estado,
-                          mensaje: data.postulacion.mensaje ?? prev.mensaje,
-                        }
-                        : null
-                    );
-                  }
-
-                  toast.success(
-                    `Postulación ${accion === "aprobar" ? "aprobada" : "rechazada"
-                    }`,
-                    { id: toastId }
-                  );
-                } catch (err) {
-                  console.error(err);
-                  toast.error("❌ Error al actualizar la postulación", {
-                    id: toastId,
-                  });
-                }
-              }}
-              className={`px-3 py-1 text-white rounded ${accion === "aprobar"
-                ? "bg-green-500 hover:bg-green-600"
-                : "bg-red-500 hover:bg-red-600"
-                }`}
-            >
-              Sí
-            </button>
-
-            <button
-              onClick={() => toast.dismiss(t.id)}
-              className="bg-gray-300 hover:bg-gray-400 text-xs px-3 py-1 rounded"
-            >
-              Cancelar
-            </button>
-          </div>
-        </div>
+    try {
+      const res = await fetch(
+        `/api/Postulaciones/${postulacionId}/estadoVacante`,
+        {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            accion,
+            revisadoPorUsuarioId: session.user.id,
+            mensaje: accion === "rechazar" ? motivoRechazo : undefined,
+          }),
+        }
       );
-    });
-  }
+
+      const data = await res.json();
+      if (!data.ok) throw new Error(data.error);
+
+      // Actualizar lista
+      setPostulaciones((prev) =>
+        prev.map((post) =>
+          post.id_postulaciones === postulacionId
+            ? {
+                ...post,
+                estado: {
+                  ...post.estado,
+                  nombre_estado: accion === "aprobar" ? "Aprobado" : "Rechazado",
+                  id_postulacion_estados: accion === "aprobar" ? 3 : 4,
+                },
+                mensaje: accion === "rechazar" ? motivoRechazo : post.mensaje,
+              }
+            : post
+        )
+      );
+
+      // Actualizar modal abierto
+      setSelectedPostulante((prev) =>
+        prev && prev.id_postulaciones === postulacionId
+          ? {
+              ...prev,
+              estado: {
+                ...prev.estado,
+                nombre_estado: accion === "aprobar" ? "Aprobado" : "Rechazado",
+                id_postulacion_estados: accion === "aprobar" ? 3 : 4,
+              },
+              mensaje: accion === "rechazar" ? motivoRechazo : prev.mensaje,
+            }
+          : prev
+      );
+
+      setModalAccion(null);
+      setMotivoRechazo("");
+    } catch (error) {
+      console.error("Error cambiando estado:", error);
+    } finally {
+      setProcessing(false);
+    }
+  };
 
   if (loading) return <p className="p-6">Cargando postulaciones...</p>;
   if (postulaciones.length === 0)
@@ -179,21 +139,17 @@ export default function PostulacionesPage() {
           <motion.div
             key={p.id_postulaciones}
             layout
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="bg-white rounded-xl shadow p-4 cursor-pointer hover:shadow-lg transition"
+            className="bg-white rounded-xl shadow p-4"
           >
-            {/* Resumen */}
             <div className="flex justify-between items-center">
+              {/* Información */}
               <div className="flex items-center gap-4">
-                {/* Foto de perfil en la card */}
                 {p.usuario.foto_perfil ? (
                   <Image
                     src={p.usuario.foto_perfil}
-                    alt={p.usuario.nombre + " foto"}
-                    width={48} // 👈 ancho en px
-                    height={48} // 👈 alto en px
+                    alt="Foto"
+                    width={48}
+                    height={48}
                     className="w-12 h-12 rounded-full object-cover"
                   />
                 ) : (
@@ -203,124 +159,104 @@ export default function PostulacionesPage() {
                 )}
 
                 <div>
-                  <p className="text-gray-500 text-sm">
+                  <p className="text-sm text-gray-500">
                     {new Date(p.creado_en).toLocaleDateString()}
                   </p>
-                  <h2 className="text-lg font-semibold">
-                    {p.usuario.nombre + " " + (p.usuario.apellido ?? "")}
-                  </h2>
+                  <p className="font-semibold">{p.usuario.nombre}</p>
                   <p className="text-gray-600">{p.usuario.correo}</p>
                 </div>
               </div>
 
               <button
+                className="text-blue-600 underline"
                 onClick={() => setSelectedPostulante(p)}
-                className="text-blue-600 font-medium hover:underline"
               >
                 Ver detalles
               </button>
             </div>
 
-            {/* Modal de detalles */}
+            {/* Modal principal */}
             <AnimatePresence>
               {selectedPostulante &&
                 selectedPostulante.id_postulaciones === p.id_postulaciones && (
                   <motion.div
-                    className="fixed inset-0 flex items-center justify-center z-50 backdrop-blur-md"
+                    className="fixed inset-0 z-50 flex items-center justify-center bg-black/40"
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
                   >
                     <motion.div
-                      className="bg-white p-6 rounded-2xl shadow-xl max-w-lg w-full border border-gray-200"
-                      initial={{ scale: 0.8, opacity: 0 }}
-                      animate={{ scale: 1, opacity: 1 }}
-                      exit={{ scale: 0.8, opacity: 0 }}
-                      transition={{ duration: 0.25 }}
+                      className="bg-white p-6 rounded-2xl max-w-lg w-full shadow"
+                      initial={{ scale: 0.8 }}
+                      animate={{ scale: 1 }}
+                      exit={{ scale: 0.8 }}
                     >
-                      {/* Foto de perfil en el modal */}
+                      {/* Datos */}
                       <div className="flex justify-center mb-4">
                         {selectedPostulante.usuario.foto_perfil ? (
                           <Image
                             src={selectedPostulante.usuario.foto_perfil}
-                            alt={selectedPostulante.usuario.nombre + " foto"}
                             width={96}
                             height={96}
-                            className="w-24 h-24 rounded-full object-cover border-2 border-gray-300"
+                            className="rounded-full object-cover border"
+                            alt=""
                           />
                         ) : (
-                          <div className="w-24 h-24 rounded-full bg-gray-200 flex items-center justify-center text-gray-500 border-2 border-gray-300">
+                          <div className="w-24 h-24 rounded-full bg-gray-200 flex items-center justify-center text-gray-500 border">
                             ?
                           </div>
                         )}
                       </div>
 
-                      <h2 className="text-2xl font-bold mb-2 text-center">
-                        {selectedPostulante.usuario.nombre +
-                          " " +
-                          (selectedPostulante.usuario.apellido ?? "")}
+                      <h2 className="text-xl font-bold text-center">
+                        {selectedPostulante.usuario.nombre}{" "}
+                        {selectedPostulante.usuario.apellido}
                       </h2>
+
                       <p>
                         <strong>Correo:</strong>{" "}
                         {selectedPostulante.usuario.correo}
                       </p>
-                      <p>
-                        <strong>Título:</strong>{" "}
-                        {selectedPostulante.usuario.titulo}
-                      </p>
-                      <p>
-                        <strong>Matrícula:</strong>{" "}
-                        {selectedPostulante.usuario.matricula}
-                      </p>
+
                       <p>
                         <strong>CV:</strong>{" "}
                         {selectedPostulante.usuario.cv_url ? (
                           <a
                             href={selectedPostulante.usuario.cv_url}
                             target="_blank"
-                            className="text-indigo-600 underline"
+                            className="text-blue-600 underline"
                           >
                             Ver CV
                           </a>
                         ) : (
-                          <span className="text-gray-400">No disponible</span>
+                          "No disponible"
                         )}
                       </p>
+
                       <p>
                         <strong>Estado:</strong>{" "}
                         {selectedPostulante.estado.nombre_estado}
                       </p>
 
+                      {/* BOTONES */}
                       <div className="flex gap-2 mt-4">
                         <button
-                          onClick={() =>
-                            confirmarCambioEstado(selectedPostulante.id_postulaciones, "aprobar")
-                          }
-                          className={`px-3 py-1 rounded text-white ${selectedPostulante.estado.id_postulacion_estados === 3 ||
-                              selectedPostulante.estado.id_postulacion_estados === 4
-                              ? "bg-gray-400 cursor-not-allowed"
-                              : "bg-green-500 hover:bg-green-600"
-                            }`}
+                          onClick={() => setModalAccion("aprobar")}
+                          className="px-3 py-1 bg-green-600 text-white rounded hover:bg-green-700"
                           disabled={
-                            selectedPostulante.estado.id_postulacion_estados === 3 ||
-                            selectedPostulante.estado.id_postulacion_estados === 4
+                            selectedPostulante.estado.id_postulacion_estados >=
+                            3
                           }
                         >
                           Aprobar
                         </button>
 
                         <button
-                          onClick={() =>
-                            confirmarCambioEstado(selectedPostulante.id_postulaciones, "rechazar")
-                          }
-                          className={`px-3 py-1 rounded text-white ${selectedPostulante.estado.id_postulacion_estados === 3 ||
-                              selectedPostulante.estado.id_postulacion_estados === 4
-                              ? "bg-gray-400 cursor-not-allowed"
-                              : "bg-red-500 hover:bg-red-600"
-                            }`}
+                          onClick={() => setModalAccion("rechazar")}
+                          className="px-3 py-1 bg-red-600 text-white rounded hover:bg-red-700"
                           disabled={
-                            selectedPostulante.estado.id_postulacion_estados === 3 ||
-                            selectedPostulante.estado.id_postulacion_estados === 4
+                            selectedPostulante.estado.id_postulacion_estados >=
+                            3
                           }
                         >
                           Rechazar
@@ -329,7 +265,7 @@ export default function PostulacionesPage() {
 
                       <button
                         onClick={() => setSelectedPostulante(null)}
-                        className="mt-4 bg-gray-600 text-white px-4 py-2 rounded hover:bg-gray-700 w-full"
+                        className="mt-4 w-full bg-gray-600 text-white py-2 rounded hover:bg-gray-700"
                       >
                         Cerrar
                       </button>
@@ -340,6 +276,89 @@ export default function PostulacionesPage() {
           </motion.div>
         ))}
       </div>
+
+      {/* MODAL DE APROBACIÓN */}
+      <AnimatePresence>
+        {modalAccion === "aprobar" && (
+          <motion.div
+            className="fixed inset-0 flex items-center justify-center bg-black/50 z-50"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+          >
+            <div className="bg-white p-6 rounded-xl shadow-lg max-w-sm w-full">
+              <h2 className="text-xl font-bold mb-4">Confirmar aprobación</h2>
+              <p>¿Seguro que deseas aprobar esta postulación?</p>
+
+              <div className="flex gap-2 mt-4">
+                <button
+                  disabled={processing}
+                  onClick={() =>
+                    cambiarEstado(selectedPostulante!.id_postulaciones, "aprobar")
+                  }
+                  className="px-3 py-1 bg-green-600 text-white rounded"
+                >
+                  {processing ? "Procesando..." : "Sí, aprobar"}
+                </button>
+                <button
+                  onClick={() => setModalAccion(null)}
+                  className="px-3 py-1 bg-gray-300 rounded"
+                >
+                  Cancelar
+                </button>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* MODAL DE RECHAZO */}
+      <AnimatePresence>
+        {modalAccion === "rechazar" && (
+          <motion.div
+            className="fixed inset-0 flex items-center justify-center bg-black/50 z-50"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+          >
+            <div className="bg-white p-6 rounded-xl shadow-lg max-w-sm w-full">
+              <h2 className="text-xl font-bold mb-4">Rechazar postulación</h2>
+
+              <textarea
+                className="w-full border p-2 rounded mb-3"
+                rows={4}
+                placeholder="Escribe el motivo del rechazo..."
+                value={motivoRechazo}
+                onChange={(e) => setMotivoRechazo(e.target.value)}
+              />
+
+              <div className="flex gap-2">
+                <button
+                  disabled={processing || motivoRechazo.trim().length === 0}
+                  onClick={() =>
+                    cambiarEstado(
+                      selectedPostulante!.id_postulaciones,
+                      "rechazar"
+                    )
+                  }
+                  className="px-3 py-1 bg-red-600 text-white rounded disabled:bg-red-300"
+                >
+                  {processing ? "Procesando..." : "Rechazar"}
+                </button>
+                <button
+                  onClick={() => {
+                    setMotivoRechazo("");
+                    setModalAccion(null);
+                  }}
+                  className="px-3 py-1 bg-gray-300 rounded"
+                >
+                  Cancelar
+                </button>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </section>
   );
 }
