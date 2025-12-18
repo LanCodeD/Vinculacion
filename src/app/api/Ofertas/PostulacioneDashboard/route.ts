@@ -2,46 +2,66 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
-export async function GET() {
+export async function GET(req: Request) {
   try {
+    const { searchParams } = new URL(req.url);
+    const yearParam = searchParams.get("year");
+    const year = yearParam ? Number(yearParam) : new Date().getFullYear();
+
     const ofertas = await prisma.ofertas.findMany({
       where: {
         oferta_estados_id: {
-          in: [3, 5], // 3 = PUBLICADA, 5 = CERRADA
+          in: [3, 5],
         },
       },
       select: {
         id_ofertas: true,
         titulo: true,
         postulaciones: {
+          where: {
+            creado_en: {
+              gte: new Date(year, 0, 1),
+              lte: new Date(year, 11, 31),
+            },
+          },
           select: {
             postulacion_estados_id: true,
+            creado_en: true,
           },
         },
       },
     });
 
     const data = ofertas.map((o) => {
-      const total = o.postulaciones.length;
+      const mesesSet = new Set<string>();
 
-      const aceptados = o.postulaciones.filter(
-        (p) => p.postulacion_estados_id === 3
-      ).length;
+      let postulantes = 0;
+      let aceptados = 0;
+      let rechazados = 0;
 
-      const rechazados = o.postulaciones.filter(
-        (p) => p.postulacion_estados_id === 4
-      ).length;
+      o.postulaciones.forEach((p) => {
+        postulantes++;
+
+        const mes = new Date(p.creado_en).toLocaleString("es-MX", {
+          month: "long",
+        });
+
+        mesesSet.add(mes);
+
+        if (p.postulacion_estados_id === 3) aceptados++;
+        if (p.postulacion_estados_id === 4) rechazados++;
+      });
 
       return {
         id: o.id_ofertas,
         titulo: o.titulo,
-        postulantes: total,
+        postulantes,
         aceptados,
         rechazados,
+        meses: Array.from(mesesSet), // 👈 AQUÍ ESTÁ LA CLAVE
       };
     });
 
-    // Ordenar por más postulantes
     data.sort((a, b) => b.postulantes - a.postulantes);
 
     return NextResponse.json({ ok: true, data });

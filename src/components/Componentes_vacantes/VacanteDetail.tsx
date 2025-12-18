@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import Image from "next/image";
 import toast from "react-hot-toast";
+import { FileText } from "lucide-react";
 
 interface VacanteDetailProps {
   id: number;
@@ -306,25 +307,26 @@ export default function VacanteDetail({
                   Verificando CV en tu perfil...
                 </p>
               ) : cvUrl ? (
+              <a
+                href={cvUrl}
+                target="_blank"
+                rel="noreferrer"
+                className="inline-flex items-center gap-2 text-indigo-600 hover:text-indigo-800 transition"
+              >
+                <FileText size={18} />
+                <span className="text-sm font-medium">CV</span>
+              </a>
+              ) : (
+              <p className="text-red-500 text-sm">
+                ⚠️ No tienes un CV cargado. Sube uno en tu{" "}
                 <a
-                  href={cvUrl}
-                  target="_blank"
-                  rel="noreferrer"
+                  href="/MenuPrincipal/ConfiPerfil"
                   className="text-indigo-600 underline"
                 >
-                  📄 Ver mi CV
-                </a>
-              ) : (
-                <p className="text-red-500 text-sm">
-                  ⚠️ No tienes un CV cargado. Sube uno en tu{" "}
-                  <a
-                    href="/MenuPrincipal/ConfiPerfil"
-                    className="text-indigo-600 underline"
-                  >
-                    perfil
-                  </a>{" "}
-                  para poder postularte.
-                </p>
+                  perfil
+                </a>{" "}
+                para poder postularte.
+              </p>
               )}
             </div>
 
@@ -365,3 +367,4 @@ export default function VacanteDetail({
     </section>
   );
 }
+

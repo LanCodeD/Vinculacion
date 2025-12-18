@@ -24,7 +24,7 @@ interface Vacante {
 function agruparOfertasPorMes(vacantes: Vacante[]) {
     const contadorMeses: Record<string, number> = {};
 
-    const mesesMap = ["ene","feb","mar","abr","may","jun","jul","ago","sep","oct","nov","dic"];
+    const mesesMap = ["ene", "feb", "mar", "abr", "may", "jun", "jul", "ago", "sep", "oct", "nov", "dic"];
 
     vacantes.forEach(v => {
         if (!v.fecha_publicacion) return;
@@ -40,7 +40,7 @@ function agruparOfertasPorMes(vacantes: Vacante[]) {
     });
 
     const mesesInv: Record<string, number> = {
-        ene:0,feb:1,mar:2,abr:3,may:4,jun:5,jul:6,ago:7,sep:8,oct:9,nov:10,dic:11
+        ene: 0, feb: 1, mar: 2, abr: 3, may: 4, jun: 5, jul: 6, ago: 7, sep: 8, oct: 9, nov: 10, dic: 11
     };
 
     return Object.entries(contadorMeses)
@@ -71,7 +71,28 @@ export default function GraficaOfertasPorMes() {
         fetchData();
     }, []);
 
-    const data = agruparOfertasPorMes(vacantes);
+    const dataCompleta = agruparOfertasPorMes(vacantes);
+    function completarUltimos3Meses(data: { mes: string; total: number }[]) {
+        const meses = ["ene", "feb", "mar", "abr", "may", "jun", "jul", "ago", "sep", "oct", "nov", "dic"];
+        const hoy = new Date();
+
+        const resultado: { mes: string; total: number }[] = [];
+
+        for (let i = 2; i >= 0; i--) {
+            const fecha = new Date(hoy.getFullYear(), hoy.getMonth() - i, 1);
+            const key = `${meses[fecha.getMonth()]} ${fecha.getFullYear()}`;
+
+            const existente = data.find(d => d.mes === key);
+
+            resultado.push({
+                mes: key,
+                total: existente ? existente.total : 0,
+            });
+        }
+
+        return resultado;
+    }
+    const data = completarUltimos3Meses(dataCompleta);
     const ultimoMes = data[data.length - 1];
 
     return (
@@ -126,3 +147,4 @@ export default function GraficaOfertasPorMes() {
         </div>
     );
 }
+

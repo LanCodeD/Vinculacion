@@ -1,12 +1,14 @@
+// src/app/(dashboard)/BolsaTrabajo/CreacionVacante/page.tsx
 "use client";
 import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import toast, { Toaster } from "react-hot-toast";
 import CampoImagen from "@/components/CampoImagen";
+import { useRouter } from "next/navigation";
 
 export default function CrearOferta() {
   const { data: session } = useSession();
-
+  const router = useRouter();
   const [titulo, setTitulo] = useState("");
   const [descripcion_general, setDescripcion_general] = useState("");
   const [requisitos, setRequisitos] = useState("");
@@ -154,7 +156,15 @@ export default function CrearOferta() {
           },
         }}
       />
-
+      <div className="flex items-center mb-4">
+        <button
+          type="button"
+          onClick={() => router.back()}
+          className="flex items-center gap-2 text-blue-600 hover:text-blue-800 font-medium"
+        >
+          ← Regresar
+        </button>
+      </div>
       <h1 className="text-3xl font-bold mb-6 text-center text-blue-700">
         Crear nueva oferta
       </h1>

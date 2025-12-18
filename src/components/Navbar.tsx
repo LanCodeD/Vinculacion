@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { FaSearch } from "react-icons/fa";
 import { signOut } from "next-auth/react";
 import Image from "next/image";
 import Link from "next/link";
@@ -75,7 +74,7 @@ export default function Navbar() {
   return (
     <div className="w-full h-[8ch] px-4 md:px-12 bg-zinc-50 shadow-md flex items-center justify-between">
       {/* Buscador */}
-      <div className="flex-1 max-w-[24rem] border border-zinc-300 rounded-full h-11 flex items-center">
+{/*       <div className="flex-1 max-w-[24rem] border border-zinc-300 rounded-full h-11 flex items-center">
         <input
           type="text"
           placeholder="Search..."
@@ -84,10 +83,10 @@ export default function Navbar() {
         <button className="px-4 h-full flex items-center justify-center text-base text-zinc-600 border-l border-zinc-300">
           <FaSearch />
         </button>
-      </div>
+      </div> */}
 
       {/* Notificaciones y perfil */}
-      <div className="flex items-center gap-x-4 md:gap-x-8 ml-2 relative text-black">
+      <div className="flex items-center gap-x-4 md:gap-x-8 relative text-black ml-auto">
         {/* Notificaciones */}
         <NotificationDropdown
           notifications={notificaciones}

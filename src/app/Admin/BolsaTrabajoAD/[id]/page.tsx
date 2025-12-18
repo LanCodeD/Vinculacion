@@ -7,7 +7,7 @@ interface Props {
 }
 
 export default async function AdminVacantePage({ params }: Props) {
-  const { id } = await params; // ✅ se resuelve la promesa correctamente
+  const { id } = await params; 
   const vacanteId = Number(id);
 
   if (!id || isNaN(vacanteId)) {
