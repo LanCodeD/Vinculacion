@@ -88,15 +88,13 @@ export default function Sidebar({ role }: { role: AppRole }) {
     <>
       {/* Sidebar Desktop */}
       <div
-        className={`hidden md:flex flex-col ${
-          open ? "w-72 p-5" : "w-20 p-4"
-        } bg-zinc-900 h-full pt-8 relative duration-300 ease-in-out`}
+        className={`hidden md:flex flex-col ${open ? "w-72 p-5" : "w-20 p-4"
+          } bg-zinc-900 h-screen pt-8 relative duration-300 ease-in-out`}
       >
         {/* Botón de expandir/colapsar */}
         <div
-          className={`absolute cursor-pointer -right-4 top-9 w-8 h-8 p-0.5 bg-zinc-50 border-zinc-50 border-2 rounded-full text-xl flex items-center justify-center transition-all ease-in-out duration-300 ${
-            !open && "rotate-180"
-          }`}
+          className={`absolute cursor-pointer -right-4 top-9 w-8 h-8 p-0.5 bg-zinc-50 border-zinc-50 border-2 rounded-full text-xl flex items-center justify-center transition-all ease-in-out duration-300 ${!open && "rotate-180"
+            }`}
           onClick={() => setOpen(!open)}
         >
           {open ? (
@@ -113,72 +111,72 @@ export default function Sidebar({ role }: { role: AppRole }) {
             alt="Logo ITSVA"
             width={48}
             height={48}
-            className={`w-10 h-10 md:w-12 md:h-12 rounded-full object-cover object-center cursor-pointer transition-transform duration-300 ease-in-out hover:scale-110 ${
-              open && "rotate-360"
-            }`}
+            className={`w-10 h-10 md:w-12 md:h-12 rounded-full object-cover object-center cursor-pointer transition-transform duration-300 ease-in-out hover:scale-110 ${open && "rotate-360"
+              }`}
             priority
           />
 
           <h1
-            className={`text-zinc-50 origin-left font-semibold text-xl duration-200 ease-in-out ${
-              !open && "scale-0"
-            }`}
+            className={`text-zinc-50 origin-left font-semibold text-xl duration-200 ease-in-out ${!open && "scale-0"
+              }`}
           >
             SISTEMA DE BOLSA
           </h1>
         </div>
 
         {/* Menús Desktop */}
-        <ul className="pt-6 space-y-0.5">
-          {Menus.map((Menu, index) => (
-            <li
-              key={index}
-              className="flex flex-col rounded-md py-3 px-4 cursor-pointer hover:bg-blue-800/50 text-zinc-50"
-            >
-              {Menu.path && !Menu.subMenu ? (
-                <Link href={Menu.path} className="flex items-center gap-x-4">
-                  <span className="text-lg">{Menu.icon}</span>
-                  <span className={`${!open && "hidden"}`}>{Menu.title}</span>
-                </Link>
-              ) : (
-                <div
-                  className="flex items-center justify-between gap-x-4"
-                  onClick={() => {
-                    if (!open) {
-                      setOpen(true);
-                      if (Menu.key) {
-                        toggleSubMenu(Menu.key);
-                      }
-                    } else {
-                      if (Menu.key) {
-                        toggleSubMenu(Menu.key);
-                      }
-                    }
-                  }}
-                >
-                  <div className="flex items-center gap-2">
+        <div className="flex-1 overflow-y-auto pt-6 pr-1">
+          <ul className="pt-6 space-y-0.5">
+            {Menus.map((Menu, index) => (
+              <li
+                key={index}
+                className="flex flex-col rounded-md py-3 px-4 cursor-pointer hover:bg-blue-800/50 text-zinc-50"
+              >
+                {Menu.path && !Menu.subMenu ? (
+                  <Link href={Menu.path} className="flex items-center gap-x-4">
                     <span className="text-lg">{Menu.icon}</span>
                     <span className={`${!open && "hidden"}`}>{Menu.title}</span>
+                  </Link>
+                ) : (
+                  <div
+                    className="flex items-center justify-between gap-x-4"
+                    onClick={() => {
+                      if (!open) {
+                        setOpen(true);
+                        if (Menu.key) {
+                          toggleSubMenu(Menu.key);
+                        }
+                      } else {
+                        if (Menu.key) {
+                          toggleSubMenu(Menu.key);
+                        }
+                      }
+                    }}
+                  >
+                    <div className="flex items-center gap-2">
+                      <span className="text-lg">{Menu.icon}</span>
+                      <span className={`${!open && "hidden"}`}>{Menu.title}</span>
+                    </div>
+                    {Menu.subMenu && open && (
+                      <span>
+                        {subMenus[Menu.key ?? ""] ? (
+                          <FaChevronDown />
+                        ) : (
+                          <FaChevronRight />
+                        )}
+                      </span>
+                    )}
                   </div>
-                  {Menu.subMenu && open && (
-                    <span>
-                      {subMenus[Menu.key ?? ""] ? (
-                        <FaChevronDown />
-                      ) : (
-                        <FaChevronRight />
-                      )}
-                    </span>
-                  )}
-                </div>
-              )}
+                )}
 
-              {open &&
-                Menu.subMenu &&
-                subMenus[Menu.key ?? ""] &&
-                renderSubMenu(Menu.subMenu)}
-            </li>
-          ))}
-        </ul>
+                {open &&
+                  Menu.subMenu &&
+                  subMenus[Menu.key ?? ""] &&
+                  renderSubMenu(Menu.subMenu)}
+              </li>
+            ))}
+          </ul>
+        </div>
       </div>
 
       {/* Sidebar Mobile */}
@@ -188,7 +186,7 @@ export default function Sidebar({ role }: { role: AppRole }) {
             className="fixed inset-0 bg-black/30"
             onClick={() => setMobileOpen(false)}
           />
-          <div className="relative w-72 bg-zinc-900 p-5 overflow-y-auto">
+          <div className="relative w-72 bg-zinc-900 p-5 h-screen overflow-y-auto">
             <button
               className="absolute top-5 right-5 text-white text-xl"
               onClick={() => setMobileOpen(false)}

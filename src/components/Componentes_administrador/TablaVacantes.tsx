@@ -62,7 +62,7 @@ export default function TablaVacantes({ vacantes }: Props) {
       {/* Tabla */}
       <div className="inline-block min-w-full shadow-lg overflow-hidden rounded-lg bg-white">
         <table className="min-w-full divide-y divide-gray-200">
-          <thead className="bg-gradient-to-r from-blue-100 to-blue-50">
+          <thead className="bg-linear-to-r from-blue-100 to-blue-50">
             <tr>
               <th className="px-6 py-3 text-left text-xs font-medium text-blue-700 uppercase tracking-wider">Título</th>
               <th className="px-6 py-3 text-left text-xs font-medium text-blue-700 uppercase tracking-wider">Empresa</th>

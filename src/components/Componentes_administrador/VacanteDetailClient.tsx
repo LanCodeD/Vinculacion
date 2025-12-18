@@ -178,12 +178,6 @@ export default function AdminVacanteDetailClient({ vacante }: Props) {
                 ? formatFecha(vacante.fecha_cierre)
                 : "No definida"}
             </p>
-            <p>
-              <strong>Última actualización:</strong>{" "}
-              {vacante.actualizado_en
-                ? formatFecha(vacante.actualizado_en)
-                : "N/A"}
-            </p>
           </div>
 
           {/* Botones */}
@@ -227,3 +221,4 @@ export default function AdminVacanteDetailClient({ vacante }: Props) {
     </div>
   );
 }
+

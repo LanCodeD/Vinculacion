@@ -1,9 +1,11 @@
+// src/app/%28dashboard%29/MenuPrincipal/ConfiPerfil/page.tsx
 "use client";
 import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import UploadFile from "@/components/Subir_documentos";
 import Image from "next/image";
 import toast from "react-hot-toast";
+import { FileText } from "lucide-react";
 
 interface UserProfile {
   id: number;
@@ -99,11 +101,12 @@ export default function Perfil() {
   if (!user) return <div>Cargando datos del usuario...</div>;
 
   return (
-    <div className="p-6 bg-white rounded shadow text-black w-full">
-      {/* CABECERA */}
-      <div className="flex flex-col items-center gap-4 mb-6 w-full">
+    <div className="w-full bg-white rounded-xl shadow-sm border border-gray-200 p-8 text-black">
+
+      {/* ===================== CABECERA ===================== */}
+      <div className="flex flex-col items-center gap-6 mb-10 w-full">
         {user.imagen_perfil ? (
-          <div className="relative w-24 h-24 rounded-full overflow-hidden border border-gray-300">
+          <div className="relative w-28 h-28 rounded-full overflow-hidden border-2 border-gray-300 shadow-sm">
             <Image
               src={user.imagen_perfil}
               alt="Foto de perfil"
@@ -114,34 +117,38 @@ export default function Perfil() {
             />
           </div>
         ) : (
-          <div className="w-24 h-24 rounded-full bg-gray-200 flex items-center justify-center text-gray-500 border">
+          <div className="w-28 h-28 rounded-full bg-gray-100 flex items-center justify-center text-gray-500 border">
             Sin imagen
           </div>
         )}
 
-        <div className="text-center">
+        <div className="text-center space-y-1">
           {editMode ? (
-            <>
-              <input
-                type="text"
-                value={formData?.nombre || ""}
-                onChange={(e) =>
-                  setFormData((prev) =>
-                    prev ? { ...prev, nombre: e.target.value } : prev
-                  )
-                }
-                className="border rounded p-1 mr-2 "
-              />
-              <input
-                type="text"
-                value={formData?.apellido || ""}
-                onChange={(e) =>
-                  setFormData((prev) =>
-                    prev ? { ...prev, apellido: e.target.value } : prev
-                  )
-                }
-                className="border rounded p-1"
-              />
+            <div className="space-y-2">
+              <div className="flex gap-2 justify-center">
+                <input
+                  type="text"
+                  value={formData?.nombre || ""}
+                  onChange={(e) =>
+                    setFormData((prev) =>
+                      prev ? { ...prev, nombre: e.target.value } : prev
+                    )
+                  }
+                  className="border border-gray-300 rounded-md px-3 py-2 text-sm"
+                  placeholder="Nombre"
+                />
+                <input
+                  type="text"
+                  value={formData?.apellido || ""}
+                  onChange={(e) =>
+                    setFormData((prev) =>
+                      prev ? { ...prev, apellido: e.target.value } : prev
+                    )
+                  }
+                  className="border border-gray-300 rounded-md px-3 py-2 text-sm"
+                  placeholder="Apellido"
+                />
+              </div>
               <input
                 type="text"
                 value={formData?.celular || ""}
@@ -150,21 +157,22 @@ export default function Perfil() {
                     prev ? { ...prev, celular: e.target.value } : prev
                   )
                 }
-                className="border rounded p-1 block mt-2"
+                className="border border-gray-300 rounded-md px-3 py-2 text-sm w-full"
                 placeholder="Celular"
               />
-            </>
+            </div>
           ) : (
             <>
               <h1 className="text-2xl font-bold">
                 {user.nombre} {user.apellido}
               </h1>
-              <p className="text-gray-600">{user.correo}</p>
-              {user.celular && <p className="text-gray-600">{user.celular}</p>}
+              <p className="text-gray-600 text-sm">{user.correo}</p>
+              {user.celular && (
+                <p className="text-gray-600 text-sm">{user.celular}</p>
+              )}
             </>
           )}
 
-          {/* Subir foto de perfil (NO SE EDITA) */}
           <UploadFile
             userId={user.id}
             tipo="foto_usuario"
@@ -175,12 +183,12 @@ export default function Perfil() {
         </div>
       </div>
 
-      {/* BOTONES */}
-      <div className="mb-4 flex gap-2 items-center justify-center">
+      {/* ===================== BOTONES ===================== */}
+      <div className="mb-10 flex gap-3 justify-center">
         {!editMode ? (
           <button
             onClick={() => setEditMode(true)}
-            className="bg-blue-600 text-white px-4 py-2 rounded"
+            className="px-5 py-2 rounded-lg text-sm font-medium bg-blue-600 hover:bg-blue-700 text-white"
           >
             Editar perfil
           </button>
@@ -188,7 +196,7 @@ export default function Perfil() {
           <>
             <button
               onClick={handleSave}
-              className="bg-green-600 text-white px-4 py-2 rounded"
+              className="px-5 py-2 rounded-lg text-sm font-medium bg-green-600 hover:bg-green-700 text-white"
             >
               Guardar
             </button>
@@ -197,7 +205,7 @@ export default function Perfil() {
                 setEditMode(false);
                 setFormData(user);
               }}
-              className="bg-gray-400 text-white px-4 py-2 rounded"
+              className="px-5 py-2 rounded-lg text-sm font-medium bg-gray-400 hover:bg-gray-500 text-white"
             >
               Cancelar
             </button>
@@ -205,17 +213,24 @@ export default function Perfil() {
         )}
       </div>
 
-      {/* INFORMACIÓN DE DOCENTE */}
+      {/* ===================== DOCENTE ===================== */}
       {user.rol === "Docente" && formData?.docentes && (
-        <div>
-          <h2 className="text-xl font-semibold mb-2">Información de Docente</h2>
+        <div className="mt-10 bg-gray-50 border border-gray-200 rounded-xl p-6">
+          <h2 className="text-lg font-semibold text-gray-800 mb-6 border-b pb-2">
+            Información de Docente
+          </h2>
+
           {formData.docentes.map((doc, i) => (
-            <div key={doc.id_docentes} className="mb-4 p-4 border rounded">
-              <p>
-                <strong>Título:</strong>{" "}
+            <div
+              key={doc.id_docentes}
+              className="bg-white border border-gray-200 rounded-lg p-5 grid grid-cols-1 md:grid-cols-2 gap-4 shadow-sm mb-6"
+            >
+              <div>
+                <span className="block text-gray-500 text-sm font-medium mb-1">
+                  Título
+                </span>
                 {editMode ? (
                   <input
-                    type="text"
                     value={doc.titulo || ""}
                     onChange={(e) =>
                       setFormData((prev) =>
@@ -229,17 +244,19 @@ export default function Perfil() {
                           : prev
                       )
                     }
-                    className="border rounded p-1 ml-2"
+                    className="border rounded-md px-3 py-2 text-sm w-full"
                   />
                 ) : (
-                  doc.titulo || "-"
+                  <p className="text-sm">{doc.titulo || "-"}</p>
                 )}
-              </p>
-              <p>
-                <strong>Puesto:</strong>{" "}
+              </div>
+
+              <div>
+                <span className="block text-gray-500 text-sm font-medium mb-1">
+                  Puesto
+                </span>
                 {editMode ? (
                   <input
-                    type="text"
                     value={doc.puesto || ""}
                     onChange={(e) =>
                       setFormData((prev) =>
@@ -253,28 +270,35 @@ export default function Perfil() {
                           : prev
                       )
                     }
-                    className="border rounded p-1 ml-2"
+                    className="border rounded-md px-3 py-2 text-sm w-full"
                   />
                 ) : (
-                  doc.puesto || "-"
+                  <p className="text-sm">{doc.puesto || "-"}</p>
                 )}
-              </p>
+              </div>
             </div>
           ))}
         </div>
       )}
 
-      {/* INFORMACIÓN DE EMPRESA */}
+      {/* ===================== EMPRESA ===================== */}
       {user.rol === "Empresa" && formData?.empresas && (
-        <div className="text-center">
-          <h2 className="text-xl font-semibold mb-2">Información de Empresa</h2>
+        <div className="mt-10 bg-gray-50 border border-gray-200 rounded-xl p-6">
+          <h2 className="text-lg font-semibold text-gray-800 mb-6 border-b pb-2">
+            Información de Empresa
+          </h2>
+
           {formData.empresas.map((emp, i) => (
-            <div key={emp.id_empresas} className="mb-4 p-4 border-0 rounded">
-              <p>
-                <strong>Nombre Comercial:</strong>{" "}
+            <div
+              key={emp.id_empresas}
+              className="bg-white border border-gray-200 rounded-lg p-5 grid grid-cols-1 md:grid-cols-2 gap-4 shadow-sm mb-6"
+            >
+              <div>
+                <span className="block text-gray-500 text-sm font-medium mb-1">
+                  Nombre comercial
+                </span>
                 {editMode ? (
                   <input
-                    type="text"
                     value={emp.nombre_comercial}
                     onChange={(e) =>
                       setFormData((prev) =>
@@ -283,122 +307,52 @@ export default function Perfil() {
                             ...prev,
                             empresas: prev.empresas?.map((empresa, idx) =>
                               idx === i
-                                ? { ...empresa, nombre_comercial: e.target.value }
+                                ? {
+                                  ...empresa,
+                                  nombre_comercial: e.target.value,
+                                }
                                 : empresa
                             ),
                           }
                           : prev
                       )
                     }
-                    className="border rounded p-1 ml-2"
+                    className="border rounded-md px-3 py-2 text-sm w-full"
                   />
                 ) : (
-                  emp.nombre_comercial
+                  <p className="text-sm">{emp.nombre_comercial}</p>
                 )}
-              </p>
-              {emp.razon_social && (
-                <p>
-                  <strong>Razón Social:</strong>{" "}
-                  {editMode ? (
-                    <input
-                      type="text"
-                      value={emp.razon_social}
-                      onChange={(e) =>
-                        setFormData((prev) =>
-                          prev
-                            ? {
-                              ...prev,
-                              empresas: prev.empresas?.map((empresa, idx) =>
-                                idx === i
-                                  ? { ...empresa, razon_social: e.target.value }
-                                  : empresa
-                              ),
-                            }
-                            : prev
-                        )
-                      }
-                      className="border rounded p-1 ml-2"
-                    />
-                  ) : (
-                    emp.razon_social
-                  )}
-                </p>
-              )}
-              <p>
-                <strong>RFC:</strong> {emp.rfc}
-              </p>
-              {emp.direccion && (
-                <p>
-                  <strong>Dirección:</strong>{" "}
-                  {editMode ? (
-                    <input
-                      type="text"
-                      value={emp.direccion}
-                      onChange={(e) =>
-                        setFormData((prev) =>
-                          prev
-                            ? {
-                              ...prev,
-                              empresas: prev.empresas?.map((empresa, idx) =>
-                                idx === i
-                                  ? { ...empresa, direccion: e.target.value }
-                                  : empresa
-                              ),
-                            }
-                            : prev
-                        )
-                      }
-                      className="border rounded p-1 ml-2 w-full"
-                    />
-                  ) : (
-                    emp.direccion
-                  )}
-                </p>
-              )}
-              {emp.correo_empresas && (
-                <p>
-                  <strong>Correo Empresa:</strong>{" "}
-                  {editMode ? (
-                    <input
-                      type="text"
-                      value={emp.correo_empresas}
-                      onChange={(e) =>
-                        setFormData((prev) =>
-                          prev
-                            ? {
-                              ...prev,
-                              empresas: prev.empresas?.map((empresa, idx) =>
-                                idx === i
-                                  ? { ...empresa, correo_empresas: e.target.value }
-                                  : empresa
-                              ),
-                            }
-                            : prev
-                        )
-                      }
-                      className="border rounded p-1 ml-2 w-full"
-                    />
-                  ) : (
-                    emp.correo_empresas
-                  )}
-                </p>
-              )}
+              </div>
+
+              <div>
+                <span className="block text-gray-500 text-sm font-medium mb-1">
+                  RFC
+                </span>
+                <p className="text-sm">{emp.rfc}</p>
+              </div>
             </div>
           ))}
         </div>
       )}
 
-      {/* INFORMACIÓN DE EGRESADO */}
+      {/* ===================== EGRESADO ===================== */}
       {user.rol === "Egresado" && formData?.egresados && (
-        <div>
-          <h2 className="text-xl font-semibold mb-2">Información de Egresado</h2>
+        <div className="mt-10 bg-gray-50 border border-gray-200 rounded-xl p-6">
+          <h2 className="text-lg font-semibold text-gray-800 mb-6 border-b pb-2">
+            Información de Egresado
+          </h2>
+
           {formData.egresados.map((eg, i) => (
-            <div key={eg.id_egresados} className="mb-4 p-4 border rounded">
-              <p>
-                <strong>Título:</strong>{" "}
+            <div
+              key={eg.id_egresados}
+              className="bg-white border border-gray-200 rounded-lg p-5 grid grid-cols-1 md:grid-cols-2 gap-4 shadow-sm mb-6"
+            >
+              <div>
+                <span className="block text-gray-500 text-sm font-medium mb-1">
+                  Título
+                </span>
                 {editMode ? (
                   <input
-                    type="text"
                     value={eg.titulo || ""}
                     onChange={(e) =>
                       setFormData((prev) =>
@@ -406,107 +360,85 @@ export default function Perfil() {
                           ? {
                             ...prev,
                             egresados: prev.egresados?.map((egresado, idx) =>
-                              idx === i ? { ...egresado, titulo: e.target.value } : egresado
+                              idx === i
+                                ? { ...egresado, titulo: e.target.value }
+                                : egresado
                             ),
                           }
                           : prev
                       )
                     }
-                    className="border rounded p-1 ml-2"
+                    className="border rounded-md px-3 py-2 text-sm w-full"
                   />
                 ) : (
-                  eg.titulo || "-"
+                  <p className="text-sm">{eg.titulo || "-"}</p>
                 )}
-              </p>
-              <p>
-                <strong>Puesto:</strong>{" "}
-                {editMode ? (
-                  <input
-                    type="text"
-                    value={eg.puesto || ""}
-                    onChange={(e) =>
-                      setFormData((prev) =>
-                        prev
-                          ? {
-                            ...prev,
-                            egresados: prev.egresados?.map((egresado, idx) =>
-                              idx === i ? { ...egresado, puesto: e.target.value } : egresado
-                            ),
-                          }
-                          : prev
-                      )
-                    }
-                    className="border rounded p-1 ml-2"
-                  />
-                ) : (
-                  eg.puesto || "-"
-                )}
-              </p>
-              <p>
-                <strong>Matrícula:</strong> {eg.matricula}
-              </p>
-              <p>
-                <strong>Fecha de egreso:</strong> {eg.fecha_egreso}
-              </p>
-              <p>
-                <strong>Correo Institucional:</strong>{" "}
-                {editMode ? (
-                  <input
-                    type="text"
-                    value={eg.correo_institucional || ""}
-                    onChange={(e) =>
-                      setFormData((prev) =>
-                        prev
-                          ? {
-                            ...prev,
-                            egresados: prev.egresados?.map((egresado, idx) =>
-                              idx === i ? { ...egresado, correo_institucional: e.target.value } : egresado
-                            ),
-                          }
-                          : prev
-                      )
-                    }
-                    className="border rounded p-1 ml-2"
-                  />
-                ) : (
-                  eg.correo_institucional || "-"
-                )}
-              </p>
-              <p>
-                <strong>CV:</strong>{" "}
+              </div>
+
+              <div>
+                <span className="block text-gray-500 text-sm font-medium mb-1">
+                  Matrícula
+                </span>
+                <p className="text-sm">{eg.matricula}</p>
+              </div>
+              <div>
+                <span className="block text-gray-500 text-sm font-medium mb-1">
+                  Correo institucional
+                </span>
+                <p className="text-sm">{eg.correo_institucional}</p>
+              </div>
+
+              <div>
+                <span className="block text-gray-500 text-sm font-medium mb-1">
+                  Fecha de egreso
+                </span>
+                <p className="text-sm">
+                  {eg.fecha_egreso
+                    ? new Date(eg.fecha_egreso).toLocaleDateString("es-MX")
+                    : "-"}
+                </p>
+              </div>
+              <div className="md:col-span-2 pt-4 border-t">
+                <span className="block text-gray-500 text-sm font-medium mb-2">
+                  Currículum Vitae
+                </span>
+
                 {eg.cv_url ? (
                   <a
                     href={eg.cv_url}
                     target="_blank"
-                    className="text-blue-600 underline"
+                    rel="noreferrer"
+                    className="inline-flex items-center gap-2 text-indigo-600 hover:text-indigo-800 transition"
                   >
-                    Ver PDF
+                    <FileText size={18} />
+                    <span className="text-sm font-medium">CV</span>
                   </a>
                 ) : (
-                  "-"
+                  <p className="text-sm text-gray-500">No cargado</p>
                 )}
-              </p>
 
-              {/* Subir CV (NO SE EDITA) */}
-              <UploadFile
-                userId={user.id}
-                tipo="cv"
-                idEgresado={eg.id_egresados}
-                onUploaded={(url) =>
-                  setUser((prev) =>
-                    prev
-                      ? {
-                        ...prev,
-                        egresados: prev.egresados?.map((e) =>
-                          e.id_egresados === eg.id_egresados
-                            ? { ...e, cv_url: url }
-                            : e
-                        ),
-                      }
-                      : prev
-                  )
-                }
-              />
+                <div className="mt-3">
+                  <UploadFile
+                    userId={user.id}
+                    tipo="cv"
+                    idEgresado={eg.id_egresados}
+                    onUploaded={(url) =>
+                      setUser((prev) =>
+                        prev
+                          ? {
+                            ...prev,
+                            egresados: prev.egresados?.map((e) =>
+                              e.id_egresados === eg.id_egresados
+                                ? { ...e, cv_url: url }
+                                : e
+                            ),
+                          }
+                          : prev
+                      )
+                    }
+                  />
+                </div>
+              </div>
             </div>
           ))}
         </div>

@@ -1,8 +1,7 @@
-// src/app/(dashboard)/BolsaTrabajo/Postulaciones/[id]/page.tsx
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
@@ -32,7 +31,7 @@ interface Postulacion {
 export default function PostulacionesPage() {
   const { id } = useParams();
   const { data: session } = useSession();
-
+  const router = useRouter();
   const [postulaciones, setPostulaciones] = useState<Postulacion[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedPostulante, setSelectedPostulante] =
@@ -90,14 +89,14 @@ export default function PostulacionesPage() {
         prev.map((post) =>
           post.id_postulaciones === postulacionId
             ? {
-                ...post,
-                estado: {
-                  ...post.estado,
-                  nombre_estado: accion === "aprobar" ? "Aprobado" : "Rechazado",
-                  id_postulacion_estados: accion === "aprobar" ? 3 : 4,
-                },
-                mensaje: accion === "rechazar" ? motivoRechazo : post.mensaje,
-              }
+              ...post,
+              estado: {
+                ...post.estado,
+                nombre_estado: accion === "aprobar" ? "Aprobado" : "Rechazado",
+                id_postulacion_estados: accion === "aprobar" ? 3 : 4,
+              },
+              mensaje: accion === "rechazar" ? motivoRechazo : post.mensaje,
+            }
             : post
         )
       );
@@ -106,14 +105,14 @@ export default function PostulacionesPage() {
       setSelectedPostulante((prev) =>
         prev && prev.id_postulaciones === postulacionId
           ? {
-              ...prev,
-              estado: {
-                ...prev.estado,
-                nombre_estado: accion === "aprobar" ? "Aprobado" : "Rechazado",
-                id_postulacion_estados: accion === "aprobar" ? 3 : 4,
-              },
-              mensaje: accion === "rechazar" ? motivoRechazo : prev.mensaje,
-            }
+            ...prev,
+            estado: {
+              ...prev.estado,
+              nombre_estado: accion === "aprobar" ? "Aprobado" : "Rechazado",
+              id_postulacion_estados: accion === "aprobar" ? 3 : 4,
+            },
+            mensaje: accion === "rechazar" ? motivoRechazo : prev.mensaje,
+          }
           : prev
       );
 
@@ -132,6 +131,15 @@ export default function PostulacionesPage() {
 
   return (
     <section className="p-6">
+      <div className="flex items-center mb-4">
+        <button
+          type="button"
+          onClick={() => router.back()}
+          className="flex items-center gap-2 text-blue-600 hover:text-blue-800 font-medium"
+        >
+          ← Regresar
+        </button>
+      </div>
       <h1 className="text-2xl font-bold mb-4">📋 Postulaciones</h1>
 
       <div className="space-y-4">
