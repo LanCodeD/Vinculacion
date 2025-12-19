@@ -118,7 +118,6 @@ export default function Navbar() {
                     Mi perfil
                   </Link>
                 </li>
-                <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Configuración</li>
                 <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">
                   <button
                     onClick={() => signOut({ callbackUrl: "/" })}

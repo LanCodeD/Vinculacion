@@ -22,13 +22,13 @@ export default async function DashboardLayout({
   const role = session.user.role as AppRole;
 
   return (
-    <div className="flex h-screen w-screen overflow-hidden">
+    <div className="flex h-screen w-screen overflow-x-auto">
+
       <Toaster position="top-right" />
-      {/* ✅ Ya no hay retraso en obtener el rol */}
       <Sidebar role={role} />
       <div className="flex flex-col flex-1 min-h-0 bg-zinc-100">
         <Navbar />
-        <main className="flex-1 overflow-y-auto px-4 md:px-12 py-4">
+        <main className="flex-1 overflow-y-auto overflow-x-auto px-4 md:px-12 py-4">
           {children}
         </main>
       </div>

@@ -42,7 +42,7 @@ export const USER_MENUS = [
   },
   //{ title: "Calendario", icon: <TiCalendar />, path: "/Calendar" },
   //{ title: "Tablas", icon: <FiTable />, path: "/BolsaTrabajo/Postulaciones" },
-  { title: "Historial", icon: <GoGraph />, path: "/Historial" },
+  { title: "Historial de Convenios", icon: <GoGraph />, path: "/Historial" },
   //{ title: "Soporte", icon: <MdOutlineHeadsetMic />, path: "/support" },
   {
     title: "Configuración",
@@ -50,8 +50,6 @@ export const USER_MENUS = [
     key: "settings",
     subMenu: [
       { title: "Perfil", path: "/MenuPrincipal/ConfiPerfil" },
-      { title: "Tema", path: "/MenuPrincipal/ConfiTema" },
-      { title: "Gestión", path: "/MenuPrincipal/ConfiGestion" },
     ],
   },
 ];
@@ -131,8 +129,6 @@ export const ADMIN_MENUS = [
     key: "settings",
     subMenu: [
       { title: "Perfil", path: "/Registro" },
-      { title: "Tema", path: "/MenuPrincipal/ConfiTema" },
-      { title: "Gestión", path: "/Admin/BolsaTrabajoAD/Estadisticas" },
     ],
   },
   {

@@ -12,7 +12,7 @@ export default function LoginForm() {
   const [correo, setCorreo] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
-  const [showPassword, setShowPassword] = useState(false); // 👈 nuevo estado
+  const [showPassword, setShowPassword] = useState(false); 
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -39,7 +39,7 @@ export default function LoginForm() {
     if (res?.error) {
       toast.error(res.error, { position: "top-right" });
     } else {
-      toast.success("Login correcto 🎉", {
+      toast.success("Login correcto", {
         position: "top-right",
         duration: 1500,
       });
@@ -120,7 +120,7 @@ justify-center flex-1 px-4 py-12 sm:px-6 lg:flex-none lg:px-20 xl:px-24">
             </div>
           </div>
 
-          {/* 🔒 Contraseña */}
+          {/* Contraseña */}
           <div>
             <label htmlFor="password" className="block text-sm font-medium text-gray-600">
               Contraseña
@@ -161,7 +161,7 @@ justify-center flex-1 px-4 py-12 sm:px-6 lg:flex-none lg:px-20 xl:px-24">
             </div>
           </div>
 
-          {/* 🔘 Botón */}
+          {/* Botón */}
           <button
             type="submit"
             disabled={loading}
@@ -170,7 +170,7 @@ justify-center flex-1 px-4 py-12 sm:px-6 lg:flex-none lg:px-20 xl:px-24">
             {loading ? "Ingresando..." : "Iniciar sesión"}
           </button>
 
-          {/* 🧩 Recuperar contraseña */}
+          {/* Recuperar contraseña */}
           <p className="text-center text-sm text-gray-500 mt-3">
             ¿Olvidaste tu contraseña?{" "}
             <Link

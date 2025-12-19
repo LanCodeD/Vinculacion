@@ -144,7 +144,7 @@ export default function ContactoEstadosPage() {
   };
 
   return (
-     <div className="p-6 bg-white rounded-xl shadow-lg text-black space-y-6 w-full h-full">
+    <div className="p-6 bg-white rounded-xl shadow-lg text-black space-y-6 w-full">
       {/* Encabezado */}
       <div className="flex justify-between items-center">
         <h1 className="text-3xl font-bold text-gray-800 flex items-center gap-2">
@@ -212,11 +212,10 @@ export default function ContactoEstadosPage() {
       </div>
 
       {/* Tabla */}
-      <div className="overflow-x-auto rounded-lg shadow border border-gray-200">
-        <table className="min-w-full text-sm text-left bg-white">
+      <div className="w-full overflow-x-auto rounded-lg shadow border border-gray-200">
+        <table className="min-w-[1200px] text-sm text-left bg-white">
           <thead className="bg-[#011848] text-white text-sm font-semibold">
             <tr>
-              
               <th className="px-4 py-3">Nombre</th>
               <th className="px-4 py-3">Apellido</th>
               <th className="px-4 py-3">Correo</th>
@@ -227,7 +226,7 @@ export default function ContactoEstadosPage() {
               <th className="px-4 py-3">Grupo</th>
               <th className="px-4 py-3 text-center">Representante</th>
               <th className="px-4 py-3">Estado</th>
-            
+
               <th className="px-4 py-3 text-center">Acciones</th>
             </tr>
           </thead>
@@ -240,7 +239,6 @@ export default function ContactoEstadosPage() {
                   idx % 2 === 0 ? "bg-white" : "bg-gray-50"
                 } hover:bg-gray-100 transition`}
               >
-                
                 <td className="px-4 py-2">{c.nombre ?? "—"}</td>
                 <td className="px-4 py-2">{c.apellido ?? "—"}</td>
                 <td className="px-4 py-2">{c.correo ?? "—"}</td>
