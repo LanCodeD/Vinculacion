@@ -13,7 +13,7 @@ export function plantillaVacanteEditadaAdmin({
   botonUrl: string;
 }) {
   return plantillaCorreoBase({
-    titulo: "⚠️ Vacante actualizada — Revisión requerida",
+    titulo: "Vacante actualizada — Revisión requerida",
     mensaje: `
       <p>Hola <strong>${adminNombre}</strong>,</p>
       <p>La empresa <strong>${empresaNombre}</strong> ha actualizado la vacante <strong>"${tituloVacante}"</strong>.</p>

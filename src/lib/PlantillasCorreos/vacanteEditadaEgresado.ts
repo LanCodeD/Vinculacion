@@ -13,7 +13,7 @@ export function plantillaVacanteEditadaEgresado({
   botonUrl: string;
 }) {
   return plantillaCorreoBase({
-    titulo: "🔄 Actualización en una vacante a la que postulaste",
+    titulo: "Actualización en una vacante a la que postulaste",
     mensaje: `
       <p>Hola <strong>${nombreEgresado}</strong>,</p>
       <p>Queremos informarte que la empresa <strong>${empresa}</strong> ha actualizado la vacante <strong>"${tituloVacante}"</strong>.</p>

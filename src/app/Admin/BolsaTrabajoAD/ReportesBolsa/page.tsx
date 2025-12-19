@@ -48,7 +48,7 @@ const estadoTexto: Record<3 | 4 | 5, string> = {
 
 export default function ReporteOfertasPage() {
   const [anio, setAnio] = useState<number>(new Date().getFullYear());
-  const [trimestre, setTrimestre] = useState<string | null>(null); // "Q1" | "Q2" | "Q3" | "Q4" | null
+  const [trimestre, setTrimestre] = useState<string | null>(null); 
   const [reporte, setReporte] = useState<ReporteOfertasResponse | null>(null);
   const [cargandoDatos, setCargandoDatos] = useState(false);
   const [descargando, setDescargando] = useState(false);
@@ -58,7 +58,6 @@ export default function ReporteOfertasPage() {
 
   useEffect(() => {
     fetchReporte();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [anio, trimestre]);
 
   async function fetchReporte() {
@@ -66,13 +65,11 @@ export default function ReporteOfertasPage() {
     try {
       const payload: PayloadReporte = { anio };
       if (trimestre) payload.trimestre = trimestre;
-      // Llamada a tu API (POST)
       const res = await axios.post<ReporteOfertasResponse>(
         "/api/Admin/BolsaTrabajo/Reportes/Ofertas",
         payload
       );
 
-      // pequeña pausa para UX (igual que en convenios)
       await new Promise((r) => setTimeout(r, 200));
       setReporte(res.data);
     } catch (error) {
@@ -88,7 +85,6 @@ export default function ReporteOfertasPage() {
     setDescargando(true);
 
     try {
-      // Envía el array de ofertas al endpoint que genera el PDF
       const res = await axios.post(
         "/api/Admin/BolsaTrabajo/Reportes/ReporteOfertas",
         { ofertas: reporte.ofertas },
@@ -116,7 +112,6 @@ export default function ReporteOfertasPage() {
         Reporte de Ofertas
       </h1>
 
-      {/* Loader global */}
       {cargandoDatos && (
         <div className="flex items-center justify-center gap-3 mt-4 p-3 text-blue-900">
           <svg
@@ -278,7 +273,6 @@ export default function ReporteOfertasPage() {
               </table>
             </div>
 
-            {/* No hay datos */}
             {reporte?.ofertas.length === 0 && (
               <p className="text-center text-gray-500 py-4">
                 No hay datos para este período. Selecciona otro año o trimestre.

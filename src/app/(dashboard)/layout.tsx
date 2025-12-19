@@ -14,7 +14,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
   const role = session?.user?.role as AppRole | undefined;
 
-  // 🚀 Redirecciones seguras dentro de useEffect
+  // Redirecciones seguras dentro de useEffect
   useEffect(() => {
     if (status === "loading") return; // no hacer nada mientras carga
 
@@ -28,12 +28,12 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     }
   }, [status, session, role, router]);
 
-  // 🚀 Mientras carga la sesión, muestra un loader
+  // Mientras carga la sesión, muestra un loader
   if (status === "loading") {
     return <div className="flex items-center justify-center h-screen">Cargando...</div>;
   }
 
-  // 🚀 Si ya redirigió, no renderiza nada
+  // Si ya redirigió, no renderiza nada
   if (!session?.user || role === "Personal-Plantel") {
     return null;
   }

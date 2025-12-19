@@ -47,19 +47,19 @@ export default function BolsaTrabajo() {
       const mesActual = hoy.getMonth();
       const añoActual = hoy.getFullYear();
 
-      // 🟦 1. Ofertas publicadas este mes
+      // 1. Ofertas publicadas este mes
       const ofertasEsteMes = vacantes.filter((v) => {
         const f = new Date(v.fecha_publicacion);
         return f.getMonth() === mesActual && f.getFullYear() === añoActual;
       }).length;
 
-      // 🟩 2. Total de postulaciones
+      // 2. Total de postulaciones
       const totalPost = vacantes.reduce(
         (acc, v) => acc + (v._count?.postulaciones || 0),
         0
       );
 
-      // 🟧 3. Vacantes activas (estado 3 = PUBLICADA)
+      // 3. Vacantes activas (estado 3 = PUBLICADA)
       const activas = vacantes.filter((v) => v.oferta_estados_id === 3).length;
 
       setOfertasMes(ofertasEsteMes);

@@ -56,9 +56,7 @@ export default function PostulacionesPage() {
       .finally(() => setLoading(false));
   }, [id, session]);
 
-  // -----------------------------
-  // ACTUALIZAR ESTADO
-  // -----------------------------
+  // ACTUALIZAR ESTADO  DE POSTULACIÓN
   const cambiarEstado = async (
     postulacionId: number,
     accion: "aprobar" | "rechazar"
@@ -140,7 +138,7 @@ export default function PostulacionesPage() {
           ← Regresar
         </button>
       </div>
-      <h1 className="text-2xl font-bold mb-4">📋 Postulaciones</h1>
+      <h1 className="text-2xl font-bold mb-4">Postulaciones</h1>
 
       <div className="space-y-4">
         {postulaciones.map((p) => (

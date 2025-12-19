@@ -31,23 +31,23 @@ export default function PostulacionesVacante({
   const [updating, setUpdating] = useState<number | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  // 🔹 Cargar postulaciones
+  // Cargar postulaciones
   useEffect(() => {
     if (!idOferta) {
-      console.warn("⚠️ No se recibió idOferta");
+      console.warn("No se recibió idOferta");
       return;
     }
 
-    console.log("🔹 Cargando postulaciones para oferta:", idOferta);
+    console.log("Cargando postulaciones para oferta:", idOferta);
 
     setLoading(true);
     setError(null);
 
     fetch(`/api/Ofertas/${idOferta}/Postulaciones`)
       .then(async (res) => {
-        console.log("🔹 Status de respuesta:", res.status);
+        console.log("Status de respuesta:", res.status);
         const data = await res.json();
-        console.log("🔹 Data recibida:", data);
+        console.log("Data recibida:", data);
 
         if (data.ok) {
           setPostulaciones(data.postulaciones);
@@ -56,13 +56,13 @@ export default function PostulacionesVacante({
         }
       })
       .catch((err) => {
-        console.error("❌ Error en fetch:", err);
+        console.error("Error en fetch:", err);
         setError("Error al conectar con el servidor");
       })
       .finally(() => setLoading(false));
   }, [idOferta]);
 
-  // 🔹 Cambiar estado de la postulación
+  // Cambiar estado de la postulación
   async function actualizarEstado(
     idPostulacion: number,
     accion: "aprobar" | "rechazar" | "revisar"
@@ -106,13 +106,13 @@ export default function PostulacionesVacante({
         err instanceof Error
           ? err.message
           : "Error desconocido al actualizar estado";
-      toast.error(`❌ ${mensaje}`);
+      toast.error(`${mensaje}`);
     } finally {
       setUpdating(null);
     }
   }
 
-  // 🔹 Renderizado
+  // Renderizado
   if (loading) return <p className="p-6">Cargando postulaciones...</p>;
   if (error) return <p className="p-6 text-red-600">{error}</p>;
   if (postulaciones.length === 0)

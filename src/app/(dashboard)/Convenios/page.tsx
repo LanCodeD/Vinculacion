@@ -38,6 +38,7 @@ const sections = [
 export default function ConveniosPage() {
   return (
     <div className="max-w-7xl mx-auto px-4 py-12 space-y-24 bg-linear-to-b from-white via-zinc-50 to-white">
+      {/* TÍTULO */}
       <motion.h1
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -47,6 +48,7 @@ export default function ConveniosPage() {
         Información sobre Convenios
       </motion.h1>
 
+      {/* SECCIONES */}
       {sections.map((section, index) => (
         <motion.div
           key={index}
@@ -54,15 +56,15 @@ export default function ConveniosPage() {
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
           viewport={{ once: true }}
-          className={`grid md:grid-cols-2 gap-8 items-center ${
-            section.reverse ? "md:grid-cols-[1fr_1fr]" : ""
-          }`}
+          className="grid md:grid-cols-2 gap-8 items-center"
         >
-          {/* Imagen con hover */}
+          {/* Imagen */}
           <motion.div
             whileHover={{ scale: 1.03 }}
             transition={{ type: "spring", stiffness: 300 }}
-            className="w-full"
+            className={`w-full ${
+              section.reverse ? "md:order-2" : "md:order-1"
+            }`}
           >
             <Image
               src={section.image}
@@ -73,8 +75,12 @@ export default function ConveniosPage() {
             />
           </motion.div>
 
-          {/* Texto animado */}
-          <div className="w-full">
+          {/* Texto */}
+          <div
+            className={`w-full ${
+              section.reverse ? "md:order-1" : "md:order-2"
+            }`}
+          >
             <motion.h2
               initial={{ opacity: 0, x: -30 }}
               whileInView={{ opacity: 1, x: 0 }}
@@ -83,6 +89,7 @@ export default function ConveniosPage() {
             >
               {section.title}
             </motion.h2>
+
             <motion.p
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}

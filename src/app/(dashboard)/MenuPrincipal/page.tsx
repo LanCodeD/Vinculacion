@@ -6,38 +6,38 @@ import { motion } from "framer-motion";
 
 const sections = [
   {
-    title: "🤝 Sistema de Vinculación",
+    title: "Sistema de Vinculación",
     description:
       "El Sistema de Vinculación integra los módulos de Convenios y Bolsa de Trabajo, permitiendo fortalecer la relación entre la institución, las empresas y la comunidad estudiantil.",
-    image: "/Vinculacion/vinculacion1.webp",
+    image: "/InformacionGeneral/convenio.jpg",
     reverse: false,
   },
   {
-    title: "📘 Convenios Institucionales",
+    title: "Convenios Institucionales",
     description:
       "Los convenios permiten establecer acuerdos de colaboración con empresas e instituciones para prácticas profesionales, estadías, investigación y otros proyectos académicos.",
-    image: "/Convenios/convenio1.webp",
+    image: "/InformacionGeneral/relaciones_institucionales.png",
     reverse: true,
   },
   {
-    title: "💼 Bolsa de Trabajo",
+    title: "Bolsa de Trabajo",
     description:
       "A través de la Bolsa de Trabajo, las empresas publican vacantes y los estudiantes o egresados pueden postularse de forma directa, facilitando su inserción al mercado laboral.",
-    image: "/BolsaTrabajo/bolsa1.webp",
+    image: "/InformacionGeneral/bolsatrabajo.jpg",
     reverse: false,
   },
   {
-    title: "🔄 Integración Convenios y Vacantes",
+    title: "Integración Convenios y Vacantes",
     description:
       "La integración de ambos módulos permite que las oportunidades laborales y los acuerdos institucionales se gestionen desde un solo sistema, optimizando los procesos de vinculación.",
-    image: "/Vinculacion/vinculacion2.webp",
+    image: "/InformacionGeneral/Inegracion.png",
     reverse: true,
   },
   {
-    title: "📊 Seguimiento y Control",
+    title: "Seguimiento y Control",
     description:
       "El sistema ofrece herramientas de seguimiento, control y consulta de información, facilitando la toma de decisiones y la evaluación del impacto de la vinculación institucional.",
-    image: "/Vinculacion/vinculacion3.webp",
+    image: "/InformacionGeneral/Control.jpg",
     reverse: false,
   },
 ];
@@ -69,24 +69,24 @@ export default function VinculacionPage() {
           <motion.div
             whileHover={{ scale: 1.03 }}
             transition={{ type: "spring", stiffness: 300 }}
-            className={`w-full ${
-              section.reverse ? "md:order-2" : "md:order-1"
-            }`}
+            className={`w-full ${section.reverse ? "md:order-2" : "md:order-1"
+              }`}
           >
-            <Image
-              src={section.image}
-              alt={section.title}
-              width={600}
-              height={400}
-              className="rounded-xl shadow-md w-full h-auto object-cover"
-            />
+            <div className="relative w-full h-64 md:h-72 lg:h-80 overflow-hidden rounded-2xl shadow-md">
+              <Image
+                src={section.image}
+                alt={section.title}
+                fill
+                className="object-cover"
+                sizes="(max-width: 768px) 100vw, 50vw"
+              />
+            </div>
           </motion.div>
 
           {/* Texto */}
           <div
-            className={`w-full ${
-              section.reverse ? "md:order-1" : "md:order-2"
-            }`}
+            className={`w-full ${section.reverse ? "md:order-1" : "md:order-2"
+              }`}
           >
             <motion.h2
               initial={{ opacity: 0, x: -30 }}

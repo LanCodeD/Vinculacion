@@ -47,7 +47,7 @@ export async function GET() {
     return NextResponse.json({ ok: true, data });
 
   } catch (error) {
-    console.error("❌ Error en GET /api/Admin/BolsaTrabajo/Ofertas:", error);
+    console.error("Error en GET /api/Admin/BolsaTrabajo/Ofertas:", error);
     return NextResponse.json({ error: "Error al obtener ofertas" }, { status: 500 });
   }
 }

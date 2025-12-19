@@ -16,7 +16,7 @@ export function plantillaEstadoPostulante({
 }) {
   const mensajes = {
     aprobada: {
-      titulo: "🎉 ¡Tu postulación fue aprobada!",
+      titulo: "¡Tu postulación fue aprobada!",
       mensaje: `
         <p>Hola <strong>${nombreEgresado}</strong>,</p>
         <p>¡Buenas noticias! Tu postulación a la vacante <strong>"${tituloVacante}"</strong> en <strong>${empresa}</strong> ha sido <b>aprobada</b>.</p>
@@ -25,7 +25,7 @@ export function plantillaEstadoPostulante({
       boton: "Ver postulación",
     },
     rechazada: {
-      titulo: "❌ Tu postulación fue rechazada",
+      titulo: "Tu postulación fue rechazada",
       mensaje: `
         <p>Hola <strong>${nombreEgresado}</strong>,</p>
         <p>Lamentamos informarte que tu postulación a la vacante <strong>"${tituloVacante}"</strong> en <strong>${empresa}</strong> fue <b>rechazada</b>.</p>

@@ -37,7 +37,7 @@ export default function EditarVacantePage() {
   const id = params.id;
 
   useEffect(() => {
-    // 🔹 Cargar ingenierías desde backend
+    // Cargar ingenierías desde backend
     fetch("/api/Ingenierias")
       .then((res) => res.json())
       .then((data) => {
@@ -47,13 +47,13 @@ export default function EditarVacantePage() {
 
     if (!id) return;
 
-    // 🔹 Obtener la vacante actual
+    // Obtener la vacante actual
     fetch(`/api/Ofertas/${id}`)
       .then((res) => res.json())
       .then((data) => {
         if (data.ok) {
           setVacante(data.vacante);
-          // 🔹 Asignar academias seleccionadas de la vacante
+          // Asignar academias seleccionadas de la vacante
           if (data.vacante.ingenierias_ofertas) {
             setIngenierias(
               data.vacante.ingenierias_ofertas.map(
@@ -96,7 +96,7 @@ export default function EditarVacantePage() {
 
     let nuevaImagenUrl = vacante.imagen;
 
-    // 🔹 Si el usuario subió una nueva imagen
+    // Si el usuario subió una nueva imagen
     if (imagenFile) {
       const formData = new FormData();
       formData.append("archivo", imagenFile);
@@ -117,7 +117,7 @@ export default function EditarVacantePage() {
       }
     }
 
-    // 🔹 Enviamos la vacante con la nueva imagen (si se cambió)
+    // Enviamos la vacante con la nueva imagen (si se cambió)
     const body = {
       ...vacante,
       imagen: nuevaImagenUrl,
@@ -135,9 +135,9 @@ export default function EditarVacantePage() {
 
     if (data.ok) {
       toast("Vacante actualizada. Se enviará a revisión.");
-      router.push("/BolsaTrabajo"); // 🔹 te envía a la página donde está el botón "Crear Vacante"
-      router.refresh(); // 🔹 fuerza la recarga de la lista y el botón
-      // 🔹 redirect completo del navegador
+      router.push("/BolsaTrabajo"); // te envía a la página donde está el botón "Crear Vacante"
+      router.refresh(); // fuerza la recarga de la lista y el botón
+      // redirect completo del navegador
     }
   };
 
@@ -265,7 +265,6 @@ export default function EditarVacantePage() {
           />
         </div>
 
-        {/* 🔹 NUEVO: Selector de categorías */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
             Ingenierías Asociadas

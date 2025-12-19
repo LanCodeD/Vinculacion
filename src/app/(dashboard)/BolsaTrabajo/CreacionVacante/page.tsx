@@ -104,7 +104,7 @@ export default function CrearOferta() {
         });
       } else {
         toast.success(
-          "✅ Oferta creada correctamente y enviada para revisión.",
+          "Oferta creada correctamente y enviada para revisión.",
           { duration: 3000 }
         );
 
@@ -144,14 +144,14 @@ export default function CrearOferta() {
           },
           success: {
             style: {
-              backgroundColor: "#bbf7d0", // bg-green-200
-              color: "#065f46", // texto verde oscuro
+              backgroundColor: "#bbf7d0", 
+              color: "#065f46", 
             },
           },
           error: {
             style: {
-              backgroundColor: "#fecaca", // bg-red-200
-              color: "#991b1b", // texto rojo oscuro
+              backgroundColor: "#fecaca", 
+              color: "#991b1b", 
             },
           },
         }}

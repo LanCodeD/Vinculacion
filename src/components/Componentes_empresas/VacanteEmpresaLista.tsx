@@ -18,7 +18,7 @@ export default function VacantesEmpresaList() {
   const [vacantes, setVacantes] = useState<Vacante[]>([]);
   const [loading, setLoading] = useState(true);
 
-  // 🔹 Cargar vacantes de la empresa
+  // Cargar vacantes de la empresa
   useEffect(() => {
     fetch("/api/Ofertas/Empresa")
       .then((res) => res.json())
@@ -39,7 +39,7 @@ export default function VacantesEmpresaList() {
       .finally(() => setLoading(false));
   }, [pathname]);
 
-  // 🔹 Confirmación visual + eliminación o cierre
+  // Confirmación visual + eliminación o cierre
   const eliminarVacante = (id: number) => {
     toast((t) => (
       <div className="flex flex-col gap-2">
@@ -55,8 +55,8 @@ export default function VacantesEmpresaList() {
 
                 if (data.ok) {
                   if (data.cerrada) {
-                    toast.success("Vacante marcada como cerrada 🔒");
-                    // 🔸 Actualiza el estado visual sin eliminar la card
+                    toast.success("Vacante marcada como cerrada");
+                    // Actualiza el estado visual sin eliminar la card
                     setVacantes((prev) =>
                       prev.map((v) =>
                         v.id_ofertas === id
@@ -65,13 +65,13 @@ export default function VacantesEmpresaList() {
                       )
                     );
                   } else {
-                    toast.success("Vacante eliminada correctamente 🗑️");
+                    toast.success("Vacante eliminada correctamente");
                     setVacantes((prev) =>
                       prev.filter((v) => v.id_ofertas !== id)
                     );
                   }
                 } else {
-                  toast.error(data.error || "Error al eliminar la vacante ❌");
+                  toast.error(data.error || "Error al eliminar la vacante");
                 }
               } finally {
                 toast.dismiss(t.id);
@@ -93,7 +93,7 @@ export default function VacantesEmpresaList() {
     ));
   };
 
-  // 🔹 Renderizado
+  // Renderizado
   if (loading) return <p>Cargando...</p>;
   if (vacantes.length === 0) return <p>No tienes vacantes aún.</p>;
 

@@ -21,7 +21,6 @@ export default function NotificacionesPage() {
   const skipRef = useRef(0);
   const take = 20; // cantidad por página
 
-  // 🟢 fetchNotificaciones envuelto en useCallback
   const fetchNotificaciones = useCallback(async () => {
     if (!hasMore) return;
     setLoading(true);
@@ -40,7 +39,7 @@ export default function NotificacionesPage() {
     } finally {
       setLoading(false);
     }
-  }, [hasMore, take]); // 👈 dependencias reales
+  }, [hasMore, take]); 
 
   const marcarLeida = async (id: number) => {
     try {
@@ -64,12 +63,10 @@ export default function NotificacionesPage() {
     }
   };
 
-  // 🟢 useEffect con dependencia
   useEffect(() => {
     fetchNotificaciones();
   }, [fetchNotificaciones]);
 
-  // 🟢 Scroll infinito con dependencia
   const observer = useRef<IntersectionObserver | null>(null);
   const lastNotificacionRef = useCallback(
     (node: HTMLLIElement) => {
@@ -82,7 +79,7 @@ export default function NotificacionesPage() {
       });
       if (node) observer.current.observe(node);
     },
-    [loading, hasMore, fetchNotificaciones] // 👈 añadimos la función
+    [loading, hasMore, fetchNotificaciones] 
   );
 
   const handleClickNotificacion = (n: Notificacion) => {
@@ -101,7 +98,7 @@ export default function NotificacionesPage() {
     <div className="p-6 max-w-3xl mx-auto">
       <div className="flex justify-between items-center mb-6">
         <button
-          onClick={() => router.back()} // vuelve a la página anterior
+          onClick={() => router.back()} 
           className="bg-gray-200 text-gray-800 px-4 py-2 rounded-lg hover:bg-gray-300 transition"
         >
           ← Regresar

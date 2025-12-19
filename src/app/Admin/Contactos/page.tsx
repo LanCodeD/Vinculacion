@@ -28,7 +28,7 @@ export interface Contacto {
   };
   grupos: {
     id_grupos: number;
-    nombre_grupo: string; // 🔹 nombre del grupo
+    nombre_grupo: string;
   };
 }
 
@@ -104,7 +104,7 @@ export default function ContactoEstadosPage() {
       throw new Error("No se pudo cargar la información");
     }
   };
-  // 🔹 Recuperar todas las empresas
+  // Recuperar todas las empresas
   const fetchEmpresas = async (): Promise<
     { id_empresas: number; nombre_comercial: string }[]
   > => {
@@ -117,7 +117,7 @@ export default function ContactoEstadosPage() {
     }
   };
 
-  // 🔹 Recuperar todas las empresas
+  // Recuperar todas las empresas
   const fetchActivo = async (): Promise<
     { id_contacto_estados: number; nombre_estado: string }[]
   > => {
@@ -130,7 +130,7 @@ export default function ContactoEstadosPage() {
     }
   };
 
-  // 🔹 Recuperar todos los grupos
+  // Recuperar todos los grupos
   const fetchGrupos = async (): Promise<
     { id_grupos: number; nombre_grupo: string }[]
   > => {

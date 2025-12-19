@@ -9,28 +9,28 @@ const sections = [
     title: "Bolsa de Trabajo",
     description:
       "La Bolsa de Trabajo es un espacio donde empresas publican vacantes laborales y estudiantes o egresados pueden postularse de manera directa, facilitando la vinculación profesional.",
-    image: "/Dashboard/BolsaTrabajo.webp",
+    image: "/InformacionBolsa/imagen1.jpg",
     reverse: false,
   },
   {
     title: "Publicación de Vacantes",
     description:
       "Las empresas registradas pueden crear ofertas de empleo especificando requisitos, puesto, modalidad y fecha de cierre, las cuales pasan por un proceso de revisión antes de publicarse.",
-    image: "/BolsaTrabajo/bolsa2.webp",
+    image: "/InformacionBolsa/imagen2.jpg",
     reverse: true,
   },
   {
     title: "Postulación de Estudiantes y Egresados",
     description:
       "Los estudiantes y egresados pueden consultar las vacantes disponibles, subir su currículum y postularse a aquellas que se ajusten a su perfil académico y profesional.",
-    image: "/BolsaTrabajo/bolsa3.webp",
+    image: "/InformacionBolsa/imagen3.jpg",
     reverse: false,
   },
   {
     title: "Seguimiento de Postulaciones",
     description:
       "Las empresas pueden dar seguimiento a los postulantes, revisar perfiles, aceptar o rechazar candidaturas y mantener un control organizado del proceso de selección.",
-    image: "/BolsaTrabajo/bolsa4.webp",
+    image: "/InformacionBolsa/imagen4.webp",
     reverse: true,
   },
 ];

@@ -46,7 +46,7 @@ export default function ModalUsuario({
     cargarRoles();
   }, []);
 
-  // 🎯 Manejo de inputs base
+  // Manejo de inputs base
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
@@ -54,7 +54,7 @@ export default function ModalUsuario({
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  // 💾 Guardar cambios (solo lo editable)
+  // Guardar cambios (solo lo editable)
   const handleGuardar = async () => {
     try {
       setGuardando(true);
@@ -83,7 +83,7 @@ export default function ModalUsuario({
       );
 
       if (res.data.success) {
-        toast("Usuario actualizado correctamente ✅");
+        toast("Usuario actualizado correctamente");
         setModoEdicion(false);
         onActualizado?.();
       } else {
@@ -100,10 +100,10 @@ export default function ModalUsuario({
 
   const fotoPerfil =
     usuario?.foto_perfil && usuario.foto_perfil.startsWith("http")
-      ? usuario.foto_perfil // ✅ Imagen externa
+      ? usuario.foto_perfil // Imagen externa
       : usuario?.foto_perfil
-      ? usuario.foto_perfil // ✅ Imagen servida desde /api/Usuarios/...
-      : "https://cdn.pixabay.com/photo/2016/11/21/11/17/model-1844729_640.jpg"; // 👌 Imagen por defecto
+      ? usuario.foto_perfil // Imagen servida desde /api/Usuarios/...
+      : "https://cdn.pixabay.com/photo/2016/11/21/11/17/model-1844729_640.jpg"; 
 
   // 🔧 Función auxiliar para renderizar perfil según tipo
   const renderPerfil = () => {

@@ -80,7 +80,7 @@ export async function POST(req: NextRequest) {
     try {
       await fs.access(rutaFinal);
       await fs.unlink(rutaFinal);
-      //console.log(`🗑️ Archivo anterior eliminado: ${rutaFinal}`);
+      //console.log(`Archivo anterior eliminado: ${rutaFinal}`);
     } catch {
       // No existía antes, no pasa nada
     }
@@ -88,7 +88,7 @@ export async function POST(req: NextRequest) {
     await fs.writeFile(rutaFinal, buffer);
     const urlArchivo = `${rutaBaseAPI}/${encodeURIComponent(nombreFinal)}`;
 
-    // 💾 Guardar en BD
+    // Guardar en BD
     if (tipo === "cv") {
       await prisma.egresados.update({
         where: { id_egresados: idEgresado },
@@ -111,7 +111,7 @@ export async function POST(req: NextRequest) {
   } catch (error: unknown) {
     const mensaje =
       error instanceof Error ? error.message : "Error desconocido al subir archivo";
-    console.error("❌ Error al subir archivo:", mensaje);
+    console.error("Error al subir archivo:", mensaje);
     return NextResponse.json({ error: "Error interno del servidor" }, { status: 500 });
   }
 }

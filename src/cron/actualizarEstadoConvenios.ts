@@ -3,17 +3,17 @@ import { prisma } from "@/lib/prisma";
 import { plantillaConvenioProximoVencerAdmin } from "@/lib/PlantillasCorreos/cronVencer";
 import { enviarCorreo } from "@/lib/mailer";
 
-// 🧩 Tipos de estado
+// Tipos de estado
 type EstadoConvenio = "ACTIVO" | "PRÓXIMO A VENCER" | "VENCIDO" | "SIN FECHA";
 
-// 🕒 Función que calcula el estado dinámico según la fecha de expiración
+// Función que calcula el estado dinámico según la fecha de expiración
 function obtenerEstadoDinamico(fechaExpira: Date | string | null): EstadoConvenio {
   if (!fechaExpira) return "SIN FECHA";
 
   const hoy = new Date();
   const expira = new Date(fechaExpira);
 
-  // ✅ Paso 1: cálculo más preciso con días
+  // Paso 1: cálculo más preciso con días
   const diffTime = expira.getTime() - hoy.getTime();
   const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
   const diferenciaMeses = Math.floor(diffDays / 30); // aproximación a meses
@@ -23,11 +23,10 @@ function obtenerEstadoDinamico(fechaExpira: Date | string | null): EstadoConveni
   return "ACTIVO";
 }
 
-// 🚀 Función principal que actualiza los convenios
+// Función principal que actualiza los convenios
 async function actualizarEstadoConvenios() {
-  console.log("⏰ Ejecutando cron job: actualización de estados dinámicos...");
   const baseUrl = process.env.NEXTAUTH_URL ?? "http://localhost:3000";
-
+  console.log("Ejecutando cron job: actualización de estados dinámicos...");
   try {
     const convenios = await prisma.convenio_concretado.findMany({
       select: {
@@ -49,7 +48,7 @@ async function actualizarEstadoConvenios() {
     for (const convenio of convenios) {
       const nuevoEstado = obtenerEstadoDinamico(convenio.fecha_expira);
 
-      // 1️⃣ Actualizar estado si cambió
+      // Actualizar estado si cambió
       if (nuevoEstado !== convenio.estado_dinamico) {
         await prisma.convenio_concretado.update({
           where: { id_convenio_concretado: convenio.id_convenio_concretado },
@@ -57,14 +56,14 @@ async function actualizarEstadoConvenios() {
         });
       }
 
-      // 2️⃣ Calcular diferencia en meses con días
+      // Calcular diferencia en meses con días
       if (convenio.fecha_expira) {
         const expira = new Date(convenio.fecha_expira);
         const diffTime = expira.getTime() - hoy.getTime();
         const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
         const diferenciaMeses = Math.floor(diffDays / 30);
 
-        // 3️⃣ Notificar administradores solo en hitos (6 meses o 2 meses)
+        // Notificar administradores solo en hitos (6 meses o 2 meses)
         if (diferenciaMeses === 6 || diferenciaMeses === 2) {
           const admins = await prisma.usuarios.findMany({
             where: { roles_id: { in: [4, 5] } }, // 4 y 5 = admin/subadmin

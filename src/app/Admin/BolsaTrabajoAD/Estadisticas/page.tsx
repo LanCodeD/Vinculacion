@@ -28,7 +28,6 @@ export default function Dashboard() {
             <div className="p-4 border rounded-xl shadow-sm bg-white space-y-2">
                 <p className="font-medium">Selecciona una gráfica</p>
 
-                {/* Dropdown simple sin shadcn */}
                 <select
                     value={selectedChart}
                     onChange={(e) => setSelectedChart(e.target.value)}

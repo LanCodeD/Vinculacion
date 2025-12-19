@@ -11,7 +11,7 @@ export default async function AdminVacantePage({ params }: Props) {
   const vacanteId = Number(id);
 
   if (!id || isNaN(vacanteId)) {
-    console.error("❌ ID inválido:", id);
+    console.error("ID inválido:", id);
     return <p className="text-center text-gray-500 mt-20">ID inválido</p>;
   }
 

@@ -20,7 +20,7 @@ export function plantillaOfertaCerrada({
     : "Sin fecha definida";
 
   return plantillaCorreoBase({
-    titulo: "📌 Tu vacante ha sido cerrada automáticamente",
+    titulo: "Tu vacante ha sido cerrada automáticamente",
     mensaje: `
       <p>Hola <strong>${empresa}</strong>,</p>
 

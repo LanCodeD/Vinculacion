@@ -79,7 +79,7 @@ export default function DetalleOfertaPage({
         ← Volver
       </Link>
 
-      {/* Encabezado tipo “documento” */}
+      {/* Encabezado */}
       <div className="bg-white p-6 rounded-xl shadow flex gap-6">
         {/* Foto de la empresa */}
         <div className="shrink-0 w-32 h-32 bg-gray-100 rounded-lg border overflow-hidden">
@@ -87,8 +87,8 @@ export default function DetalleOfertaPage({
             <Image
               src={oferta.empresa_foto}
               alt={oferta.empresa}
-              width={400} // 👈 pon un ancho aproximado
-              height={300} // 👈 pon un alto aproximado
+              width={400} 
+              height={300} 
               className="w-full h-full object-cover"
             />
           ) : (
