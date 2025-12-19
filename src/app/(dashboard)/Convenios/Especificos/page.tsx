@@ -28,32 +28,45 @@ export default function ConveniosGeneralesInicio() {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-[80vh] text-center px-6">
-      <Toaster position="top-right" />
-      <div className="max-w-2xl space-y-6">
-        <h1 className="text-3xl font-bold text-[#011848]">
-          Solicitud de Convenio Específico
-        </h1>
-        <p className="text-gray-600">
-          En esta sección podrás crear una nueva solicitud de convenio
-          específico. Completa los pasos requeridos y guarda tu progreso en cada
-          sección.
-        </p>
+  <div className="flex flex-col items-center justify-center min-h-[80vh] bg-white px-6 text-center">
+    <Toaster position="top-right" />
+    <div className="max-w-2xl w-full space-y-8">
+      {/* Encabezado */}
+      <h1 className="text-4xl font-extrabold text-[#011848] tracking-tight">
+        Solicitud de Convenio Específico
+      </h1>
+
+      {/* Descripción */}
+      <p className="text-gray-700 text-base leading-relaxed">
+        En esta sección podrás crear una nueva solicitud de convenio específico.
+        Completa los pasos requeridos y guarda tu progreso en cada sección.
+      </p>
+
+      {/* Imagen */}
+      <div className="overflow-hidden rounded-xl shadow-lg">
         <Image
-          src="/Convenios/convenio2.webp"
-          alt="imagen"
+          src="/Convenios/convenio1.webp"
+          alt="Imagen ilustrativa de convenio"
           width={600}
           height={400}
-          className="rounded-xl shadow-md w-full h-auto object-cover"
+          className="w-full h-auto object-cover transition-transform duration-300 hover:scale-[1.02]"
         />
-        <button
-          onClick={crearSolicitud}
-          disabled={loading}
-          className="mt-6 px-8 py-3 rounded-xl bg-[#53b431] text-white font-medium hover:bg-[#459b28] transition"
-        >
-          {loading ? "Creando solicitud..." : "Empezar solicitud"}
-        </button>
       </div>
+
+      {/* Botón */}
+      <button
+        onClick={crearSolicitud}
+        disabled={loading}
+        className={`mt-4 px-8 py-3 rounded-xl font-semibold text-white transition-all duration-300 shadow-md ${
+          loading
+            ? "bg-gray-400 cursor-not-allowed animate-pulse"
+            : "bg-[#53b431] hover:bg-[#459b28] hover:scale-[1.02]"
+        }`}
+      >
+        {loading ? "Creando solicitud..." : "Empezar solicitud"}
+      </button>
     </div>
-  );
+  </div>
+);
+
 }

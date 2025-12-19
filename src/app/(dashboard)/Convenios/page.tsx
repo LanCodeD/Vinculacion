@@ -6,31 +6,31 @@ import { motion } from "framer-motion";
 
 const sections = [
   {
-    title: "📘 Convenios Generales",
+    title: "Convenios Generales",
     description:
       "Son acuerdos marco entre instituciones que establecen lineamientos amplios para colaboración académica, intercambios o proyectos sin requerimientos específicos.",
     image: "/Convenios/convenio2.webp",
     reverse: false,
   },
   {
-    title: "📗 Convenios Específicos",
+    title: "Convenios Específicos",
     description:
       "Derivan de los convenios generales y detallan acciones concretas como movilidad estudiantil, investigación conjunta o uso compartido de recursos.",
     image: "/Convenios/convenio1.webp",
     reverse: true,
   },
   {
-    title: "🧭 ¿Cómo elegir el tipo de convenio?",
+    title: "¿Cómo elegir el tipo de convenio?",
     description:
       "Si tu proyecto es amplio y no requiere ejecución inmediata, considera un convenio general. Si involucra fechas, recursos o compromisos específicos, opta por uno específico.",
-    image: "/Convenios/convenio2.webp",
+    image: "/Convenios/convenio3.webp",
     reverse: false,
   },
   {
-    title: "📄 ¿Consultar los registros realizados?",
+    title: "¿Consultar los registros realizados?",
     description:
       "Aquí puedes revisar los convenios registrados en el sistema, filtrarlos por tipo, fecha o institución participante.",
-    image: "/Convenios/convenio2.webp",
+    image: "/Convenios/convenio4.webp",
     reverse: true,
   },
 ];
