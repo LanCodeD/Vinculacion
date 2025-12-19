@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { useEstadoPaso } from "@/hook/EstadoPasoEspecifico";
 import toast from "react-hot-toast";
+import LoaderIndicador from "@/components/Loader";
 
 export default function PasoDatosEmpresaEspecifico() {
   const { id_solicitud } = useParams();
@@ -24,7 +25,7 @@ export default function PasoDatosEmpresaEspecifico() {
   const [guardando, setGuardando] = useState(false);
   const [cargando, setCargando] = useState(true);
 
-  // 🧭 Cargar datos existentes
+  //  Cargar datos existentes
   useEffect(() => {
     const cargar = async () => {
       try {
@@ -47,7 +48,7 @@ export default function PasoDatosEmpresaEspecifico() {
     if (id_solicitud) cargar();
   }, [id_solicitud]);
 
-  // 💾 Guardar datos
+  //  Guardar datos
   const guardar = async () => {
     setGuardando(true);
     const toastId = toast.loading("Guardando datos...");
@@ -56,17 +57,19 @@ export default function PasoDatosEmpresaEspecifico() {
         `/api/Convenios/Especificos/${id_solicitud}/DatosEmpresa`,
         form
       );
-      toast.success("Datos guardados correctamente ✅", { id: toastId });
+      toast.success("Datos guardados correctamente", { id: toastId });
     } catch (e) {
       console.error(e);
-      toast.error("Error al guardar los datos ❌", { id: toastId });
+      toast.error("Error al guardar los datos ", { id: toastId });
     } finally {
       setGuardando(false);
     }
   };
 
-  if (cargando)
-    return <p className="text-center py-10 text-black">Cargando datos...</p>;
+  if (cargando) {
+    return <LoaderIndicador mensaje="Cargando datos de Empresas..." />;
+  }
+
 
   const bloqueadoPaso =
     bloqueado || estadoPaso === "EN REVISION" || estadoPaso === "APROBADO";

@@ -3,6 +3,7 @@
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import axios from "axios";
+import LoaderIndicador from "@/components/Loader";
 
 // 🔹 Tipos de datos para mayor claridad
 interface Responsable {
@@ -65,8 +66,10 @@ export default function PasoResponsabilidadesEspecificoAdmin() {
     if (id_solicitud) cargar();
   }, [id_solicitud]);
 
-  if (cargando)
-    return <p className="text-center py-6 text-black">Cargando datos...</p>;
+  if (cargando) {
+    return <LoaderIndicador mensaje="Cargando datos de Responsabilidades..." />;
+  }
+
 
   // 🔹 Renderizado de cada bloque de responsabilidades (plantel / empresa)
   const renderSeccion = (titulo: string, actor: keyof FormResponsabilidades) => (
@@ -78,7 +81,7 @@ export default function PasoResponsabilidadesEspecificoAdmin() {
           <label className="block text-sm font-medium text-gray-700 capitalize">
             {campo}
           </label>
-          <p className="border rounded-lg p-3 bg-white mt-1 min-h-[3rem] text-gray-800 whitespace-pre-line">
+          <p className="border rounded-lg p-3 bg-white mt-1 min-h-12 text-gray-800 whitespace-pre-line">
             {form[actor][campo] || "—"}
           </p>
         </div>

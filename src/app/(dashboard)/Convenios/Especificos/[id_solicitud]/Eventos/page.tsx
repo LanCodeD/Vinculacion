@@ -4,6 +4,7 @@ import axios from "axios";
 import { useParams } from "next/navigation";
 import { useEstadoPaso } from "@/hook/EstadoPasoEspecifico";
 import toast from "react-hot-toast";
+import LoaderIndicador from "@/components/Loader";
 
 export default function EventoPage() {
   const { id_solicitud } = useParams();
@@ -54,7 +55,7 @@ export default function EventoPage() {
         `/api/Convenios/Especificos/${id_solicitud}/Eventos`,
         form
       );
-      toast.success("Evento guardado correctamente ✅", { id: toastId });
+      toast.success("Evento guardado correctamente ", { id: toastId });
     } catch (err: unknown) {
       if (axios.isAxiosError(err)) {
         const mensaje =
@@ -62,7 +63,7 @@ export default function EventoPage() {
         toast.error(mensaje);
         console.error("❌ Axios error:", err);
       } else {
-        toast.error("Error inesperado ❌");
+        toast.error("Error inesperado ");
         console.error("❌ Error desconocido:", err);
       }
     } finally {
@@ -70,8 +71,10 @@ export default function EventoPage() {
     }
   };
 
-  if (cargando)
-    return <p className="text-center py-6 text-black">Cargando datos...</p>;
+  if (cargando) {
+    return <LoaderIndicador mensaje="Cargando datos de Eventos..." />;
+  }
+
 
   const bloqueadoPaso =
     bloqueado || estadoPaso === "EN REVISION" || estadoPaso === "APROBADO";

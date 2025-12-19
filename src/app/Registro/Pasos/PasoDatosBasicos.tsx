@@ -7,7 +7,7 @@ import type { DatosRegistro, DatosBasicos } from "@/types/registro";
 import type { Dispatch, SetStateAction } from "react";
 import toast from "react-hot-toast";
 import { z } from "zod";
-import BotonGoogle from "./BotonGoogle";
+//import BotonGoogle from "./BotonGoogle";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 
 interface Props {
@@ -211,13 +211,13 @@ export default function PasoDatosBasicos({
           </button>
         </div>
         {/* Si luego quieres agregar Google */}
-        <div className="mt-6 text-center">
+{/*         <div className="mt-6 text-center">
           <BotonGoogle
             texto="Registrarse con Google"
             modo="registro"
             tipoCuenta={registro.tipoCuentaId}
           />
-        </div>
+        </div> */}
       </div>
     </div>
   );

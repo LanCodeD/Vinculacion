@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 import { useEstadoPaso } from "@/hook/EstadoPaso";
 import { toast } from "react-hot-toast";
+import LoaderIndicador from "@/components/Loader";
 
 export default function PasoSolicitante() {
   const { id_solicitud } = useParams();
@@ -53,7 +54,10 @@ export default function PasoSolicitante() {
     }
   };
 
-  if (cargando) return <p className="text-center py-6 text-black">Cargando datos...</p>;
+    if (cargando) {
+      return <LoaderIndicador mensaje="Cargando datos del Solicitante..." />;
+    }
+  
 
   const bloqueadoPaso = bloqueado || estadoPaso === "EN REVISION" || estadoPaso === "APROBADO";
 

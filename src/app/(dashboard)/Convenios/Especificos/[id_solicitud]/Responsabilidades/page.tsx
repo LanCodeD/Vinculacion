@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { useEstadoPaso } from "@/hook/EstadoPasoEspecifico";
 import toast from "react-hot-toast";
+import LoaderIndicador from "@/components/Loader";
 
 // 🔹 Tipos para mantener seguridad y claridad
 interface Responsable {
@@ -85,17 +86,17 @@ export default function PasoResponsabilidades() {
         `/api/Convenios/Especificos/${id_solicitud}/Responsabilidades`,
         form
       );
-      toast.success("Responsabilidades guardadas correctamente ✅", {
+      toast.success("Responsabilidades guardadas correctamente", {
         id: toastId,
       });
     } catch (err: unknown) {
       if (axios.isAxiosError(err)) {
         const mensaje =
-          err.response?.data?.error || "Error al guardar responsabilidades ❌";
+          err.response?.data?.error || "Error al guardar responsabilidades";
         toast.error(mensaje, { id: toastId });
         console.error("❌ Axios error:", err);
       } else {
-        toast.error("Error inesperado ❌", { id: toastId });
+        toast.error("Error inesperado", { id: toastId });
         console.error("❌ Error desconocido:", err);
       }
     } finally {
@@ -103,8 +104,10 @@ export default function PasoResponsabilidades() {
     }
   };
 
-  if (cargando)
-    return <p className="text-center py-6 text-black">Cargando datos...</p>;
+  if (cargando) {
+    return <LoaderIndicador mensaje="Cargando datos de Responsabilidades..." />;
+  }
+
   const bloqueadoPaso =
     bloqueado || estadoPaso === "EN REVISION" || estadoPaso === "APROBADO";
 

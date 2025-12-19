@@ -5,6 +5,7 @@ import { useEstadoPaso } from "@/hook/EstadoPasoEspecifico";
 import { useState, useEffect } from "react";
 import axios from "axios";
 import toast from "react-hot-toast";
+import LoaderIndicador from "@/components/Loader";
 
 interface Firma {
   id_firma: number;
@@ -76,14 +77,14 @@ export default function PasoTipoConvenioEspecifico() {
 
     try {
       await axios.put(`/api/Convenios/Especificos/${id_solicitud}`, form);
-      toast.success("Guardado correctamente ✅", { id: toastId });
+      toast.success("Guardado correctamente ", { id: toastId });
     } catch (err: unknown) {
       if (axios.isAxiosError(err)) {
-        const mensaje = err.response?.data?.error || "Error al guardar ❌";
+        const mensaje = err.response?.data?.error || "Error al guardar ";
         toast.error(mensaje, { id: toastId });
         console.error("❌ Axios error:", err);
       } else {
-        toast.error("Error inesperado ❌", { id: toastId });
+        toast.error("Error inesperado", { id: toastId });
         console.error("❌ Error desconocido:", err);
       }
     } finally {
@@ -91,7 +92,10 @@ export default function PasoTipoConvenioEspecifico() {
     }
   };
 
-  if (cargando) return <p className="text-center py-6">Cargando datos...</p>;
+    if (cargando) {
+      return <LoaderIndicador mensaje="Cargando datos del Tipo de Convenio..." />;
+    }
+  
 
   const bloqueadoPaso =
     bloqueado || estadoPaso === "EN REVISION" || estadoPaso === "APROBADO";

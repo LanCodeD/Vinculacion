@@ -3,6 +3,7 @@
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import axios from "axios";
+import LoaderIndicador from "@/components/Loader";
 
 export default function PasoDatosEmpresaEspecificoAdmin() {
   const { id_solicitud } = useParams();
@@ -42,8 +43,10 @@ export default function PasoDatosEmpresaEspecificoAdmin() {
     if (id_solicitud) cargar();
   }, [id_solicitud]);
 
-  if (cargando)
-    return <p className="text-center py-6 text-black">Cargando datos...</p>;
+  if (cargando) {
+    return <LoaderIndicador mensaje="Cargando datos de la Empresa..." />;
+  }
+
 
   return (
     <div className="max-w-3xl mx-auto space-y-6 text-black">

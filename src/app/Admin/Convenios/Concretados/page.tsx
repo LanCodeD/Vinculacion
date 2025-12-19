@@ -10,6 +10,7 @@ import ModalEditarConvenioConcretado from "@/components/ModalConvenioConcretadoE
 import ModalVerConvenioConcretado from "@/components/ModalConvenioConcretadoVer";
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
+import LoaderIndicador from "@/components/Loader";
 dayjs.extend(utc);
 
 type EstadoConvenio = "ACTIVO" | "PRÓXIMO A VENCER" | "VENCIDO" | "SIN FECHA";
@@ -186,12 +187,10 @@ export default function AdminConveniosConcretados() {
     indiceInicio + conveniosPorPagina
   );
 
-  if (cargando)
-    return (
-      <p className="text-center py-10 text-black">
-        Cargando convenios concretados...
-      </p>
-    );
+  if (cargando) {
+    return <LoaderIndicador mensaje="Cargando Convenios Concretados..." />;
+  }
+
 
   return (
     <div className="max-w-6xl mx-auto py-8 text-black">

@@ -3,6 +3,7 @@
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import axios from "axios";
+import LoaderIndicador from "@/components/Loader";
 
 interface EmpresaData {
   dependencia_nombre: string; // Nombre de la empresa
@@ -36,8 +37,9 @@ export default function AdminDatosEmpresa() {
   }, [id_solicitud]);
 
   // 🕓 Estado de carga
-  if (cargando)
-    return <p className="text-center py-10 text-black">Cargando datos...</p>;
+  if (cargando) {
+    return <LoaderIndicador mensaje="Cargando datos de la Empresa.." />;
+  }
 
   // 🚫 Sin datos
   if (!form)
@@ -61,7 +63,7 @@ export default function AdminDatosEmpresa() {
             {form.dependencia_nombre || "—"}
           </span>
         </p>
-        
+
         <div>
           <label className="block text-sm font-bold text-black">
             Descripción de la Empresa:

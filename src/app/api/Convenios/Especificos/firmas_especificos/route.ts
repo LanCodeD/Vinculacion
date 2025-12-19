@@ -7,10 +7,15 @@ export async function GET() {
   try {
     const firmas = await prisma.firma_origen.findMany({
       where: {
-        id_firma: {
-          gte: 9,
-          lte: 12,
-        },
+        OR: [
+          { id_firma: 3 },
+          {
+            id_firma: {
+              gte: 9,
+              lte: 12,
+            },
+          },
+        ],
       },
       select: {
         id_firma: true,

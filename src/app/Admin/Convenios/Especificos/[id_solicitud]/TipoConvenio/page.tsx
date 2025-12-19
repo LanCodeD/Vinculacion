@@ -3,6 +3,7 @@
 import { useParams } from "next/navigation";
 import { useState, useEffect } from "react";
 import axios from "axios";
+import LoaderIndicador from "@/components/Loader";
 
 interface Firma {
   id_firma: number;
@@ -63,7 +64,10 @@ export default function PasoTipoConvenioEspecificoAdmin() {
     if (id_solicitud) cargar();
   }, [id_solicitud]);
 
-  if (cargando) return <p className="text-center py-6">Cargando datos...</p>;
+    if (cargando) {
+      return <LoaderIndicador mensaje="Cargando datos del Tipo de Convenio..." />;
+    }
+  
 
   // 🔹 Obtener nombres de las firmas seleccionadas
   const firmasSeleccionadas = firmas

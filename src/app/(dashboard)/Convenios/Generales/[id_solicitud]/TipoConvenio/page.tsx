@@ -5,6 +5,7 @@ import { useEstadoPaso } from "@/hook/EstadoPaso";
 import { useState, useEffect } from "react";
 import axios from "axios";
 import toast from "react-hot-toast";
+import LoaderIndicador from "@/components/Loader";
 
 interface Firma {
   id_firma: number;
@@ -33,7 +34,7 @@ export default function PasoTipoConvenio() {
     const cargarFirmas = async () => {
       const { data } = await axios.get("/api/Convenios/firma_origen");
       // Solo mostrar las 2 primeras como te indicaron
-      setFirmas(data.slice(0, 3));
+      setFirmas(data.slice(0, 2));
     };
     cargarFirmas();
   }, []);
@@ -46,7 +47,7 @@ export default function PasoTipoConvenio() {
       );
 
       // ✅ Nueva versión sin conversión de zona
-/*       const toInputDate = (value?: string | null) => {
+      /*       const toInputDate = (value?: string | null) => {
         if (!value) return "";
         // Prisma devuelve el DATE como "2025-10-01T00:00:00.000Z", así que cortamos antes de la "T"
         return value.split("T")[0];
@@ -70,14 +71,14 @@ export default function PasoTipoConvenio() {
 
     try {
       await axios.put(`/api/Convenios/Generales/${id_solicitud}`, form);
-      toast.success("Guardado correctamente ✅", { id: toastId });
+      toast.success("Guardado correctamente", { id: toastId });
     } catch (err: unknown) {
       if (axios.isAxiosError(err)) {
-        const mensaje = err.response?.data?.error || "Error al guardar ❌";
+        const mensaje = err.response?.data?.error || "Error al guardar ";
         toast.error(mensaje, { id: toastId });
         console.error("❌ Axios error:", err);
       } else {
-        toast.error("Error inesperado ❌", { id: toastId });
+        toast.error("Error inesperado ", { id: toastId });
         console.error("❌ Error desconocido:", err);
       }
     } finally {
@@ -85,8 +86,9 @@ export default function PasoTipoConvenio() {
     }
   };
 
-  if (cargando)
-    return <p className="text-center py-6 text-black">Cargando datos...</p>;
+  if (cargando) {
+    return <LoaderIndicador mensaje="Cargando datos del Tipo de Convenio..." />;
+  }
 
   const bloqueadoPaso =
     bloqueado || estadoPaso === "EN REVISION" || estadoPaso === "APROBADO";

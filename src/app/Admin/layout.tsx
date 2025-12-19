@@ -2,6 +2,7 @@
 import Sidebar from "@/components/Sidebar";
 import Navbar from "@/components/Navbar";
 import { authOptions } from "@/app/api/auth/[...nextauth]/authOptionsCredencial";
+import { Toaster } from "react-hot-toast";
 import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
 import { AppRole } from "@/types/roles";
@@ -22,6 +23,7 @@ export default async function DashboardLayout({
 
   return (
     <div className="flex h-screen w-screen overflow-hidden">
+      <Toaster position="top-right" />
       {/* ✅ Ya no hay retraso en obtener el rol */}
       <Sidebar role={role} />
       <div className="flex flex-col flex-1 min-h-0 bg-zinc-100">

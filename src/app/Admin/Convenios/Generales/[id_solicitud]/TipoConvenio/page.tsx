@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import axios from "axios";
+import LoaderIndicador from "@/components/Loader";
 
 interface FormTipoConvenio {
   firmas_origen: number[];
@@ -27,7 +28,7 @@ export default function TipoConvenioAdmin() {
 
         // 🔹 Cargar nombres de las firmas disponibles
         const firmasData = await axios.get("/api/Convenios/firma_origen");
-        setFirmas(firmasData.data.slice(0, 3)); // solo las 2 válidas
+        setFirmas(firmasData.data.slice(0, 2)); // solo las 2 válidas
       } catch (err) {
         console.error("Error al cargar datos:", err);
       } finally {
@@ -37,8 +38,10 @@ export default function TipoConvenioAdmin() {
     cargar();
   }, [id_solicitud]);
 
-  if (loading)
-    return <p className="text-center py-6 text-black">Cargando datos...</p>;
+  if (loading) {
+    return <LoaderIndicador mensaje="Cargando datos del Tipo de Convenio..." />;
+  }
+
   if (!form)
     return (
       <p className="text-center py-6 text-gray-600">

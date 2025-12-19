@@ -39,7 +39,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   }
 
   return (
-    <div className="flex h-screen w-screen overflow-hidden">
+    <div className="flex h-screen w-screen overflow-x-auto">
       <Sidebar role={role!} />
       <div className="flex flex-col flex-1 min-h-0 bg-zinc-100">
         <Navbar />

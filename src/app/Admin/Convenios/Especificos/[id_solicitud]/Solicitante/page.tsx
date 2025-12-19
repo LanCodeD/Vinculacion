@@ -3,6 +3,7 @@
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import axios from "axios";
+import LoaderIndicador from "@/components/Loader";
 
 export default function PasoSolicitanteEspecificoAdmin() {
   const { id_solicitud } = useParams();
@@ -51,8 +52,10 @@ export default function PasoSolicitanteEspecificoAdmin() {
     if (id_solicitud) cargar();
   }, [id_solicitud]);
 
-  if (cargando)
-    return <p className="text-center py-6 text-black">Cargando datos...</p>;
+  if (cargando) {
+    return <LoaderIndicador mensaje="Cargando datos del Solicitante..." />;
+  }
+
 
   return (
     <div className="max-w-3xl mx-auto space-y-8 text-black">
