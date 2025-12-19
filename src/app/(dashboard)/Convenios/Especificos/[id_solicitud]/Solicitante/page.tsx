@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 import { useEstadoPaso } from "@/hook/EstadoPasoEspecifico";
 import { toast } from "react-hot-toast";
+import LoaderIndicador from "@/components/Loader";
 
 export default function PasoSolicitanteEspecifico() {
   const { id_solicitud } = useParams();
@@ -63,15 +64,18 @@ export default function PasoSolicitanteEspecifico() {
         `/api/Convenios/Especificos/${id_solicitud}/Solicitante`,
         form
       );
-      toast.success("Datos guardados correctamente ✅", { id: toastId });
+      toast.success("Datos guardados correctamente", { id: toastId });
     } catch {
-      toast.error("Error al guardar los datos ❌", { id: toastId });
+      toast.error("Error al guardar los datos", { id: toastId });
     } finally {
       setGuardando(false);
     }
   };
 
-  if (cargando) return <p className="text-center py-6 text-black">Cargando datos...</p>;
+    if (cargando) {
+      return <LoaderIndicador mensaje="Cargando datos de Solicitante..." />;
+    }
+  
 
   const bloqueadoPaso =
     bloqueado || estadoPaso === "EN REVISION" || estadoPaso === "APROBADO";
@@ -152,7 +156,7 @@ export default function PasoSolicitanteEspecifico() {
       {/* --- Sección Contacto --- */}
       <section>
         <h2 className="text-xl font-semibold text-[#011848] mb-4">
-          Datos del Contacto (Adicional)
+          Datos del Contacto (Empresa)
         </h2>
 
         <div>

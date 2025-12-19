@@ -6,6 +6,7 @@ import axios from "axios";
 import toast from "react-hot-toast";
 import ModalConfirmacion from "@/components/ModalConfirmacionAdmin";
 import { FaSearch } from "react-icons/fa";
+import LoaderIndicador from "@/components/Loader";
 
 interface Solicitud {
   id_solicitud: number;
@@ -117,10 +118,10 @@ export default function AdminSolicitudesPage() {
     indiceInicio + solicitudesPorPagina
   );
 
-  if (cargando)
-    return (
-      <p className="text-center py-10 text-black">Cargando solicitudes...</p>
-    );
+  if (cargando) {
+    return <LoaderIndicador mensaje="Cargando Solicitudes Convenios..." />;
+  }
+
 
   return (
     <div className="max-w-6xl mx-auto py-8 text-black">

@@ -5,6 +5,7 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 import toast from "react-hot-toast";
 import { useEstadoPaso } from "@/hook/EstadoPasoEspecifico";
+import LoaderIndicador from "@/components/Loader";
 
 export default function PasoParticipantes() {
   const { id_solicitud } = useParams();
@@ -130,17 +131,17 @@ export default function PasoParticipantes() {
           estudiantes,
         }
       );
-      toast.success("Participantes guardados correctamente ✅", {
+      toast.success("Participantes guardados correctamente", {
         id: toastId,
       });
     } catch (err: unknown) {
       if (axios.isAxiosError(err)) {
         const mensaje =
-          err.response?.data?.error || "Error al guardar los participantes ❌";
+          err.response?.data?.error || "Error al guardar los participantes ";
         toast.error(mensaje, { id: toastId });
         console.error("❌ Axios error:", err);
       } else {
-        toast.error("Error inesperado ❌", { id: toastId });
+        toast.error("Error inesperado ", { id: toastId });
         console.error("❌ Error desconocido:", err);
       }
     } finally {
@@ -148,7 +149,10 @@ export default function PasoParticipantes() {
     }
   };
 
-  if (cargando) return <p className="text-center py-6">Cargando datos...</p>;
+    if (cargando) {
+      return <LoaderIndicador mensaje="Cargando datos de Participantes..." />;
+    }
+  
 
   const bloqueadoPaso =
     bloqueado || estadoPaso === "EN REVISION" || estadoPaso === "APROBADO";

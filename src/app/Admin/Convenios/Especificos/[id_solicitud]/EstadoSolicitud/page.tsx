@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import axios from "axios";
 import toast from "react-hot-toast";
+import LoaderIndicador from "@/components/Loader";
 
 interface PasoHistorial {
   paso: string;
@@ -87,10 +88,10 @@ export default function EstadoSolicitudAdmin() {
     }
   };
 
-  if (cargando)
-    return (
-      <p className="text-center py-8 text-gray-700">Cargando solicitud...</p>
-    );
+  if (cargando) {
+    return <LoaderIndicador mensaje="Cargando datos de la Solicitud..." />;
+  }
+
 
   // 🔹 Nombres actualizados de los pasos
   const pasos = [

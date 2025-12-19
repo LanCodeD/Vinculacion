@@ -58,13 +58,13 @@ export default function AuditoriaConvenio() {
                   await axios.put(
                     `/api/Convenios/Especificos/${id_solicitud}/Enviar`
                   );
-                  toast.success("Solicitud enviada correctamente ✅", {
+                  toast.success("Solicitud enviada correctamente ", {
                     id: toastId,
                     duration: 3000,
                   });
                   await cargar();
                 } catch {
-                  toast.error("Error al enviar la solicitud ❌", {
+                  toast.error("Error al enviar la solicitud ", {
                     id: toastId,
                   });
                 }
@@ -91,12 +91,13 @@ export default function AuditoriaConvenio() {
     historial.length === 0
       ? "Sin información aún"
       : historial.every((h) => h.estado === "APROBADO")
-      ? "✅ Aprobado totalmente"
+      ? "Aprobado totalmente"
       : historial.some((h) => h.estado === "CORREGIR")
-      ? "❌ Con observaciones"
+      ? "Con observaciones"
       : historial.some((h) => h.estado === "PENDIENTE")
-      ? "🕓 Pendiente de revisión"
-      : "🔄 En revisión";
+      ? "Pendiente de revisión"
+      : "En revisión";
+      
 
   return (
     <div className="max-w-3xl mx-auto py-8 space-y-6 text-black">

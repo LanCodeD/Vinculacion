@@ -3,6 +3,7 @@
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import axios from "axios";
+import LoaderIndicador from "@/components/Loader";
 
 interface Docente {
   nombre_completo: string;
@@ -45,8 +46,10 @@ export default function PasoParticipantesEspecificoAdmin() {
     if (id_solicitud) cargar();
   }, [id_solicitud]);
 
-  if (cargando)
-    return <p className="text-center py-6 text-black">Cargando datos...</p>;
+  if (cargando) {
+    return <LoaderIndicador mensaje="Cargando datos de Participantes..." />;
+  }
+
 
   return (
     <div className="max-w-5xl mx-auto space-y-8 text-black">

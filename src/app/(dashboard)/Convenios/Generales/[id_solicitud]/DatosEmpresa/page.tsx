@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { useEstadoPaso } from "@/hook/EstadoPaso";
 import toast from "react-hot-toast";
+import LoaderIndicador from "@/components/Loader";
 
 export default function PasoDatosEmpresa() {
   const { id_solicitud } = useParams();
@@ -56,17 +57,19 @@ export default function PasoDatosEmpresa() {
         `/api/Convenios/Generales/${id_solicitud}/DatosEmpresa`,
         form
       );
-      toast.success("Datos guardados correctamente ✅", { id: toastId });
+      toast.success("Datos guardados correctamente ", { id: toastId });
     } catch (e) {
       console.error(e);
-      toast.error("Error al guardar los datos ❌", { id: toastId });
+      toast.error("Error al guardar los datos ", { id: toastId });
     } finally {
       setGuardando(false);
     }
   };
 
-  if (cargando)
-    return <p className="text-center py-10 text-black">Cargando datos...</p>;
+  if (cargando) {
+    return <LoaderIndicador mensaje="Cargando datos de Empresas..." />;
+  }
+
 
   const bloqueadoPaso =
     bloqueado || estadoPaso === "EN REVISION" || estadoPaso === "APROBADO";

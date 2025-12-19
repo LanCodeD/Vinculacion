@@ -125,7 +125,7 @@ export default function HistorialSolicitudes() {
         <p>No tienes solicitudes registradas.</p>
       ) : (
         <div className="overflow-x-auto bg-white shadow-lg rounded-lg">
-          <table className="min-w-full text-sm border-collapse">
+          <table className="min-w-[1000px] text-sm border-collapse">
             <thead className="bg-[#011848] text-white">
               <tr>
                 <th className="px-4 py-2 text-left">ID Solicitud</th>

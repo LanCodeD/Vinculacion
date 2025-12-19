@@ -3,6 +3,7 @@
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import axios from "axios";
+import LoaderIndicador from "@/components/Loader";
 
 interface SolicitanteData {
   solicitante_nombre: string;
@@ -35,10 +36,10 @@ export default function AdminSolicitante() {
   }, [id_solicitud]);
 
   // 🕓 Estado de carga
-  if (cargando)
-    return (
-      <p className="text-center py-10 text-black">Cargando datos...</p>
-    );
+  if (cargando) {
+    return <LoaderIndicador mensaje="Cargando datos del Solicitante..." />;
+  }
+
 
   // 🚫 Sin datos
   if (!form)

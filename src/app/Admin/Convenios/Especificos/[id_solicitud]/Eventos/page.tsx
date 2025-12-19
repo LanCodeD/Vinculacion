@@ -6,6 +6,7 @@ import { useParams } from "next/navigation";
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
 import timezone from "dayjs/plugin/timezone";
+import LoaderIndicador from "@/components/Loader";
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -44,8 +45,10 @@ export default function PasoEventosEspecificoAdmin() {
     if (id_solicitud) cargar();
   }, [id_solicitud]);
 
-  if (cargando)
-    return <p className="text-center py-6 text-black">Cargando datos...</p>;
+  if (cargando) {
+    return <LoaderIndicador mensaje="Cargando datos de Eventos..." />;
+  }
+
 
   return (
     <div className="max-w-3xl mx-auto space-y-6 text-black">
