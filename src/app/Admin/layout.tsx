@@ -11,7 +11,7 @@ export default async function DashboardLayout({
 }: {
   children: React.ReactNode;
 }) {
-  // 🚀 Obtener sesión directamente en el servidor
+  // Obtener sesión directamente en el servidor
   const session = await getServerSession(authOptions);
 
   if (!session?.user) {
@@ -22,7 +22,7 @@ export default async function DashboardLayout({
 
   return (
     <div className="flex h-screen w-screen overflow-hidden">
-      {/* ✅ Ya no hay retraso en obtener el rol */}
+      {/* Ya no hay retraso en obtener el rol */}
       <Sidebar role={role} />
       <div className="flex flex-col flex-1 min-h-0 bg-zinc-100">
         <Navbar />

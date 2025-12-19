@@ -35,18 +35,13 @@ export default function Home() {
                   src="/Banner/tecnm.webp"
                   alt="Logo"
                   priority
-                  fill 
+                  fill
                   className="object-contain scale-125"
                 />
               </div>
             </a>
 
             <div className="flex items-center lg:order-2">
-              <Link className="rounded-lg border-2 border-white px-4 py-2 text-sm font-medium text-white hover:bg-blue-800 sm:mr-2 lg:px-5 lg:py-2.5" href="/">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
-                </svg>
-              </Link>
               <Link className="rounded-lg border-2 border-white px-4 py-2 text-sm font-medium text-white hover:bg-blue-800 sm:mr-2 lg:px-5 lg:py-2.5" href="/IniciarSesion">
                 Iniciar sesión
               </Link>
@@ -57,7 +52,33 @@ export default function Home() {
 
             <div className="hidden w-full items-center justify-between lg:order-1 lg:flex lg:w-auto" id="mobile-menu-2">
               <ul className="mt-4 flex flex-col font-medium lg:mt-0 lg:flex-row lg:space-x-8">
-                <li><Link className="block border-b py-2 pr-4 pl-3 text-gray-200 hover:text-white lg:border-0 lg:p-0" href="/">ITSVA</Link></li>
+                <li>
+                  <Link
+                    href="/"
+                    className="
+      block
+      text-gray-100
+      font-semibold
+      tracking-wide
+      text-sm
+      md:text-base
+      py-2
+      px-3
+      rounded-md
+      transition-all
+      duration-300
+      hover:text-white
+      hover:bg-white/10
+      focus:outline-none
+      focus:ring-2
+      focus:ring-white/30
+      lg:p-0
+      lg:hover:bg-transparent
+    "
+                  >
+                    INSTITUTO TECNOLÓGICO SUPERIOR DE VALLADOLID
+                  </Link>
+                </li>
               </ul>
             </div>
           </div>
@@ -183,32 +204,152 @@ export default function Home() {
 
       {/* ================= Secciones adicionales ================= */}
       <section id="convenios" className="bg-blue-50 py-20">
-        <div className="max-w-4xl mx-auto px-4 text-center">
-          <h2 className="text-3xl font-bold mb-4 text-blue-700">Convenios</h2>
-          <div className="flex justify-center mb-4">
-            <p className="text-gray-700 mb-8">
-              Solicitudes.
-            </p>
+        <div className="max-w-7xl mx-auto px-4">
+          <div className="grid md:grid-cols-2 gap-12 items-center">
+
+            {/* TEXTO */}
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 1, ease: "easeOut" }}
+              viewport={{ once: true }}
+              className="font-sans"
+            >
+              <h2 className="text-3xl md:text-4xl font-semibold mb-6 text-blue-700">
+                Convenios Institucionales
+              </h2>
+
+              <p className="text-gray-700 mb-5 text-lg font-medium leading-relaxed text-justify">
+                Los convenios institucionales permiten establecer vínculos formales
+                de colaboración entre el Instituto Tecnológico Superior de Valladolid
+                y diversas instituciones públicas, privadas y del sector productivo.
+              </p>
+
+              <p className="text-gray-700 mb-5 text-lg font-medium leading-relaxed text-justify">
+                A través de estos acuerdos se promueven prácticas profesionales,
+                servicio social, movilidad académica, investigación conjunta y
+                desarrollo de proyectos estratégicos.
+              </p>
+
+              <p className="text-gray-700 text-lg font-medium leading-relaxed text-justify">
+                Esta plataforma facilita la solicitud, seguimiento y consulta de
+                convenios, fortaleciendo la vinculación institucional y el desarrollo
+                profesional de nuestra comunidad.
+              </p>
+            </motion.div>
+
+            {/* IMAGEN */}
+            <motion.div
+              initial={{ opacity: 0, x: 40 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              transition={{ duration: 2, ease: "easeOut", delay: 0.1 }}
+              viewport={{ once: true }}
+              className="flex justify-center"
+            >
+              <img
+                src="/Convenios/convenio2.webp"
+                alt="Convenios institucionales"
+                className="rounded-xl shadow-lg max-w-full h-auto"
+              />
+            </motion.div>
+
           </div>
-
         </div>
       </section>
 
-      <section className="bg-gray-50 py-20">
-        <div className="max-w-4xl mx-auto px-4 text-center">
-          <h2 className="text-3xl font-bold mb-4 text-blue-700">Bolsa de trabajo</h2>
-          <p className="text-gray-700 mb-8">
-            Postulaciones.
-          </p>
+      <section id="bolsa-trabajo" className="bg-gray-50 py-20">
+        <div className="max-w-7xl mx-auto px-4">
+          <div className="grid md:grid-cols-2 gap-12 items-center">
+
+            {/* IMAGEN */}
+            <motion.div
+              initial={{ opacity: 0, x: -40 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              transition={{ duration: 1.8, ease: "easeOut" }}
+              viewport={{ once: true }}
+              className="flex justify-center"
+            >
+              <img
+                src="/Dashboard/BolsaTrabajo.webp"
+                alt="Bolsa de Trabajo"
+                className="rounded-xl shadow-lg max-w-full h-auto"
+              />
+            </motion.div>
+
+            {/* TEXTO */}
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 1, ease: "easeOut" }}
+              viewport={{ once: true }}
+              className="font-sans"
+            >
+              <h2 className="text-3xl md:text-4xl font-semibold mb-6 text-blue-700">
+                Bolsa de Trabajo Institucional
+              </h2>
+
+              <p className="text-gray-700 mb-5 text-lg font-medium leading-relaxed text-justify">
+                La Bolsa de Trabajo institucional es una plataforma diseñada para
+                fortalecer la vinculación entre el sector productivo y la comunidad
+                estudiantil y egresada del Instituto Tecnológico Superior de Valladolid.
+              </p>
+
+              <p className="text-gray-700 mb-5 text-lg font-medium leading-relaxed text-justify">
+                A través de este sistema, las empresas pueden publicar vacantes
+                laborales y perfiles profesionales, mientras que los estudiantes y
+                egresados tienen la oportunidad de postularse de manera directa,
+                segura y organizada.
+              </p>
+
+              <p className="text-gray-700 text-lg font-medium leading-relaxed text-justify">
+                La plataforma permite dar seguimiento a las postulaciones, facilitando
+                procesos de selección eficientes y contribuyendo al desarrollo
+                profesional y la inserción laboral de nuestra comunidad académica.
+              </p>
+            </motion.div>
+
+          </div>
         </div>
       </section>
 
-      <section className="bg-white py-20">
+      <section id="nosotros" className="bg-white py-20">
         <div className="max-w-4xl mx-auto px-4 text-center">
-          <h2 className="text-3xl font-bold mb-4 text-blue-700">Nosotros</h2>
-          <p className="text-gray-700 mb-8">
-            Somos un área dedicada a la gestion de convenios y oportunidades laborales.
-          </p>
+
+          {/* TEXTO */}
+          <motion.div
+            initial={{ opacity: 0, y: 25 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 1, ease: "easeOut" }}
+            viewport={{ once: true }}
+            className="font-sans"
+          >
+            <h2 className="text-3xl md:text-4xl font-semibold mb-6 text-blue-700">
+              Nosotros
+            </h2>
+
+            <p className="text-gray-700 text-lg md:text-xl font-medium leading-relaxed text-center">
+              Somos un área institucional dedicada a la gestión de convenios,
+              vinculación académica y oportunidades laborales, con el objetivo de
+              fortalecer la relación entre el Instituto Tecnológico Superior de
+              Valladolid y los sectores público, privado y social.
+            </p>
+          </motion.div>
+
+          {/* IMAGEN */}
+          <motion.div
+            initial={{ opacity: 0, y: 40 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 1.6, ease: "easeOut", delay: 0.2 }}
+            viewport={{ once: true }}
+            className="flex justify-center mt-12"
+          >
+            <img
+              src="/Convenios/convenio1.webp"
+              alt="Área de vinculación institucional"
+              className="rounded-xl shadow-lg max-w-md w-full h-auto"
+            />
+          </motion.div>
+
         </div>
       </section>
 

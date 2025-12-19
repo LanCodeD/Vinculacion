@@ -35,7 +35,7 @@ export default function GraficaPostulantesPorOferta() {
         );
 
         if (!resp.ok) {
-          console.error("❌ Error API:", resp.status, resp.statusText);
+          console.error("Error API:", resp.status, resp.statusText);
           return;
         }
 
@@ -48,10 +48,10 @@ export default function GraficaPostulantesPorOferta() {
             b.postulantes - a.postulantes
         );
 
-        // 🔟 Limitar a top 10 ofertas
+        // Limitar a top 10 ofertas
         setData(ordenado.slice(0, 10));
       } catch (e) {
-        console.error("❌ Error cargando datos:", e);
+        console.error("Error cargando datos:", e);
       } finally {
         setLoading(false);
       }
@@ -127,7 +127,7 @@ export default function GraficaPostulantesPorOferta() {
               />
               <Legend />
 
-              {/* 🔵 Postulantes */}
+              {/* Postulantes */}
               <Bar
                 name="Postulantes"
                 dataKey="postulantes"
@@ -135,7 +135,7 @@ export default function GraficaPostulantesPorOferta() {
                 radius={[8, 8, 0, 0]}
               />
 
-              {/* 🟢 Aceptados */}
+              {/* Aceptados */}
               <Bar
                 name="Aceptados"
                 dataKey="aceptados"
@@ -143,7 +143,7 @@ export default function GraficaPostulantesPorOferta() {
                 radius={[8, 8, 0, 0]}
               />
 
-              {/* 🔴 Rechazados */}
+              {/* Rechazados */}
               <Bar
                 name="Rechazados"
                 dataKey="rechazados"

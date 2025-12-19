@@ -82,7 +82,7 @@ export async function POST(req: NextRequest) {
     });
 
   } catch (error) {
-    console.error("❌ ERROR EN SERVIDOR:", error);
+    console.error("ERROR EN SERVIDOR:", error);
     return Response.json({ error: "Error en el servidor" }, { status: 500 });
   }
 }

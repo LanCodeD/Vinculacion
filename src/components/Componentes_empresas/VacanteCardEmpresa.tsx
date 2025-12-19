@@ -14,7 +14,7 @@ interface VacanteCardProps {
   estado?: number;
   showActions?: boolean;
   onDelete?: (id: number) => void;
-  onUpdate?: (id: number, nuevoEstado: number) => void; // 👈 Nuevo prop
+  onUpdate?: (id: number, nuevoEstado: number) => void;
 }
 
 const estadoEstilos: Record<number, string> = {
@@ -52,14 +52,14 @@ const VacanteCard: React.FC<VacanteCardProps> = ({
       const data = await res.json();
 
       if (data.ok) {
-        toast.success("Vacante reabierta correctamente ✅");
-        onUpdate?.(id, 3); // 🔁 Actualiza estado visual
+        toast.success("Vacante reabierta correctamente");
+        onUpdate?.(id, 3); // Actualiza estado visual
       } else {
-        toast.error(data.error || "Error al reabrir la vacante ❌");
+        toast.error(data.error || "Error al reabrir la vacante");
       }
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
-      toast.error("Error de conexión al reabrir ❌");
+      toast.error("Error de conexión al reabrir");
     }
   };
 

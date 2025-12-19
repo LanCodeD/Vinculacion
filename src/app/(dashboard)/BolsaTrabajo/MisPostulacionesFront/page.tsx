@@ -40,7 +40,7 @@ export default function MisPostulaciones() {
       case 4:
         return { texto: "Finalizado", color: "text-red-500" };
       default:
-        return { texto: "", color: "text-gray-400" }; // No mostrar para otros estados
+        return { texto: "", color: "text-gray-400" }; 
     }
   };
 
@@ -58,7 +58,7 @@ export default function MisPostulaciones() {
         toast.error(data.error || "No se pudo eliminar la postulación");
         return;
       }
-      // Actualizar la lista en el front
+      
       setPostulaciones((prev) => prev.filter((p) => p.id_postulaciones !== id));
       toast.success("Postulación eliminada");
     } catch (error: unknown) {
@@ -132,7 +132,7 @@ export default function MisPostulaciones() {
             <div className="flex flex-col items-center justify-center gap-2 ml-4">
               {/* Ver detalles */}
               <div className="flex flex-col items-center justify-center gap-2 ml-4">
-                {/* Ver detalles (icono de ojo) */}
+                {/* Ver detalles */}
                 <button
                   onClick={() => {
                     setSelectedOferta(p);
@@ -163,7 +163,7 @@ export default function MisPostulaciones() {
                   </svg>
                 </button>
 
-                {/* Darse de baja (icono de papelera) */}
+                {/* Darse de baja */}
                 <button
                   onClick={() => {
                     toast((t) => (
@@ -177,8 +177,8 @@ export default function MisPostulaciones() {
                         <div className="flex gap-2 mt-2">
                           <button
                             onClick={async () => {
-                              toast.dismiss(t.id); // cierra el toast
-                              await handleEliminar(p.id_postulaciones); // llama a tu función
+                              toast.dismiss(t.id); 
+                              await handleEliminar(p.id_postulaciones); 
                             }}
                             className="bg-red-600 hover:bg-red-700 text-white text-xs px-3 py-1 rounded-md"
                           >
@@ -251,7 +251,7 @@ export default function MisPostulaciones() {
                 {formatearFecha(selectedOferta.creado_en, true)}
               </p>
 
-              {/* Descripción segura con "Leer más" */}
+              {/* Descripción */}
               {selectedOferta.oferta.descripcion_general ? (
                 <>
                   <p className="mt-3 text-gray-800">

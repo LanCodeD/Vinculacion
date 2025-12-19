@@ -130,7 +130,7 @@ export const ADMIN_MENUS = [
     icon: <FaGears />,
     key: "settings",
     subMenu: [
-      { title: "Perfil", path: "/Registro" },
+      { title: "Perfil", path: "/BolsaTrabajo/MenuPrincipal/ConfiPerfil"},
       { title: "Tema", path: "/MenuPrincipal/ConfiTema" },
       { title: "Gestión", path: "/Admin/BolsaTrabajoAD/Estadisticas" },
     ],

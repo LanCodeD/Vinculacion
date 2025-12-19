@@ -108,7 +108,7 @@ export async function GET(
     });
 
   } catch (error) {
-    console.error("❌ Error en GET /api/...:", error);
+    console.error("Error en GET /api/...:", error);
     return NextResponse.json({ error: "Error al obtener postulaciones" }, { status: 500 });
   }
 }

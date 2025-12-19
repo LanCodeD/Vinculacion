@@ -43,21 +43,17 @@ export default function VacanteDetail({
   >("descripcion");
   const [yaPostulado, setYaPostulado] = useState(false);
 
-  // Util: comprueba si una URL responde (HEAD -> fallback GET)
   async function urlExists(
     url: string,
     signal?: AbortSignal
   ): Promise<boolean> {
     try {
-      // Intentamos HEAD primero (más ligero)
       const headRes = await fetch(url, { method: "HEAD", signal });
       if (headRes.ok) return true;
 
-      // Si HEAD no responde OK (algunos servidores no permiten HEAD), intentamos GET
       const getRes = await fetch(url, { method: "GET", signal });
       return getRes.ok;
     } catch {
-      // Puede fallar por CORS o network — lo tratamos como no existente
       return false;
     }
   }
@@ -104,8 +100,6 @@ export default function VacanteDetail({
           setCvUrl(null);
           return;
         }
-
-        // Validamos que la URL realmente responde (no apunte a recurso borrado)
         const exists = await urlExists(possibleUrl, signal);
 
         if (!mounted) return;
@@ -171,7 +165,7 @@ export default function VacanteDetail({
     }
 
     if (!cvUrl) {
-      setMensaje("⚠️ Necesitas subir tu CV en tu perfil antes de postularte.");
+      setMensaje("Necesitas subir tu CV en tu perfil antes de postularte.");
       return;
     }
 
@@ -318,7 +312,7 @@ export default function VacanteDetail({
               </a>
               ) : (
               <p className="text-red-500 text-sm">
-                ⚠️ No tienes un CV cargado. Sube uno en tu{" "}
+                No tienes un CV cargado. Sube uno en tu{" "}
                 <a
                   href="/MenuPrincipal/ConfiPerfil"
                   className="text-indigo-600 underline"
