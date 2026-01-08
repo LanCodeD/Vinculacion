@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
 import { FaEye, FaSearch } from "react-icons/fa";
+import { GrDocumentPdf } from "react-icons/gr";
 dayjs.extend(utc);
 
 // 🎯 Interfaz extendida para mostrar más datos
@@ -17,6 +18,7 @@ interface SolicitudConvenio {
   tipo?: { nombre_tipo: string };
   estado?: { nombre_estado: string };
   solicitud_firmas_origen?: { firma?: { nombre: string } }[];
+  detalle?: { dependencia_nombre: string };
 
   // Relación opcional con convenio concretado
   convenio_concretado?: {
@@ -82,7 +84,8 @@ export default function HistorialSolicitudes() {
         )) ||
       s.convenio_concretado?.estado_dinamico?.toLowerCase().includes(texto) ||
       s.convenio_concretado?.vigencia?.toLowerCase().includes(texto) ||
-      s.convenio_concretado?.unidad_vigencia?.toLowerCase().includes(texto)
+      s.convenio_concretado?.unidad_vigencia?.toLowerCase().includes(texto) ||
+      s.detalle?.dependencia_nombre?.toLocaleLowerCase().includes(texto)
     );
   });
 
@@ -110,7 +113,7 @@ export default function HistorialSolicitudes() {
               setBusqueda(e.target.value);
               setPaginaActual(1);
             }}
-            placeholder="Buscar por Tipo, Firmas o Estado..."
+            placeholder="Buscar por Tipo, Firmas, Estado o Dependencia..."
             className="w-full pl-10 pr-4 py-2 rounded-lg border border-gray-300 shadow-sm focus:outline-none focus:ring-2 focus:ring-[#011848] focus:border-[#011848] text-sm"
           />
           <span className="absolute left-3 top-2.5 text-gray-400">
@@ -132,6 +135,7 @@ export default function HistorialSolicitudes() {
                 <th className="px-4 py-2 text-left">Tipo de Solicitud</th>
                 <th className="px-4 py-2 text-left">Firmas de Origen</th>
                 <th className="px-4 py-2 text-left">Documento</th>
+                <th className="px-4 py-2 text-left">Dependencia</th>
                 <th className="px-4 py-2 text-left">Fecha Firmada</th>
                 <th className="px-4 py-2 text-left">Vigencia</th>
                 <th className="px-4 py-2 text-left">Unidad Vigencia</th>
@@ -160,19 +164,24 @@ export default function HistorialSolicitudes() {
                           .join(", ")
                       : "Sin firmas"}
                   </td>
+                  <td className="px-4 py-2 ">
+                    <div className="flex items-center justify-center gap-3 h-full">
+                      {s.convenio_concretado?.documento_ruta ? (
+                        <a
+                          href={s.convenio_concretado.documento_ruta}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-red-600 underline items-center justify-center"
+                        >
+                          <GrDocumentPdf size={24} />
+                        </a>
+                      ) : (
+                        "No disponible"
+                      )}
+                    </div>
+                  </td>
                   <td className="px-4 py-2">
-                    {s.convenio_concretado?.documento_ruta ? (
-                      <a
-                        href={s.convenio_concretado.documento_ruta}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-blue-600 underline"
-                      >
-                        Ver documento
-                      </a>
-                    ) : (
-                      "No disponible"
-                    )}
+                    {s.detalle?.dependencia_nombre ?? "Pendiente"}
                   </td>
                   <td className="px-4 py-2">
                     {s.convenio_concretado?.fecha_firmada

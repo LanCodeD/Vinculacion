@@ -72,7 +72,7 @@ export default function PasoDatosBasicos({
     }
 
     if (registro.tipoCuentaId === 1 && !regexInstitucional.test(form.correo)) {
-      toast.error("El correo debe pertenecer al dominio institucional Docente");
+      toast.error("El correo debe pertenecer al dominio institucional Docente / Administrativo");
       return;
     }
 

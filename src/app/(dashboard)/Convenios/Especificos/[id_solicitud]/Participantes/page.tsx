@@ -33,6 +33,23 @@ export default function PasoParticipantes() {
   ]);
   const [guardando, setGuardando] = useState(false);
   const [cargando, setCargando] = useState(true);
+  const [programasEducativos, setProgramasEducativos] = useState<
+    { id_academias: number; ingenieria: string }[]
+  >([]);
+
+  useEffect(() => {
+    const cargarProgramas = async () => {
+      try {
+        const { data } = await axios.get("/api/Ingenierias");
+        if (data.ok && data.ingenierias?.length) {
+          setProgramasEducativos(data.ingenierias);
+        }
+      } catch (error) {
+        console.error("❌ Error al cargar programas educativos:", error);
+      }
+    };
+    cargarProgramas();
+  }, []);
 
   // 🔹 Cargar datos existentes desde el backend
   useEffect(() => {
@@ -149,10 +166,9 @@ export default function PasoParticipantes() {
     }
   };
 
-    if (cargando) {
-      return <LoaderIndicador mensaje="Cargando datos de Participantes..." />;
-    }
-  
+  if (cargando) {
+    return <LoaderIndicador mensaje="Cargando datos de Participantes..." />;
+  }
 
   const bloqueadoPaso =
     bloqueado || estadoPaso === "EN REVISION" || estadoPaso === "APROBADO";
@@ -218,8 +234,7 @@ export default function PasoParticipantes() {
                   />
                 </td>
                 <td className="p-2">
-                  <input
-                    type="text"
+                  <select
                     className="w-full border rounded p-1"
                     value={docente.programa_educativo}
                     onChange={(e) =>
@@ -232,7 +247,15 @@ export default function PasoParticipantes() {
                       )
                     }
                     disabled={bloqueadoPaso}
-                  />
+                  >
+                    {" "}
+                    <option value="">Selecciona...</option>{" "}
+                    {programasEducativos.map((prog) => (
+                      <option key={prog.id_academias} value={prog.ingenieria}>
+                        {prog.ingenieria}
+                      </option>
+                    ))}
+                  </select>
                 </td>
                 <td className="p-2">
                   <input
@@ -318,6 +341,7 @@ export default function PasoParticipantes() {
                   <input
                     type="text"
                     className="w-full border rounded p-1"
+                    placeholder="Masculino / Feminino"
                     value={est.genero}
                     onChange={(e) =>
                       setEstudiantes(
@@ -330,8 +354,7 @@ export default function PasoParticipantes() {
                   />
                 </td>
                 <td className="p-2">
-                  <input
-                    type="text"
+                  <select
                     className="w-full border rounded p-1"
                     value={est.programa_educativo}
                     onChange={(e) =>
@@ -344,7 +367,14 @@ export default function PasoParticipantes() {
                       )
                     }
                     disabled={bloqueadoPaso}
-                  />
+                  >
+                    <option value="">Selecciona...</option>
+                    {programasEducativos.map((prog) => (
+                      <option key={prog.id_academias} value={prog.ingenieria}>
+                        {prog.ingenieria}
+                      </option>
+                    ))}
+                  </select>
                 </td>
                 <td className="p-2">
                   <input
