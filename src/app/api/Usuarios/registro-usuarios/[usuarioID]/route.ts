@@ -73,7 +73,7 @@ export async function PATCH(
         return NextResponse.json(
           {
             error:
-              "El correo debe ser institucional Docente (Dominio del plantel)",
+              "El correo debe ser institucional Docente / Administrativo (Dominio del plantel)",
           },
           { status: 400 }
         );

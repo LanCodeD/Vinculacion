@@ -18,6 +18,7 @@ export async function GET() {
         creado_por_usuario_id: true,
         estado: { select: { nombre_estado: true } }, // Estado de la solicitud
         tipo: { select: { nombre_tipo: true } },
+        detalle: {select: {dependencia_nombre: true}}, // nombre de la dependencia colocada en la solicitud
         solicitud_firmas_origen: {
           select: { firma: { select: { nombre: true } } },
         },
