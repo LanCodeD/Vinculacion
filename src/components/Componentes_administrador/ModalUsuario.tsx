@@ -447,7 +447,7 @@ export default function ModalUsuario({
 
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-50">
-      <div className="bg-white w-full max-w-2xl max-h-[90vh] rounded-xl shadow-lg relative flex flex-col">
+      <div className="bg-white w-full max-w-2xl max-h-[90vh] rounded-xl shadow-lg relative flex flex-col px-6 py-4">
         {/* Botón cerrar */}
         <button
           className="absolute top-2 right-3 text-gray-500 hover:text-gray-800 text-lg"

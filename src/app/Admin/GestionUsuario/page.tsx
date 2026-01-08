@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 import axios from "axios";
 import ModalUsuario from "@/components/Componentes_administrador/ModalUsuario";
-import type { UsuarioGestion } from "@/types/GestionUsuario"; 
+import type { UsuarioGestion } from "@/types/GestionUsuario";
 
 export default function GestionUsuarioPage() {
   const [usuarios, setUsuarios] = useState<UsuarioGestion[]>([]);
@@ -68,41 +68,43 @@ export default function GestionUsuarioPage() {
   }
 
   return (
-    <main className="p-6 text-gray-900">
-      <h1 className="text-3xl font-bold mb-6">Gestión de Usuarios</h1>
+    <main className="p-6 text-gray-900 max-w-7xl mx-auto">
+      <h1 className="text-3xl font-bold mb-8 text-[#011848]">
+        Gestión de Usuarios
+      </h1>
 
-      <div className="overflow-x-auto rounded-lg border border-gray-200 shadow">
-        <table className="min-w-full border-collapse bg-white text-sm">
-          <thead className="bg-blue-50 text-blue-900">
+      <div className="overflow-x-auto rounded-xl border border-gray-200 shadow-md bg-white">
+        <table className="min-w-full border-collapse text-sm">
+          <thead className="bg-[#e6f0ff] text-[#011848]">
             <tr>
-              <th className="px-4 py-3 text-left font-semibold">ID</th>
-              <th className="px-4 py-3 text-left font-semibold">Nombre</th>
-              <th className="px-4 py-3 text-left font-semibold">Correo</th>
-              <th className="px-4 py-3 text-left font-semibold">Rol</th>
-              <th className="px-4 py-3 text-left font-semibold">
+              <th className="px-6 py-4 text-left font-semibold">ID</th>
+              <th className="px-6 py-4 text-left font-semibold">Nombre</th>
+              <th className="px-6 py-4 text-left font-semibold">Correo</th>
+              <th className="px-6 py-4 text-left font-semibold">Rol</th>
+              <th className="px-6 py-4 text-left font-semibold">
                 Tipo de Cuenta
               </th>
-              <th className="px-4 py-3 text-left font-semibold">Detalles</th>
+              <th className="px-6 py-4 text-left font-semibold">Detalles</th>
             </tr>
           </thead>
           <tbody>
             {usuarios.map((usuario) => (
               <tr
                 key={usuario.id_usuarios}
-                className="border-t hover:bg-gray-50 transition-colors"
+                className="border-t hover:bg-gray-50 transition"
               >
-                <td className="px-4 py-3">{usuario.id_usuarios}</td>
-                <td className="px-4 py-3">
+                <td className="px-6 py-4">{usuario.id_usuarios}</td>
+                <td className="px-6 py-4">
                   {usuario.nombre} {usuario.apellido}
                 </td>
-                <td className="px-4 py-3">{usuario.correo}</td>
-                <td className="px-4 py-3">{usuario.roles?.nombre ?? "—"}</td>
-                <td className="px-4 py-3">
+                <td className="px-6 py-4">{usuario.correo}</td>
+                <td className="px-6 py-4">{usuario.roles?.nombre ?? "—"}</td>
+                <td className="px-6 py-4">
                   {usuario.tipos_cuenta?.nombre ?? "—"}
                 </td>
-                <td className="px-4 py-3">
+                <td className="px-6 py-4">
                   <button
-                    className="text-blue-600 hover:underline font-medium"
+                    className="text-blue-600 hover:text-blue-800 font-medium underline"
                     onClick={() => abrirModal(usuario)}
                   >
                     Ver más
@@ -115,15 +117,14 @@ export default function GestionUsuarioPage() {
       </div>
 
       {usuarios.length === 0 && (
-        <p className="mt-6 text-gray-600">No hay usuarios registrados.</p>
+        <p className="mt-8 text-center text-gray-500">
+          No hay usuarios registrados.
+        </p>
       )}
 
       {/* 🪟 Modal externo */}
       {usuarioSeleccionado && (
-        <ModalUsuario
-          usuario={usuarioSeleccionado}
-          onClose={cerrarModal}
-        />
+        <ModalUsuario usuario={usuarioSeleccionado} onClose={cerrarModal} />
       )}
     </main>
   );
