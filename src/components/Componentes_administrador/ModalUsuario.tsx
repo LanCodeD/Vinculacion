@@ -63,17 +63,17 @@ export default function ModalUsuario({
         roles_id: formData.roles_id,
         egresado: formData.egresados_perfil
           ? {
-              verificado_en: formData.egresados_perfil.verificado_en,
-              verificado_por_usuarios_id:
-                formData.egresados_perfil.verificado_por_usuarios_id,
-            }
+            verificado_en: formData.egresados_perfil.verificado_en,
+            verificado_por_usuarios_id:
+              formData.egresados_perfil.verificado_por_usuarios_id,
+          }
           : null,
         empresas: formData.empresas_perfil
           ? {
-              verificado_en: formData.empresas_perfil.verificado_en,
-              verificado_por_usuarios_id:
-                formData.empresas_perfil.verificado_por_usuarios_id,
-            }
+            verificado_en: formData.empresas_perfil.verificado_en,
+            verificado_por_usuarios_id:
+              formData.empresas_perfil.verificado_por_usuarios_id,
+          }
           : null,
       };
 
@@ -102,8 +102,8 @@ export default function ModalUsuario({
     usuario?.foto_perfil && usuario.foto_perfil.startsWith("http")
       ? usuario.foto_perfil // Imagen externa
       : usuario?.foto_perfil
-      ? usuario.foto_perfil // Imagen servida desde /api/Usuarios/...
-      : "https://cdn.pixabay.com/photo/2016/11/21/11/17/model-1844729_640.jpg"; 
+        ? usuario.foto_perfil // Imagen servida desde /api/Usuarios/...
+        : "https://cdn.pixabay.com/photo/2016/11/21/11/17/model-1844729_640.jpg";
 
   // 🔧 Función auxiliar para renderizar perfil según tipo
   const renderPerfil = () => {
@@ -191,21 +191,21 @@ export default function ModalUsuario({
                     ...prev,
                     egresados_perfil: prev.egresados_perfil
                       ? {
-                          ...prev.egresados_perfil,
-                          verificado_por_usuarios_id: deseaVerificar
-                            ? usuarioActual?.id ?? null
-                            : null,
-                          verificado_por: deseaVerificar
-                            ? {
-                                nombre: usuarioActual?.nombre ?? "",
-                                apellido: "",
-                                correo: usuarioActual?.correo ?? "",
-                              }
-                            : null,
-                          verificado_en: deseaVerificar
-                            ? dayjs().format("YYYY-MM-DD")
-                            : null,
-                        }
+                        ...prev.egresados_perfil,
+                        verificado_por_usuarios_id: deseaVerificar
+                          ? usuarioActual?.id ?? null
+                          : null,
+                        verificado_por: deseaVerificar
+                          ? {
+                            nombre: usuarioActual?.nombre ?? "",
+                            apellido: "",
+                            correo: usuarioActual?.correo ?? "",
+                          }
+                          : null,
+                        verificado_en: deseaVerificar
+                          ? dayjs().format("YYYY-MM-DD")
+                          : null,
+                      }
                       : null,
                   }));
                 }}
@@ -385,21 +385,21 @@ export default function ModalUsuario({
                     ...prev,
                     empresas_perfil: prev.empresas_perfil
                       ? {
-                          ...prev.empresas_perfil,
-                          verificado_por_usuarios_id: deseaVerificar
-                            ? usuarioActual?.id ?? null
-                            : null,
-                          verificado_por: deseaVerificar
-                            ? {
-                                nombre: usuarioActual?.nombre ?? "",
-                                apellido: "",
-                                correo: usuarioActual?.correo ?? "",
-                              }
-                            : null,
-                          verificado_en: deseaVerificar
-                            ? dayjs().format("YYYY-MM-DD")
-                            : null,
-                        }
+                        ...prev.empresas_perfil,
+                        verificado_por_usuarios_id: deseaVerificar
+                          ? usuarioActual?.id ?? null
+                          : null,
+                        verificado_por: deseaVerificar
+                          ? {
+                            nombre: usuarioActual?.nombre ?? "",
+                            apellido: "",
+                            correo: usuarioActual?.correo ?? "",
+                          }
+                          : null,
+                        verificado_en: deseaVerificar
+                          ? dayjs().format("YYYY-MM-DD")
+                          : null,
+                      }
                       : null,
                   }));
                 }}
@@ -447,7 +447,7 @@ export default function ModalUsuario({
 
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-50">
-      <div className="bg-white w-full max-w-2xl rounded-xl shadow-lg p-6 relative">
+      <div className="bg-white w-full max-w-2xl max-h-[90vh] rounded-xl shadow-lg relative flex flex-col">
         {/* Botón cerrar */}
         <button
           className="absolute top-2 right-3 text-gray-500 hover:text-gray-800 text-lg"
